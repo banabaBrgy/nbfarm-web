@@ -1,0 +1,182 @@
+/* ===========================
+   MANAGER DASHBOARD
+=========================== */
+
+body{
+    background:#f5f7fb;
+}
+
+.dashboard-title{
+    font-size:2.2rem;
+    font-weight:700;
+    color:#1f2937;
+}
+
+.dashboard-subtitle{
+    color:#6b7280;
+    margin-bottom:30px;
+}
+
+/* ===========================
+   SUMMARY CARDS
+=========================== */
+
+.summary-card{
+    background:#fff;
+    border:none;
+    border-radius:22px;
+    padding:25px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    transition:.25s;
+    height:170px;
+}
+
+.summary-card:hover{
+    transform:translateY(-4px);
+}
+
+.summary-card .icon-box{
+    width:82px;
+    height:82px;
+    border-radius:22px;
+    background:#2e7d32;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.summary-card .icon-box i{
+    color:#fff;
+    font-size:35px;
+}
+
+.summary-card small{
+    color:#8b8b8b;
+    font-weight:600;
+    display:block;
+}
+
+.summary-card h2{
+    font-size:48px;
+    font-weight:700;
+    color:#2e7d32;
+    margin:5px 0;
+}
+
+.summary-card p{
+    color:#8b8b8b;
+    margin:0;
+}
+
+/* ===========================
+   BIG CARDS
+=========================== */
+
+.dashboard-card{
+    background:#fff;
+    border:none;
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    margin-top:30px;
+}
+
+.dashboard-card h3{
+    color:#2e7d32;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+/* ===========================
+   INVENTORY SUMMARY
+=========================== */
+
+.inventory-item{
+    margin-bottom:22px;
+}
+
+.inventory-item h6{
+    font-weight:600;
+    color:#333;
+    margin-bottom:8px;
+}
+
+.progress{
+    height:10px;
+    border-radius:20px;
+    background:#ececec;
+}
+
+.progress-bar{
+    background:#2e7d32;
+    border-radius:20px;
+}
+
+/* ===========================
+   ACTIVITY LIST
+=========================== */
+
+.activity-item{
+    display:flex;
+    align-items:center;
+    margin-bottom:18px;
+    border-bottom:1px solid #f0f0f0;
+    padding-bottom:15px;
+}
+
+.activity-icon{
+    width:45px;
+    height:45px;
+    background:#e8f5e9;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-right:15px;
+}
+
+.activity-icon i{
+    color:#2e7d32;
+}
+
+.activity-title{
+    font-weight:600;
+    color:#333;
+}
+
+.activity-time{
+    color:#9ca3af;
+    font-size:13px;
+}
+
+/* ===========================
+   CHART
+=========================== */
+
+.chart-container{
+    height:360px;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:992px){
+
+    .summary-card{
+        margin-bottom:20px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .dashboard-title{
+        font-size:1.8rem;
+    }
+
+    .summary-card h2{
+        font-size:36px;
+    }
+
+}

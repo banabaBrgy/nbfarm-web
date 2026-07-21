@@ -1,0 +1,504 @@
+/* ===================================================
+   REVENUE PAGE
+=================================================== */
+
+.revenue-page{
+    padding:30px;
+    background:#f8fafc;
+    min-height:100vh;
+}
+
+.page-title{
+    font-size:30px;
+    font-weight:700;
+    color:#1f2937;
+    margin-bottom:25px;
+}
+
+/* ===================================================
+   SUMMARY CARDS
+=================================================== */
+
+.summary-card{
+    background:#fff;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 10px 25px rgba(0,0,0,.05);
+    transition:.3s;
+    height:100%;
+}
+
+.summary-card:hover{
+    transform:translateY(-5px);
+}
+
+.summary-label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:1px;
+    color:#6b7280;
+    text-transform:uppercase;
+}
+
+.summary-card h2{
+    margin:15px 0 5px;
+    font-size:34px;
+    color:#2E7D32;
+    font-weight:700;
+}
+
+.summary-card small{
+    color:#9ca3af;
+}
+
+.summary-card.warning h2{
+    color:#f59e0b;
+}
+/* ===================================================
+   REVENUE MAIN CARDS
+=================================================== */
+
+.revenue-card{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.05);
+
+    height:100%;
+
+}
+
+/* ===================================================
+   CARD TITLES
+=================================================== */
+
+.card-title{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+    margin-bottom:20px;
+
+}
+
+.form-title{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+}
+
+/* ===================================================
+   CHART
+=================================================== */
+
+#revenueChart{
+
+    width:100%;
+
+    min-height:300px;
+
+}
+
+/* ===================================================
+   FORM
+=================================================== */
+
+.revenue-card .form-label{
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#4b5563;
+
+    margin-bottom:6px;
+
+}
+
+.revenue-card .form-control,
+
+.revenue-card .form-select{
+
+    height:48px;
+
+    border-radius:12px;
+
+    border:1px solid #d1d5db;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+.revenue-card .form-control:focus,
+
+.revenue-card .form-select:focus{
+
+    border-color:#2E7D32;
+
+    box-shadow:0 0 0 .15rem rgba(46,125,50,.18);
+
+}
+
+/* ===================================================
+   TOTAL BOX
+=================================================== */
+
+.total-box{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#f8fafc;
+
+    border:1px dashed #2E7D32;
+
+    border-radius:14px;
+
+    padding:18px;
+
+    margin-top:18px;
+
+}
+
+.total-box span{
+
+    font-size:15px;
+
+    color:#6b7280;
+
+}
+
+.total-box strong{
+
+    font-size:28px;
+
+    color:#2E7D32;
+
+    font-weight:700;
+
+}
+
+/* ===================================================
+   SAVE BUTTON
+=================================================== */
+
+.btn-save{
+
+    width:100%;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#2E7D32;
+
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.btn-save:hover{
+
+    background:#256728;
+
+    transform:translateY(-2px);
+
+}
+/* ==========================================
+   TRANSACTIONS CARD
+========================================== */
+
+.transactions-card{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 10px 25px rgba(0,0,0,.05);
+    margin-top:30px;
+}
+
+.transactions-header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    gap:20px;
+}
+
+.transactions-title{
+    font-size:22px;
+    font-weight:700;
+    color:#1f2937;
+}
+
+.transactions-controls{
+    display:flex;
+    gap:12px;
+}
+
+.search-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#f3f4f6;
+    border-radius:12px;
+    padding:0 15px;
+    height:46px;
+}
+
+.search-bar input{
+    border:none;
+    background:transparent;
+    outline:none;
+    width:230px;
+}
+
+.sort-select{
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    height:46px;
+    padding:0 15px;
+}
+/* ==========================================
+   TRANSACTIONS TABLE
+========================================== */
+
+.transactions-table-wrap{
+    overflow-x:auto;
+}
+
+.transactions-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.transactions-table thead th{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:#6b7280;
+    padding:15px 12px;
+    border-bottom:2px solid #f1f5f9;
+    font-weight:700;
+}
+
+.transactions-table tbody td{
+    padding:18px 12px;
+    border-bottom:1px solid #eef2f7;
+    color:#374151;
+    vertical-align:middle;
+}
+
+.transactions-table tbody tr{
+    transition:.25s;
+}
+
+.transactions-table tbody tr:hover{
+    background:#f8fafc;
+}
+
+.tx-customer{
+    font-weight:600;
+    color:#111827;
+}
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.status-pill{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.status-paid{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.status-pending{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.status-partial{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+/* ==========================================
+   EMPTY TABLE
+========================================== */
+
+.transactions-empty{
+    text-align:center;
+    color:#9ca3af;
+    padding:30px;
+    font-style:italic;
+}
+
+/* ==========================================
+   PAGINATION
+========================================== */
+
+.transactions-pagination{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:20px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.pagination-info{
+    color:#6b7280;
+    font-size:14px;
+}
+
+.pagination-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.page-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 16px;
+    border-radius:10px;
+    background:#2E7D32;
+    color:#fff;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    transition:.25s;
+}
+
+.page-btn:hover{
+    background:#256728;
+    color:#fff;
+}
+
+.page-btn.disabled{
+    background:#d1d5db;
+    color:#6b7280;
+    pointer-events:none;
+}
+
+.page-current{
+    font-size:14px;
+    color:#6b7280;
+    font-weight:600;
+}
+/* ==========================================
+   REVENUE CHART
+========================================== */
+
+.chart-wrapper{
+    position:relative;
+    width:100%;
+    height:340px;
+}
+
+.chart-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.chart-title{
+    font-size:22px;
+    font-weight:700;
+    color:#1f2937;
+}
+
+.chart-subtitle{
+    font-size:14px;
+    color:#6b7280;
+}
+
+.chart-filter{
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    padding:8px 14px;
+    background:#fff;
+    color:#374151;
+}
+
+#revenueChart{
+    width:100% !important;
+    height:300px !important;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:992px){
+
+    .transactions-header-row{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .transactions-controls{
+        width:100%;
+        flex-direction:column;
+    }
+
+    .search-bar{
+        width:100%;
+    }
+
+    .search-bar input{
+        width:100%;
+    }
+
+    .sort-select{
+        width:100%;
+    }
+
+    .transactions-pagination{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+.chart-card{
+    min-height:430px;
+}
+
+.chart-wrapper{
+    position:relative;
+    width:100%;
+    height:330px;
+    margin-top:10px;
+}

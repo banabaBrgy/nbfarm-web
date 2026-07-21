@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+            'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#f5f6fa;
+}
+
+/* LEFT PANEL */
+
+.left-panel{
+    background:linear-gradient(135deg,#2E7D32,#43A047);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.logo-icon{
+    font-size:90px;
+    color:#fff;
+}
+
+.left-panel h1{
+    font-size:48px;
+    font-weight:700;
+}
+
+.left-panel h4{
+    font-weight:400;
+}
+
+.left-panel p{
+    font-size:18px;
+    opacity:.9;
+}
+
+/* RIGHT PANEL */
+
+.right-panel{
+    background:#f4f6f9;
+}
+
+.login-card{
+    width:430px;
+    background:#fff;
+    padding:50px;
+    border-radius:20px;
+    box-shadow:0 10px 35px rgba(0,0,0,.1);
+}
+
+.user-icon{
+    font-size:70px;
+    color:#2E7D32;
+}
+
+.form-control{
+    height:50px;
+    border-radius:12px;
+}
+
+.form-control:focus{
+    border-color:#2E7D32;
+    box-shadow:0 0 0 .2rem rgba(46,125,50,.2);
+}
+
+.btn-success{
+    background:#2E7D32;
+    border:none;
+    height:50px;
+    border-radius:12px;
+    font-weight:600;
+}
+
+.btn-success:hover{
+    background:#1B5E20;
+}
+
+@media(max-width:991px){
+
+    .login-card{
+        width:90%;
+        padding:35px;
+    }
+
+}

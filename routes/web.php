@@ -1,0 +1,219 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\ProductionDetailsController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\RevenueController;
+use App\Http\Controllers\BatchController;
+use App\Http\Controllers\QrScannerController;
+use App\Http\Controllers\QrRecordController;
+use App\Http\Controllers\QrTransactionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ManagerDashboardController;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return redirect('/login');
+});
+
+// Login
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+
+Route::get('/owner/users', [UserController::class, 'index'])
+    ->name('owner.users');
+
+// Forgot Password
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])
+    ->name('forgot.password');
+
+Route::post('/forgot-password/check', [ForgotPasswordController::class, 'checkUsername'])
+    ->name('forgot.check');
+
+Route::post('/forgot-password/verify', [ForgotPasswordController::class, 'verifyAnswer'])
+    ->name('forgot.verify');
+
+Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])
+    ->name('forgot.reset');
+
+Route::view('/terms', 'terms')->name('terms');
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| MANAGER ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::prefix('manager')
+    ->middleware(['auth'])
+    ->name('manager.')
+    ->group(function () {
+
+        Route::get('/dashboard', [ManagerDashboardController::class, 'index'])
+            ->name('dashboard');
+
+    // Production
+    Route::get('/production', [ProductionController::class, 'index'])->name('production');
+
+    Route::get('/production/{id}/details', [ProductionDetailsController::class, 'index'])
+        ->name('production.details');
+
+    Route::get('/production/batch/{batch}', [BatchController::class, 'show'])
+        ->name('batch.details');
+
+    // Inventory
+     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
+Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
+Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
+Route::delete('/inventory/delete/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
+        
+    // QR Scanner
+    Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
+        ->name('production.scan');
+
+    Route::post('/scan/store', [QrScannerController::class, 'store'])
+        ->name('scan.store');
+
+    // QR Records
+    Route::post('/qr/generate', [QrRecordController::class, 'generate'])
+        ->name('qr.generate');
+
+    Route::get('/qr/list', [QrRecordController::class, 'index'])
+        ->name('qr.list');
+
+    Route::get('/qr/print', [QrRecordController::class, 'print'])
+        ->name('qr.print');
+
+    // QR Transactions
+    Route::post('/qr-transactions/store', [QrTransactionController::class, 'store'])
+        ->name('qr.transaction.store');
+
+    Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
+        ->name('qr.update');
+
+        Route::view('/reports', 'manager.reports')
+            ->name('reports');
+Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
+    Route::post('/dispatch/store', [DispatchController::class, 'store'])->name('dispatch.store');
+    Route::patch('/dispatch/{dispatch}/status', [DispatchController::class, 'updateStatus'])->name('dispatch.updateStatus');
+    Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])->name('dispatch.update');
+    Route::delete('/dispatch/{dispatch}', [DispatchController::class, 'destroy'])
+    ->name('dispatch.destroy');
+    });
+/*
+|--------------------------------------------------------------------------
+| OWNER ROUTES
+|--------------------------------------------------------------------------
+*/
+
+      Route::middleware('auth')->prefix('owner')->name('owner.')->group(function () {
+    Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/production', [ProductionController::class, 'index'])->name('production');
+    Route::get('/production/{id}/details', [ProductionDetailsController::class, 'index'])->name('production.details');
+    Route::get('/production/batch/{batch}', [BatchController::class, 'show'])->name('batch.details');
+    Route::get('/production/scan-qr', [QrScannerController::class, 'index'])->name('production.scan');
+
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
+    Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
+    Route::delete('/inventory/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
+    Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
+   
+    Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
+    Route::post('/dispatch/store', [DispatchController::class, 'store'])->name('dispatch.store');
+    Route::patch('/dispatch/{dispatch}/status', [DispatchController::class, 'updateStatus'])->name('dispatch.updateStatus');
+    Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])->name('dispatch.update');
+    Route::delete('/dispatch/{dispatch}', [DispatchController::class, 'destroy'])
+    ->name('dispatch.destroy');
+
+    Route::view('/forecast', 'forecast')->name('forecast');
+    Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
+
+        Route::get('/revenue', [RevenueController::class, 'index'])->name('revenue');
+        Route::post('/revenue', [RevenueController::class, 'store'])->name('revenue.store');
+Route::get('/revenue/search', [RevenueController::class, 'search'])->name('revenue.search');
+
+});
+/*
+|--------------------------------------------------------------------------
+| STAFF ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->prefix('staff')->name('staff.')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    // Production
+    Route::get('/production', [ProductionController::class, 'index'])->name('production');
+
+    Route::get('/production/{id}/details', [ProductionDetailsController::class, 'index'])
+        ->name('production.details');
+
+    Route::get('/production/batch/{batch}', [BatchController::class, 'show'])
+        ->name('batch.details');
+
+    // Inventory
+     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
+Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
+Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
+Route::delete('/inventory/delete/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
+        
+    // QR Scanner
+    Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
+        ->name('production.scan');
+
+    Route::post('/scan/store', [QrScannerController::class, 'store'])
+        ->name('scan.store');
+
+    // QR Records
+    Route::post('/qr/generate', [QrRecordController::class, 'generate'])
+        ->name('qr.generate');
+
+    Route::get('/qr/list', [QrRecordController::class, 'index'])
+        ->name('qr.list');
+
+    Route::get('/qr/print', [QrRecordController::class, 'print'])
+        ->name('qr.print');
+
+    // QR Transactions
+    Route::post('/qr-transactions/store', [QrTransactionController::class, 'store'])
+        ->name('qr.transaction.store');
+
+    Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
+        ->name('qr.update');
+
+    Route::prefix('owner')->name('owner.')->group(function () {
+
+        Route::get('/users', [UserController::class, 'index'])
+            ->name('users');
+
+        Route::post('/users', [UserController::class, 'store'])
+            ->name('users.store');
+
+        Route::put('/users/{user}', [UserController::class, 'update'])
+            ->name('users.update');
+
+        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+            ->name('users.toggleStatus');
+
+});
+    });

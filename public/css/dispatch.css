@@ -1,0 +1,442 @@
+/* ===========================
+   DISPATCH PAGE HEADER
+=========================== */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.25);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #256628;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+}
+
+/* ===========================
+   STAT CARDS (Dispatch monitoring)
+=========================== */
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 6px 0 2px;
+    color: #2e7d32;
+}
+
+.stat-sub {
+    font-size: 12.5px;
+    color: #94a3b8;
+}
+
+@media (max-width: 992px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .stat-grid { grid-template-columns: 1fr; }
+}
+
+/* ===========================
+   FILTER BAR
+=========================== */
+
+.dispatch-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 0.1rem;
+    width: 100%;
+}
+
+.dispatch-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0;
+}
+
+.dispatch-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 0.875rem;
+    min-width: 220px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-box:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+}
+
+.sort-select {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.875rem;
+    background: #fff;
+    color: #334155;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.sort-select:hover,
+.sort-select:focus {
+    border-color: #2e7d32;
+}
+
+/* ===========================
+   TABLE
+=========================== */
+
+.table-container {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table th:nth-child(1), .table td:nth-child(1) { width: 9%; }   /* Date */
+.table th:nth-child(2), .table td:nth-child(2) { width: 14%; }  /* Recipient */
+.table th:nth-child(3), .table td:nth-child(3) { width: 14%; }  /* Address */
+.table th:nth-child(4), .table td:nth-child(4) { width: 12%; }  /* Size */
+.table th:nth-child(5), .table td:nth-child(5) { width: 12%; }  /* Qty */
+.table th:nth-child(6), .table td:nth-child(6) { width: 12%; }  /* Price */
+.table th:nth-child(7), .table td:nth-child(7) { width: 13%; }  /* Status */
+.table th:nth-child(8), .table td:nth-child(8) { width: 14%; }  /* Action */
+
+.table thead th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    padding: 13px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table tbody td {
+    padding: 13px 16px;
+    font-size: 0.875rem;
+    color: #000000;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    word-wrap: break-word;
+}
+
+.table td.action-cell {
+    overflow: visible;
+}
+/* ===========================
+   STATUS BADGES — colors matched to meaning
+=========================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.badge-warning {
+    /* Pending — awaiting action */
+    background: #fff4e0;
+    color: #b7791f;
+}
+
+.badge-info {
+    /* On Transit — in progress */
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-success {
+    /* Delivered — completed */
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* ===========================
+   ACTION BUTTONS
+=========================== */
+
+.action-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+
+    /* FIX: remove native button appearance */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 0;
+    line-height: 1;
+    outline: none;
+}
+.icon-btn-edit {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+
+.icon-btn-delete {
+    background: #fdecea;
+    color: #d32f2f;
+}
+
+
+/* ===========================
+   MODALS
+=========================== */
+
+.modal-content {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 18px 22px;
+}
+
+.modal-title {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.modal-body {
+    padding: 20px 22px;
+}
+
+.modal-footer {
+    border-top: 1px solid #f1f5f9;
+    padding: 16px 22px;
+}
+
+/* ===========================
+   PAGINATION
+=========================== */
+
+.dispatch-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-btn {
+    padding: 7px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    text-decoration: none;
+    color: #374151;
+    background: #fff;
+    font-size: 0.85rem;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.page-btn:hover {
+    background: #f3f4f6;
+    border-color: #2e7d32;
+}
+
+.page-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.page-number {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .dispatch-filters {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .search-box {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .dispatch-pagination {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+.dispatch-summary {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 24px;
+    flex: 1;
+    min-width: 220px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.summary-card i {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 18px;
+    color: #fff;
+    background: #2E7D32; /* default green - Total Dispatch */
+}
+
+.summary-card span {
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.summary-card h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #2E7D32;
+}
+
+/* Pending - orange */
+.summary-card.pending i {
+    background: #f5a623;
+}
+
+/* On Transit - blue */
+.summary-card.transit i {
+    background: #2f6fed;
+}
+
+/* Delivered - green (check icon) */
+.summary-card.delivered i {
+    background: #27ae60;
+}
+

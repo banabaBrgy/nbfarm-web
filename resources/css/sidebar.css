@@ -1,0 +1,219 @@
+/* ===================================
+   SIDEBAR LAYOUT
+=================================== */
+
+.wrapper{
+    display:flex;
+    min-height:100vh;
+}
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+
+    width:260px;
+    height:100vh;
+
+    background:#1f2937;
+    color:#fff;
+
+    display:flex;
+    flex-direction:column;
+
+    z-index:1000;
+
+    overflow-y:auto;
+
+    box-shadow:3px 0 12px rgba(0,0,0,.15);
+}
+
+/* ===================================
+   PROFILE
+=================================== */
+
+.profile{
+
+    padding:30px 20px;
+
+    text-align:center;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.profile-image{
+
+    width:80px;
+    height:80px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:#2E7D32;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#fff;
+
+    font-size:30px;
+
+}
+
+.role{
+
+    margin-top:15px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:.5px;
+
+}
+
+/* ===================================
+   NAVIGATION
+=================================== */
+
+.sidebar nav{
+
+    flex:1;
+
+    padding:20px 0;
+
+}
+
+.sidebar ul{
+
+    margin:0;
+    padding:0;
+
+    list-style:none;
+
+}
+
+.sidebar li{
+
+    margin-bottom:6px;
+
+}
+
+.sidebar a{
+
+    display:flex;
+    align-items:center;
+
+    gap:14px;
+
+    padding:14px 25px;
+
+    color:#d8dde7;
+
+    text-decoration:none;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+.sidebar a i{
+
+    width:20px;
+
+    text-align:center;
+
+}
+
+.sidebar li.active a{
+
+    background:#2E7D32;
+
+    color:#fff;
+
+    border-left:5px solid #81C784;
+
+}
+
+.sidebar a:hover{
+
+    background:#2E7D32;
+
+    color:#fff;
+
+}
+
+/* ===================================
+   LOGOUT
+=================================== */
+
+.logout{
+
+    padding:20px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+.logout button{
+
+    width:100%;
+
+    border:none;
+
+    padding:14px;
+
+    border-radius:12px;
+
+    background:#d32f2f;
+
+    color:#fff;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.logout button:hover{
+
+    background:#b71c1c;
+
+}
+
+/* ===================================
+   MAIN CONTENT
+=================================== */
+
+.main-content{
+
+    flex:1;
+
+    margin-left:260px;
+
+    padding:30px;
+
+}
+
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media(max-width:768px){
+    .sidebar{
+        width:220px;
+    }
+
+    .main-content{
+        margin-left:220px;
+    }   
+        
+    }
+

@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+
+class Transaction extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'customer',
+        'transaction_date',
+        'quantity',
+        'price',
+        'status',
+    ];
+
+    protected $casts = [
+        'transaction_date' => 'date',
+        'price'      => 'decimal:2',
+    ];
+
+    /* ── Query Scopes ── */
+
+    public function scopeToday(Builder $query): Builder
+    {
+        return $query->whereDate('transaction_date', Carbon::today());
+    }
+
+    public function scopeThisWeek(Builder $query): Builder
+    {
+        return $query->whereBetween('transaction_date', [
+            Carbon::now()->startOfWeek(),
+            Carbon::now()->endOfWeek(),
+        ]);
+    }
+
+    public function scopeThisMonth(Builder $query): Builder
+    {
+        return $query->whereMonth('transaction_date', Carbon::now()->month)
+                      ->whereYear('transaction_date', Carbon::now()->year);
+    }
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('status', 'Pending');
+    }
+
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        if (! $term) {
+            return $query;
+        }
+
+        return $query->where('customer', 'like', "%{$term}%");
+    }
+
+    /**
+     * Last 7 days of transactions grouped by date, for the revenue chart.
+     */
+    public static function last7DaysTotals(): array
+    {
+        $start = Carbon::today()->subDays(6);
+
+        $rows = static::selectRaw('transaction_date, SUM(price) as total')
+            ->where('transaction_date', '>=', $start)
+            ->groupBy('transaction_date')
+            ->pluck('total', 'transaction_date');
+
+        $result = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $start->copy()->addDays($i);
+            $key  = $date->toDateString();
+
+            $result[] = [
+                'day'    => $date->format('D'),
+                'date'   => $key,
+                'amount' => (float) ($rows[$key] ?? 0),
+            ];
+        }
+
+        return $result;
+    }
+}
