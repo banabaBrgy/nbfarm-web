@@ -36,6 +36,10 @@
 </head>
 
 <body>
+    <button class="sidebar-toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-backdrop"></div>
 
     @php
         $role = strtolower(trim(auth()->user()->role));
@@ -132,7 +136,7 @@
     <div class="wrapper">
 
         <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="app-sidebar">
 
         <div class="profile">
             <div class="profile-image">
@@ -148,7 +152,7 @@
                 @foreach ($menuItems as $item)
                     @if (in_array($role, $item['roles']) && Route::has($item['route']))
                         <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
-                            <a href="{{ route($item['route']) }}">
+                            <a href="{{ route($item['route']) }}" title="{{ $item['label'] }}" aria-label="{{ $item['label'] }}">
                                 <i class="{{ $item['icon'] }}"></i>
                                 {{ $item['label'] }}
                             </a>
@@ -160,7 +164,7 @@
 
         <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="logout">
     @csrf
-    <button type="submit">
+    <button type="submit" aria-label="Logout" title="Logout">
         <i class="fas fa-sign-out-alt"></i>
         Logout
     </button>

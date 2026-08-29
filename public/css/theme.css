@@ -327,19 +327,19 @@ small{
 
 .bg-success{
 
-    background:var(--primary)!important;
+    background:var(--primary);
 
 }
 
 .bg-warning{
 
-    background:var(--warning)!important;
+    background:var(--warning);
 
 }
 
 .bg-danger{
 
-    background:var(--danger)!important;
+    background:var(--danger);
 
 }
 
@@ -455,7 +455,7 @@ small{
 
 .text-primary{
 
-    color:var(--primary)!important;
+    color:var(--primary);
 
 }
 
@@ -463,4 +463,140 @@ small{
 
     background:rgba(0,185,6,.12);
 
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+================================================== */
+
+@media (max-width: 992px) {
+    .page-title {
+        font-size: clamp(18px, 4vw, 24px);
+    }
+
+    .table-container,
+    .summary-card {
+        padding: 18px;
+    }
+
+    .icon-circle {
+        width: 54px;
+        height: 54px;
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: clamp(18px, 4vw, 22px);
+        margin-bottom: 18px;
+    }
+
+    .table-container,
+    .summary-card {
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .table {
+        font-size: 12px;
+    }
+
+    .table thead th {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .table tbody td {
+        padding: 10px;
+    }
+
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-body {
+        padding: 16px;
+    }
+
+    .badge {
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+
+    .btn {
+        padding: 8px 14px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 18px;
+        margin-bottom: 14px;
+    }
+
+    .table-container,
+    .summary-card {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .table {
+        font-size: 11px;
+    }
+
+    .table thead th {
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    .table tbody td {
+        padding: 8px;
+    }
+
+    .icon-circle {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+
+    .card-body {
+        padding: 12px;
+    }
+
+    .card-header {
+        padding: 10px 12px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .btn {
+        padding: 7px 12px;
+        font-size: 11px;
+        border-radius: 6px;
+    }
+
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 16px; }
+    h4 { font-size: 14px; }
+    h5 { font-size: 13px; }
+    h6 { font-size: 12px; }
+
+    body { font-size: 13px; }
 }

@@ -70,3 +70,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+// Mobile sidebar toggle
+document.addEventListener('DOMContentLoaded', () => {
+
+    const toggle = document.querySelector('.sidebar-toggle');
+    const backdrop = document.querySelector('.sidebar-backdrop');
+    const sidebarLinks = document.querySelectorAll('.sidebar nav a');
+
+    if (!toggle || !backdrop) {
+        return;
+    }
+
+    const closeSidebar = () => {
+        document.body.classList.remove('sidebar-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation');
+        toggle.innerHTML = '<i class="fas fa-bars"></i>';
+    };
+
+    toggle.addEventListener('click', () => {
+        const isOpen = document.body.classList.toggle('sidebar-open');
+
+        toggle.setAttribute('aria-expanded', String(isOpen));
+        toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+        toggle.innerHTML = isOpen
+            ? '<i class="fas fa-xmark"></i>'
+            : '<i class="fas fa-bars"></i>';
+    });
+
+    backdrop.addEventListener('click', closeSidebar);
+
+    sidebarLinks.forEach((link) => {
+        link.addEventListener('click', closeSidebar);
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeSidebar();
+        }
+    });
+
+});

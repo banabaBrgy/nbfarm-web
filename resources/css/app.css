@@ -90,11 +90,95 @@ body{
     background:#1B5E20;
 }
 
-@media(max-width:991px){
+@media(max-width:1200px) {
+    .login-card {
+        width: 90%;
+        max-width: 430px;
+        padding: 40px;
+    }
+}
+
+@media(max-width:992px){
 
     .login-card{
         width:90%;
         padding:35px;
+    }
+
+    .user-icon{
+        font-size: 60px;
+    }
+
+    .form-control{
+        height: 45px;
+        font-size: 13px;
+    }
+
+    .btn-success {
+        height: 45px;
+        font-size: 14px;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .left-panel{
+        min-height: auto;
+        padding: 20px;
+        display: none;
+    }
+
+    .right-panel{
+        min-height: 100vh;
+    }
+
+    .login-card{
+        width: 95%;
+        max-width: 100%;
+        padding: 28px;
+        border-radius: 16px;
+    }
+
+    .user-icon{
+        font-size: 50px;
+        margin-bottom: 12px;
+    }
+
+    .form-control{
+        height: 42px;
+        font-size: 13px;
+    }
+
+    .btn-success {
+        height: 42px;
+        font-size: 13px;
+    }
+
+}
+
+@media(max-width:480px){
+
+    .login-card{
+        width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 0;
+    }
+
+    .user-icon{
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .form-control{
+        height: 40px;
+        font-size: 12px;
+    }
+
+    .btn-success {
+        height: 40px;
+        font-size: 12px;
     }
 
 }

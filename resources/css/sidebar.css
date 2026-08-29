@@ -11,6 +11,157 @@
 }
 
 /* ==================================================
+   RESPONSIVE APP SHELL
+================================================== */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.wrapper {
+    min-width: 0;
+}
+
+.wrapper > .sidebar {
+    position: fixed;
+    width: 250px;
+}
+
+.wrapper > .main-content {
+    min-width: 0;
+    margin-left: 250px;
+    overflow-x: hidden;
+}
+
+.wrapper > .sidebar .logout button {
+    margin-top: 0;
+}
+
+.wrapper > .main-content .table-container,
+.wrapper > .main-content .inventory-table-wrapper,
+.wrapper > .main-content .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.wrapper + .footer {
+    left: 250px;
+    margin-left: 0;
+}
+
+.sidebar-toggle,
+.sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 992px) {
+    .wrapper > .sidebar {
+        width: 220px;
+    }
+
+    .wrapper > .main-content {
+        margin-left: 220px;
+    }
+
+    .wrapper + .footer {
+        left: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrapper > .sidebar {
+        width: 250px;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1050;
+    }
+
+    body.sidebar-open .wrapper > .sidebar {
+        transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 1051;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border: 1px solid #dbe4de;
+        border-radius: 10px;
+        color: #25671e;
+        background: #ffffff;
+        box-shadow: 0 5px 16px rgba(31, 41, 55, 0.12);
+        cursor: pointer;
+        font-size: 17px;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar-toggle:hover {
+        color: #ffffff;
+        background: #25671e;
+        transform: scale(1.05);
+    }
+
+    .sidebar-toggle:active {
+        transform: scale(0.95);
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1049;
+        display: block;
+        visibility: hidden;
+        background: rgba(15, 35, 25, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    body.sidebar-open .sidebar-backdrop {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .wrapper > .main-content {
+        margin-left: 0;
+        padding: 72px 16px 20px;
+        width: 100%;
+    }
+
+    .wrapper + .footer {
+        left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .wrapper > .sidebar {
+        width: min(250px, 90vw);
+    }
+
+    .wrapper > .main-content {
+        padding: 70px 12px 16px;
+    }
+
+    .wrapper + .footer {
+        left: 0;
+        font-size: 11px;
+    }
+
+    .sidebar-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+/* ==================================================
    SIDEBAR
 ================================================== */
 
@@ -21,10 +172,10 @@
     top:0;
     left:0;
 
-    width:260px;
+    width:250px;
     height:100vh;
 
-   background:#25671E;
+    background:#25671E;
 
     color:#fff;
 
@@ -36,8 +187,8 @@
 
     z-index:1000;
 
-    box-shadow:
-        5px 0 20px rgba(0,0,0,.15);
+    border-right:1px solid rgba(255,255,255,.08);
+    box-shadow:5px 0 20px rgba(0,0,0,.15);
 
 }
 
@@ -51,7 +202,7 @@
 
 .sidebar::-webkit-scrollbar-thumb{
 
-    background:#666;
+    background:rgba(185,233,215,.35);
 
     border-radius:20px;
 
@@ -63,7 +214,7 @@
 
 .profile{
 
-    padding:30px 20px;
+    padding:26px 20px 24px;
 
     text-align:center;
 
@@ -71,31 +222,41 @@
 
 }
 
+.profile::before{
+    display:block;
+    margin-bottom:20px;
+    color:#f1fff4;
+    content:'NB POULTRY FARM';
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1.6px;
+}
+
 .profile-image{
 
-    width:82px;
-    height:82px;
+    width:76px;
+    height:76px;
 
     margin:auto;
 
     border-radius:50%;
 
-    background:#00B906;
+    background:#e5f5e8;
 
     display:flex;
 
     align-items:center;
     justify-content:center;
 
-    color:#fff;
+    color:#25671e;
 
-    font-size:30px;
+    font-size:28px;
 
     font-weight:600;
 
     box-shadow:
 
-        0 5px 15px rgba(0,185,6,.35);
+        0 8px 18px rgba(9,38,18,.18);
 
 }
 
@@ -115,11 +276,13 @@
 
 .role{
 
-    font-size:13px;
+    margin-top:14px;
+    font-size:12px;
 
-    color:#d5d5d5;
+    color:#d9ede0;
 
-    letter-spacing:.8px;
+    font-weight:600;
+    letter-spacing:1.1px;
 
     text-transform:uppercase;
 
@@ -133,8 +296,18 @@
 
     flex:1;
 
-    padding:18px 12px;
+    padding:22px 14px;
 
+}
+
+.sidebar nav::before{
+    display:block;
+    margin:0 12px 12px;
+    color:#a9ceb2;
+    content:'MAIN MENU';
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:1.4px;
 }
 
 .sidebar ul{
@@ -149,7 +322,7 @@
 
 .sidebar li{
 
-    margin-bottom:8px;
+    margin-bottom:5px;
 
 }
 
@@ -159,15 +332,17 @@
 
     align-items:center;
 
-    gap:15px;
+    gap:13px;
 
-    padding:14px 18px;
+    min-height:48px;
+    padding:12px 14px;
 
     text-decoration:none;
 
-    color:#ECECEC;
+    color:#d9e8dd;
 
-    border-radius:12px;
+    border:1px solid transparent;
+    border-radius:10px;
 
     transition:.25s ease;
 
@@ -179,11 +354,19 @@
 
 .sidebar a i{
 
-    width:22px;
+    width:32px;
+    height:32px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
 
     text-align:center;
 
-    font-size:16px;
+    color:#b8d7c0;
+    background:rgba(255,255,255,.07);
+    border-radius:9px;
+    font-size:15px;
+    transition:.2s ease;
 
 }
 
@@ -191,11 +374,12 @@
 
 .sidebar a:hover{
 
-    background:#1E5419;
+    background:rgba(255,255,255,.08);
+    border-color:rgba(255,255,255,.08);
 
     color:#fff;
 
-    transform:translateX(4px);
+    transform:translateX(3px);
 
 }
 
@@ -203,21 +387,21 @@
 
 .sidebar li.active a{
 
-    background:#00B906;
+    background:#e2f6e7;
+    border-color:#bde6c6;
 
-    color:#fff;
+    color:#1d6334;
 
     font-weight:600;
 
-    box-shadow:
-
-        0 6px 18px rgba(0,185,6,.35);
+    box-shadow:0 8px 18px rgba(8,42,18,.2);
 
 }
 
 .sidebar li.active a i{
 
-    color:#fff;
+    color:#1d6334;
+    background:#bde6c6;
 
 }
 
@@ -227,7 +411,7 @@
 
 .logout{
 
-    padding:20px;
+    padding:18px 14px 20px;
 
     border-top:1px solid rgba(255,255,255,.08);
 
@@ -239,15 +423,15 @@
 
     border:none;
 
-    border-radius:12px;
+    border-radius:10px;
 
-    padding:13px;
+    padding:11px;
 
-    background:#E53935;
+    background:#d85b52;
 
     color:#fff;
 
-    font-size:14px;
+    font-size:13px;
 
     font-weight:600;
 
@@ -259,9 +443,9 @@
 
 .logout button:hover{
 
-    background:#C62828;
+    background:#c64c44;
 
-    transform:translateY(-2px);
+    transform:translateY(-1px);
 
 }
 
@@ -273,7 +457,7 @@
 
     flex:1;
 
-    margin-left:260px;
+    margin-left:250px;
 
     min-height:100vh;
 
@@ -289,7 +473,7 @@
 
 .page-label{
 
-    font-size:28px;
+    font-size: clamp(20px, 5vw, 28px);
 
     font-weight:700;
 
@@ -297,13 +481,15 @@
 
     margin-bottom:25px;
 
+    word-break: break-word;
+
 }
 
 /* ==================================================
    RESPONSIVE
 ================================================== */
 
-@media(max-width:768px){
+@media(max-width:992px){
 
 .sidebar{
 
@@ -315,7 +501,7 @@
 
     margin-left:220px;
 
-    padding:20px;
+    padding:25px;
 
 }
 
@@ -338,7 +524,194 @@
 
     font-size:13px;
 
-    padding:12px 16px;
+    padding:11px 14px;
+
+    gap:10px;
+
+}
+
+.sidebar a i{
+
+    width:30px;
+    height:30px;
+    font-size:14px;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.sidebar{
+
+    width:250px;
+
+}
+
+.main-content{
+
+    margin-left:0;
+
+    padding:18px;
+
+}
+
+.page-label{
+
+    font-size: clamp(18px, 5vw, 24px);
+
+    margin-bottom:20px;
+
+}
+
+.profile{
+
+    padding:20px 14px;
+
+}
+
+.profile::before{
+
+    font-size:10px;
+    margin-bottom:15px;
+
+}
+
+.profile-image{
+
+    width:65px;
+    height:65px;
+
+    font-size:24px;
+
+}
+
+.role{
+
+    font-size:11px;
+    margin-top:12px;
+
+}
+
+.sidebar nav{
+
+    padding:18px 12px;
+
+}
+
+.sidebar nav::before{
+
+    font-size:9px;
+    margin:0 10px 10px;
+
+}
+
+.sidebar a{
+
+    font-size:12px;
+
+    padding:10px 12px;
+
+    gap:11px;
+
+}
+
+.sidebar a i{
+
+    width:28px;
+    height:28px;
+    font-size:13px;
+
+}
+
+.logout{
+
+    padding:15px 12px 18px;
+
+}
+
+.logout button{
+
+    font-size:12px;
+    padding:10px;
+
+}
+
+}
+
+@media(max-width:480px){
+
+.page-label{
+
+    font-size: clamp(16px, 4vw, 20px);
+
+    margin-bottom:16px;
+
+}
+
+.main-content{
+
+    padding:14px 10px;
+
+}
+
+.profile{
+
+    padding:18px 12px;
+
+}
+
+.profile::before{
+
+    font-size:9px;
+    margin-bottom:12px;
+
+}
+
+.profile-image{
+
+    width:60px;
+    height:60px;
+
+    font-size:22px;
+
+}
+
+.role{
+
+    font-size:10px;
+    margin-top:10px;
+
+}
+
+.sidebar nav{
+
+    padding:14px 10px;
+
+}
+
+.sidebar nav::before{
+
+    font-size:8px;
+    margin:0 8px 8px;
+
+}
+
+.sidebar a{
+
+    font-size:11px;
+
+    padding:9px 10px;
+
+    gap:9px;
+
+}
+
+.sidebar a i{
+
+    width:26px;
+    height:26px;
+    font-size:12px;
 
 }
 
