@@ -182,6 +182,71 @@
 
     </div>
 
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-nav-bar" style="display: none;">
+        @php
+            $role = strtolower(trim(auth()->user()->role));
+
+            if ($role === 'poultry staff') {
+                $role = 'staff';
+            }
+
+            if ($role === 'farm manager') {
+                $role = 'manager';
+            }
+
+            if ($role === 'farm owner') {
+                $role = 'owner';
+            }
+
+            $mobileMenuItems = [
+                [
+                    'label' => 'Dashboard',
+                    'icon' => 'fas fa-chart-line',
+                    'route' => $role == 'owner' ? 'owner.dashboard' : ($role == 'manager' ? 'manager.dashboard' : 'staff.dashboard'),
+                    'roles' => ['owner', 'manager', 'staff'],
+                ],
+                [
+                    'label' => 'Production',
+                    'icon' => 'fas fa-egg',
+                    'route' => $role == 'owner' ? 'owner.production' : ($role == 'manager' ? 'manager.production' : 'staff.production'),
+                    'roles' => ['owner', 'manager', 'staff'],
+                ],
+                [
+                    'label' => 'Inventory',
+                    'icon' => 'fas fa-box',
+                    'route' => $role == 'owner' ? 'owner.inventory' : ($role == 'manager' ? 'manager.inventory' : 'staff.inventory'),
+                    'roles' => ['owner', 'manager', 'staff'],
+                ],
+                [
+                    'label' => 'Dispatch',
+                    'icon' => 'fas fa-truck',
+                    'route' => $role == 'owner' ? 'owner.dispatch' : 'manager.dispatch',
+                    'roles' => ['owner', 'manager'],
+                ],
+                [
+                    'label' => 'Menu',
+                    'icon' => 'fas fa-bars',
+                    'route' => '#',
+                    'roles' => ['owner', 'manager', 'staff'],
+                    'class' => 'mobile-menu-toggle'
+                ],
+            ];
+        @endphp
+
+        @foreach ($mobileMenuItems as $item)
+            @if (in_array($role, $item['roles']) && ($item['class'] === 'mobile-menu-toggle' || Route::has($item['route'])))
+                <a href="{{ $item['class'] === 'mobile-menu-toggle' ? '#' : route($item['route']) }}" 
+                   class="mobile-nav-item {{ request()->routeIs($item['route']) ? 'active' : '' }} {{ $item['class'] ?? '' }}"
+                   title="{{ $item['label'] }}"
+                   aria-label="{{ $item['label'] }}">
+                    <i class="{{ $item['icon'] }}"></i>
+                    <span>{{ $item['label'] }}</span>
+                </a>
+            @endif
+        @endforeach
+    </nav>
+
     <footer class="footer">
         <span>NB POULTRY FARM </span>
         <span class="sep"> | </span>

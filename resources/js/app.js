@@ -77,37 +77,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.querySelector('.sidebar-toggle');
     const backdrop = document.querySelector('.sidebar-backdrop');
     const sidebarLinks = document.querySelectorAll('.sidebar nav a');
+    const mobileNavBar = document.querySelector('.mobile-nav-bar');
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
 
-    if (!toggle || !backdrop) {
-        return;
-    }
-
-    const closeSidebar = () => {
-        document.body.classList.remove('sidebar-open');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.setAttribute('aria-label', 'Open navigation');
-        toggle.innerHTML = '<i class="fas fa-bars"></i>';
+    // Show mobile nav bar on mobile, hide on desktop
+    const updateMobileNav = () => {
+        if (window.innerWidth <= 768) {
+            if (mobileNavBar) mobileNavBar.style.display = 'flex';
+        } else {
+            if (mobileNavBar) mobileNavBar.style.display = 'none';
+        }
     };
 
-    toggle.addEventListener('click', () => {
-        const isOpen = document.body.classList.toggle('sidebar-open');
+    // Initial check
+    updateMobileNav();
+    window.addEventListener('resize', updateMobileNav);
 
-        toggle.setAttribute('aria-expanded', String(isOpen));
-        toggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
-        toggle.innerHTML = isOpen
-            ? '<i class="fas fa-xmark"></i>'
-            : '<i class="fas fa-bars"></i>';
+    // Mobile menu toggle functionality
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isOpen = document.body.classList.toggle('sidebar-open');
+            
+            if (backdrop) {
+                if (isOpen) {
+                    backdrop.style.display = 'block';
+                } else {
+                    backdrop.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener('click', () => {
+            document.body.classList.remove('sidebar-open');
+            backdrop.style.display = 'none';
+        });
+    }
+
+    // Close sidebar when clicking on a mobile nav item (if it's not the menu toggle)
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item:not(.mobile-menu-toggle)');
+    mobileNavItems.forEach((item) => {
+        item.addEventListener('click', () => {
+            document.body.classList.remove('sidebar-open');
+            if (backdrop) backdrop.style.display = 'none';
+        });
     });
 
-    backdrop.addEventListener('click', closeSidebar);
+    // Close sidebar when clicking on sidebar links
+    if (sidebarLinks && backdrop) {
+        sidebarLinks.forEach((link) => {
+            link.addEventListener('click', () => {
+                document.body.classList.remove('sidebar-open');
+                backdrop.style.display = 'none';
+            });
+        });
+    }
 
-    sidebarLinks.forEach((link) => {
-        link.addEventListener('click', closeSidebar);
-    });
-
+    // Close sidebar when screen resizes to desktop
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
-            closeSidebar();
+            document.body.classList.remove('sidebar-open');
+            if (backdrop) backdrop.style.display = 'none';
         }
     });
 
