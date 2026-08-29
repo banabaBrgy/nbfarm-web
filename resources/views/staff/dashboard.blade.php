@@ -139,6 +139,9 @@
     <script>
 
         const ctx = document.getElementById('productionChart');
+        const weeklyTotals = {!! json_encode($weeklyProduction->pluck('total')) !!};
+        const highestTotal = Math.max(...weeklyTotals, 0);
+        const yAxisMax = Math.max(2500, Math.ceil(Math.max(highestTotal, 500) / 500) * 500);
 
         new Chart(ctx, {
 
@@ -156,7 +159,7 @@
 
                     label: 'Egg Production',
 
-                    data: {!! json_encode($weeklyProduction->pluck('total')) !!},
+                    data: weeklyTotals,
                 }]
 
             },
@@ -181,7 +184,12 @@
 
                     y: {
 
-                        beginAtZero: true
+                        beginAtZero: true,
+                        min: 0,
+                        max: yAxisMax,
+                        ticks: {
+                            stepSize: 500
+                        }
 
                     }
 
