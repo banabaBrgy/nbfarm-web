@@ -1,36 +1,65 @@
-/* ===================================
-   SIDEBAR LAYOUT
-=================================== */
+/* ==================================================
+   SIDEBAR
+================================================== */
 
 .wrapper{
+
     display:flex;
+
     min-height:100vh;
+
 }
 
+/* ==================================================
+   SIDEBAR
+================================================== */
+
 .sidebar{
+
     position:fixed;
+
     top:0;
     left:0;
 
     width:260px;
     height:100vh;
 
-    background:#1f2937;
+   background:#25671E;
+
     color:#fff;
 
     display:flex;
-    flex-direction:column;
 
-    z-index:1000;
+    flex-direction:column;
 
     overflow-y:auto;
 
-    box-shadow:3px 0 12px rgba(0,0,0,.15);
+    z-index:1000;
+
+    box-shadow:
+        5px 0 20px rgba(0,0,0,.15);
+
 }
 
-/* ===================================
+/* Scrollbar */
+
+.sidebar::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:#666;
+
+    border-radius:20px;
+
+}
+
+/* ==================================================
    PROFILE
-=================================== */
+================================================== */
 
 .profile{
 
@@ -44,16 +73,17 @@
 
 .profile-image{
 
-    width:80px;
-    height:80px;
+    width:82px;
+    height:82px;
 
     margin:auto;
 
     border-radius:50%;
 
-    background:#2E7D32;
+    background:#00B906;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
@@ -61,95 +91,139 @@
 
     font-size:30px;
 
+    font-weight:600;
+
+    box-shadow:
+
+        0 5px 15px rgba(0,185,6,.35);
+
+}
+
+.profile h5{
+
+    margin-top:15px;
+
+    margin-bottom:5px;
+
+    font-size:18px;
+
+    color:#fff;
+
+    font-weight:600;
+
 }
 
 .role{
 
-    margin-top:15px;
+    font-size:13px;
 
-    font-size:14px;
+    color:#d5d5d5;
 
-    font-weight:600;
+    letter-spacing:.8px;
 
-    letter-spacing:.5px;
+    text-transform:uppercase;
 
 }
 
-/* ===================================
+/* ==================================================
    NAVIGATION
-=================================== */
+================================================== */
 
 .sidebar nav{
 
     flex:1;
 
-    padding:20px 0;
+    padding:18px 12px;
 
 }
 
 .sidebar ul{
 
-    margin:0;
+    list-style:none;
+
     padding:0;
 
-    list-style:none;
+    margin:0;
 
 }
 
 .sidebar li{
 
-    margin-bottom:6px;
+    margin-bottom:8px;
 
 }
 
 .sidebar a{
 
     display:flex;
+
     align-items:center;
 
-    gap:14px;
+    gap:15px;
 
-    padding:14px 25px;
-
-    color:#d8dde7;
+    padding:14px 18px;
 
     text-decoration:none;
 
-    font-size:15px;
+    color:#ECECEC;
 
-    transition:.25s;
+    border-radius:12px;
+
+    transition:.25s ease;
+
+    font-size:14px;
+
+    font-weight:500;
 
 }
 
 .sidebar a i{
 
-    width:20px;
+    width:22px;
 
     text-align:center;
 
-}
-
-.sidebar li.active a{
-
-    background:#2E7D32;
-
-    color:#fff;
-
-    border-left:5px solid #81C784;
+    font-size:16px;
 
 }
+
+/* Hover */
 
 .sidebar a:hover{
 
-    background:#2E7D32;
+    background:#1E5419;
+
+    color:#fff;
+
+    transform:translateX(4px);
+
+}
+
+/* Active */
+
+.sidebar li.active a{
+
+    background:#00B906;
+
+    color:#fff;
+
+    font-weight:600;
+
+    box-shadow:
+
+        0 6px 18px rgba(0,185,6,.35);
+
+}
+
+.sidebar li.active a i{
 
     color:#fff;
 
 }
 
-/* ===================================
+/* ==================================================
    LOGOUT
-=================================== */
+================================================== */
 
 .logout{
 
@@ -165,13 +239,15 @@
 
     border:none;
 
-    padding:14px;
-
     border-radius:12px;
 
-    background:#d32f2f;
+    padding:13px;
+
+    background:#E53935;
 
     color:#fff;
+
+    font-size:14px;
 
     font-weight:600;
 
@@ -183,13 +259,15 @@
 
 .logout button:hover{
 
-    background:#b71c1c;
+    background:#C62828;
+
+    transform:translateY(-2px);
 
 }
 
-/* ===================================
+/* ==================================================
    MAIN CONTENT
-=================================== */
+================================================== */
 
 .main-content{
 
@@ -197,23 +275,71 @@
 
     margin-left:260px;
 
+    min-height:100vh;
+
+    background:#F5F5F5;
+
     padding:30px;
 
 }
 
+/* ==================================================
+   PAGE LABEL
+================================================== */
 
-/* ===================================
+.page-label{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#25671E;
+
+    margin-bottom:25px;
+
+}
+
+/* ==================================================
    RESPONSIVE
-=================================== */
+================================================== */
 
 @media(max-width:768px){
-    .sidebar{
-        width:220px;
-    }
 
-    .main-content{
-        margin-left:220px;
-    }   
-        
-    }
+.sidebar{
 
+    width:220px;
+
+}
+
+.main-content{
+
+    margin-left:220px;
+
+    padding:20px;
+
+}
+
+.profile{
+
+    padding:22px 15px;
+
+}
+
+.profile-image{
+
+    width:70px;
+    height:70px;
+
+    font-size:26px;
+
+}
+
+.sidebar a{
+
+    font-size:13px;
+
+    padding:12px 16px;
+
+}
+
+}

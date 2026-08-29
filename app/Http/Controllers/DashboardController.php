@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Production;
-use App\Models\Inventory;
 use Illuminate\Support\Facades\DB;
 use App\Models\DailyInventoryLog;
 use App\Models\Forecast;
@@ -11,84 +10,132 @@ use App\Models\InventoryItem;
 
 class DashboardController extends Controller
 {
-   public function index()
-{
-    $today = now()->toDateString();
+    public function index()
+    {
+        $today = now()->toDateString();
 
-if (!DailyInventoryLog::where('log_date', $today)->exists()) {
+        /*
+        |--------------------------------------------------------------------------
+        | Daily Inventory Deduction
+        |--------------------------------------------------------------------------
+        */
 
-    // FEEDS
-    InventoryItem::where('item_name', 'Feeds')
-        ->decrement('current_stock');
+        if (!DailyInventoryLog::where('log_date', $today)->exists()) {
 
-    // VITAMINS
-    InventoryItem::where('item_name', 'Supplement')
-        ->decrement('current_stock');
+            // FEEDS
+            InventoryItem::where('item_name', 'Feeds')
+                ->decrement('current_stock');
 
-    DailyInventoryLog::create([
-        'log_date' => $today
-    ]);
-}
-    /*
-    |--------------------------------------------------------------------------
-    | Latest Production Date
-    |--------------------------------------------------------------------------
-    */
+            // SUPPLEMENT
+            InventoryItem::where('item_name', 'Supplement')
+                ->decrement('current_stock');
 
-    $latestDate = Production::max('production_date');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard Cards
-    |--------------------------------------------------------------------------
-    */
+            DailyInventoryLog::create([
+                'log_date' => $today
+            ]);
+        }
 
-    // Total Eggs Today
-    $todayProduction = Production::whereDate('production_date', $latestDate)
-        ->sum('eggs_produced');
 
-    // Active Batches
-    $activeBatches = Production::whereDate('production_date', $latestDate)
-        ->distinct('batch_id')
-        ->count('batch_id');
+        /*
+        |--------------------------------------------------------------------------
+        | Latest Production Date
+        |--------------------------------------------------------------------------
+        */
 
-    // Feeds Available
-    $feeds = InventoryItem::where('item_name', 'Feeds')
-        ->sum('current_stock');
+        $latestDate = Production::max('production_date');
 
-    // Egg Trays Available
-    $eggTrays = InventoryItem::where('item_name', 'Egg Trays')
-        ->sum('current_stock');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Weekly Production Chart
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard Cards
+        |--------------------------------------------------------------------------
+        */
 
-    $weeklyProduction = Production::selectRaw("
-        DATE(production_date) as production_date,
-        SUM(eggs_produced) as total
-    ")
-    ->whereBetween('production_date', [
-        now()->subDays(6)->startOfDay(),
-        now()->endOfDay()
-    ])
-    ->groupBy(DB::raw('DATE(production_date)'))
-    ->orderBy('production_date')
-    ->get();
+        // Total Eggs Today
+        $todayProduction = Production::whereDate(
+                'production_date',
+                $latestDate
+            )
+            ->sum('eggs_produced');
 
-    $forecast = Forecast::latest('forecast_date')->first();
 
-$predictedEggs = $forecast?->predicted_eggs ?? 0; 
+        // Active Batches
+        $activeBatches = Production::whereDate(
+                'production_date',
+                $latestDate
+            )
+            ->distinct('batch_id')
+            ->count('batch_id');
 
-    return view('staff.dashboard', compact(
-    'todayProduction',
-    'activeBatches',
-    'feeds',
-    'eggTrays',
-    'weeklyProduction',
-    'predictedEggs'
-));
-}
+
+        // Feeds Available
+        $feeds = InventoryItem::where('item_name', 'Feeds')
+            ->sum('current_stock');
+
+
+        // Egg Trays Available
+        $eggTrays = InventoryItem::where('item_name', 'Egg Trays')
+            ->sum('current_stock');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Weekly Production Chart
+        |--------------------------------------------------------------------------
+        | Always show last 7 days
+        |--------------------------------------------------------------------------
+        */
+
+        $weeklyProduction = collect();
+
+
+        for ($i = 6; $i >= 0; $i--) {
+
+            $date = now()->subDays($i);
+
+
+            $total = Production::whereDate(
+                    'production_date',
+                    $date->toDateString()
+                )
+                ->sum('eggs_produced');
+
+
+            $weeklyProduction->push([
+                'production_date' => $date->toDateString(),
+                'total' => $total
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Forecast
+        |--------------------------------------------------------------------------
+        */
+
+        $forecast = Forecast::latest('forecast_date')
+            ->first();
+
+
+        $predictedEggs = $forecast?->predicted_eggs ?? 0;
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Return Dashboard
+        |--------------------------------------------------------------------------
+        */
+
+        return view('staff.dashboard', compact(
+            'todayProduction',
+            'activeBatches',
+            'feeds',
+            'eggTrays',
+            'weeklyProduction',
+            'predictedEggs'
+        ));
+    }
 }

@@ -61,46 +61,49 @@ class AuthController extends Controller
         ];
 
         // Attempt Login
-        if (Auth::attempt($credentials, $request->has('remember'))) {
+       // Attempt Login
+if (Auth::attempt($credentials, $request->has('remember'))) {
 
-            $request->session()->regenerate();
+    $request->session()->regenerate();
 
-            $user = Auth::user();
+    $user = Auth::user();
 
-            // Normalize role
-$role = strtolower(trim($user->role));
+    // Normalize role
+    $role = strtolower(trim($user->role));
 
-switch ($role) {
+    switch ($role) {
 
-    case 'farm owner':
-    case 'owner':
-        return redirect()->route('owner.dashboard');
+        case 'farm owner':
+        case 'owner':
+            return redirect()->route('owner.dashboard');
 
-    case 'farm manager':
-    case 'manager':
-        return redirect()->route('manager.dashboard');
+        case 'farm manager':
+        case 'manager':
+            return redirect()->route('manager.dashboard');
 
-    case 'poultry staff':
-    case 'staff':
-        return redirect()->route('staff.dashboard');
+        case 'poultry staff':
+        case 'staff':
+            return redirect()->route('staff.dashboard');
 
-    default:
-        Auth::logout();
+        default:
+            Auth::logout();
 
-        return redirect()
-            ->route('login')
-            ->withErrors([
-                'username' => 'Unauthorized role.',
-            ]);
+            return redirect()
+                ->route('login')
+                ->withErrors([
+                    'username' => 'Unauthorized role.',
+                ]);
+    }
 }
 
-            return back()
-                ->withErrors([
-                    'username' => 'Invalid username or password.',
-                ])
-                ->withInput();
-        }
+// ✅ Idinagdag: kailangan mag-return dito kung fumail ang Auth::attempt
+return back()
+    ->withErrors([
+        'username' => 'Invalid username or password.',
+    ])
+    ->withInput();
     }
+
 
     /**
      * Logout

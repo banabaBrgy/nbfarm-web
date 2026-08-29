@@ -79,6 +79,16 @@
         </div>
         @endif
 
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0 ps-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <form method="POST" action="{{ route('forgot.reset') }}">
             @csrf
 
@@ -90,9 +100,13 @@
                     </span>
                     <input type="password"
                            name="password"
+                           id="password"
                            class="form-control"
                            placeholder="Enter new password"
                            required>
+                    <span class="input-group-text" style="cursor:pointer;" onclick="togglePassword('password', this)">
+                        <i class="bi bi-eye-fill"></i>
+                    </span>
                 </div>
             </div>
 
@@ -104,9 +118,13 @@
                     </span>
                     <input type="password"
                            name="password_confirmation"
+                           id="password_confirmation"
                            class="form-control"
                            placeholder="Confirm password"
                            required>
+                    <span class="input-group-text" style="cursor:pointer;" onclick="togglePassword('password_confirmation', this)">
+                        <i class="bi bi-eye-fill"></i>
+                    </span>
                 </div>
             </div>
 
@@ -120,6 +138,23 @@
     </div>
 
 </div>
+
+<script>
+    function togglePassword(inputId, iconSpan) {
+        const input = document.getElementById(inputId);
+        const icon = iconSpan.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye-fill');
+            icon.classList.add('bi-eye-slash-fill');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash-fill');
+            icon.classList.add('bi-eye-fill');
+        }
+    }
+</script>
 
 </body>
 </html>

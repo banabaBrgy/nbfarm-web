@@ -1,13 +1,13 @@
 :root {
-    --cream: #F3ECDC;
-    --paper: #FBF7EE;
+    --cream: #F5F5F5;
+    --paper: #F5F5F5;
     --ink: #2A211B;
-    --ink-soft: #6B5F52;
-    --moss: #4E5D39;
-    --moss-dark: #38432A;
-    --straw: #DDA843;
-    --sage: #6E7B5C;
-    --line: #DDD0B4;
+    --ink-soft: #2A211B;
+    --moss: #00B906;
+    --moss-dark: #499A13;
+    --straw: #FED24F;
+    --sage: #2A211B;
+    --line: #222222;
     --error: #A63D2F;
 }
 
@@ -15,21 +15,25 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
 }
 
 body {
+    
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     background: var(--cream);
-    background-image:
-        radial-gradient(circle at 1px 1px, rgba(42, 33, 27, 0.05) 1px, transparent 0);
-    background-size: 24px 24px;
+   background:
+        linear-gradient(180deg, rgba(56, 67, 42, 0.45) 0%, rgba(56, 67, 42, 0.55) 55%, rgba(38, 43, 26, 0.82) 100%),
+        url('/images/farm-hero.jpg');
+    background-size: cover;
     padding: 30px;
     color: var(--ink);
 }
+
 
 .login-wrapper {
     width: 1080px;
@@ -46,8 +50,13 @@ body {
 /* ---------- LEFT PANEL: feed-sack label ---------- */
 .left-panel {
     position: relative;
-    background: var(--moss);
-    color: #F6E9DE;
+    background:
+        linear-gradient(180deg, rgba(56, 67, 42, 0.45) 0%, rgba(56, 67, 42, 0.55) 55%, rgba(38, 43, 26, 0.82) 100%),
+        url('/images/farm-hero.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    background-blend-mode: multiply, normal;
+    color: #F5F5F5;
     padding: 60px 48px;
     display: flex;
     flex-direction: column;
@@ -55,13 +64,26 @@ body {
     overflow: hidden;
 }
 
+.left-panel h1,
+.left-panel .lede,
+.stamp-badge {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.module-row {
+    background: rgba(38, 43, 26, 0.35);
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin: 0 -14px;
+}
+
 .left-panel::before {
     content: '';
     position: absolute;
     inset: 0;
     background-image:
-        radial-gradient(ellipse 11px 15px at 18px 16px, rgba(255,255,255,0.07) 42%, transparent 43%),
-        radial-gradient(ellipse 11px 15px at 58px 46px, rgba(255,255,255,0.07) 42%, transparent 43%);
+        radial-gradient(ellipse 11px 15px at 18px 16px, rgba(255, 255, 255, 0.07) 42%, transparent 43%),
+        radial-gradient(ellipse 11px 15px at 58px 46px, rgba(255, 255, 255, 0.07) 42%, transparent 43%);
     background-size: 76px 62px;
     pointer-events: none;
 }
@@ -166,9 +188,13 @@ body {
 .right-panel {
     padding: 56px 60px;
     background: var(--paper);
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(42, 33, 27, 0.035) 1px, transparent 0);
+    background-size: 22px 22px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
 }
 
 .form-eyebrow {
@@ -191,7 +217,20 @@ body {
 .subtitle {
     color: var(--ink-soft);
     font-size: 14.5px;
-    margin-bottom: 32px;
+    margin-bottom: 18px;
+    position: relative;
+    padding-bottom: 22px;
+}
+
+.subtitle::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 46px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--straw);
 }
 
 .error-box {
@@ -244,11 +283,30 @@ input:focus-visible {
     outline-offset: 3px;
 }
 
+/* Icon-accented inputs */
+.input-icon-wrap {
+    position: relative;
+}
+
+.input-icon-wrap input[type=text],
+.input-icon-wrap input[type=password] {
+    padding-left: 26px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    font-size: 14px;
+    opacity: 0.55;
+    pointer-events: none;
+}
+
 .password-container {
     position: relative;
 }
 
-.password-container input {
+.password-container.input-icon-wrap input {
     padding-right: 36px;
 }
 
@@ -268,13 +326,6 @@ input:focus-visible {
     margin: 6px 0 18px;
     font-size: 13.5px;
     color: var(--ink-soft);
-}
-
-.terms input {
-    margin-top: 3px;
-    accent-color: var(--moss);
-    width: 15px;
-    height: 15px;
 }
 
 .terms a {
@@ -302,10 +353,46 @@ input:focus-visible {
     color: var(--ink-soft);
 }
 
+/* Custom checkboxes (shared: terms + remember) */
+.terms input,
 .remember input {
-    width: 15px;
-    height: 15px;
-    accent-color: var(--moss);
+    appearance: none;
+    -webkit-appearance: none;
+    width: 17px !important;
+    height: 17px !important;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 0 !important;
+    transition: background .15s, border-color .15s;
+}
+
+.terms input:checked,
+.remember input:checked {
+    background: var(--moss);
+    border-color: var(--moss);
+}
+
+.terms input:checked::after,
+.remember input:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--paper);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.terms input:focus-visible,
+.remember input:focus-visible {
+    outline: 2px solid var(--moss);
+    outline-offset: 2px;
 }
 
 .forgot-password {
@@ -319,8 +406,12 @@ input:focus-visible {
     text-decoration: underline;
 }
 
-.g-recaptcha {
+.recaptcha-frame {
     margin: 4px 0 22px;
+    padding: 14px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
 }
 
 .login-btn {
@@ -377,4 +468,12 @@ input:focus-visible {
     .right-panel {
         padding: 40px 32px;
     }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--ink);
+    -webkit-box-shadow: 0 0 0px 1000px var(--paper) inset;
+    transition: background-color 5000s ease-in-out 0s;
 }

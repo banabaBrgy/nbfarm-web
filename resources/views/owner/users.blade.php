@@ -105,6 +105,7 @@
             </tbody>
         </table>
 
+
         <div class="pagination-bar">
             {{ $users->links() }}
         </div>
@@ -114,9 +115,18 @@
 </div>
 
 <!-- ADD USER MODAL -->
-<div class="modal-overlay" id="addModal">
+<div class="modal-overlay {{ $errors->any() && old('_form') === 'add' ? 'active' : '' }}" id="addModal">
     <div class="modal-box">
         <h3>Add User</h3>
+        @if($errors->any())
+        <div class="alert-errors">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <form action="{{ route('owner.users.store') }}" method="POST">
             @csrf
 

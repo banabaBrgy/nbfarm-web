@@ -2,49 +2,47 @@
 
 @section('title','Batch Details')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/production-details.css') }}">
+@endpush
+
 @section('content')
 
-<div class="container-fluid">
+<div class="production-details-page">
 
-    <a href="{{ route(auth()->user()->role . '.production') }}" class="btn btn-secondary mb-3">
-    <i class="fas fa-arrow-left"></i>
-    Back
-</a>
+    <a href="{{ route(auth()->user()->role . '.production') }}" class="btn-back mb-3">
+        <i class="fas fa-arrow-left"></i>
+        Back
+    </a>
 
-    <div class="row mb-4">
+    <div class="detail-summary">
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6>Batch</h6>
-                    <h2>Batch {{ $production->batch_id }}</h2>
-                </div>
+        <div>
+            <div class="detail-card">
+                <small>Batch</small>
+                <h1>Batch {{ $production->batch_id }}</h1>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6>Total Eggs</h6>
-                    <h2>{{ number_format($production->eggs_produced) }}</h2>
-                </div>
+        <div>
+            <div class="detail-card">
+                <small>Total Eggs</small>
+                <h1>{{ number_format($production->eggs_produced) }}</h1>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6>Production Date</h6>
-                    <h4>{{ $production->production_date }}</h4>
-                </div>
+        <div>
+            <div class="detail-card">
+                <small>Production Date</small>
+                <h2>{{ $production->production_date }}</h2>
             </div>
         </div>
 
     </div>
 
-    <div class="card shadow">
+    <div class="records-card">
 
-        <div class="card-header bg-success text-white">
+        <div class="records-header">
 
             QR Records
 
@@ -52,84 +50,86 @@
 
         <div class="card-body">
 
-            <table class="table table-bordered">
+            <table>
 
                 <thead>
 
-                <tr>
+                    <tr>
 
-                    <th>QR Code</th>
-                    <th>Egg Size</th>
-                    <th>Total Eggs</th>
-                    <th width="120">Action</th>
+                        <th>QR Code</th>
+                        <th>Egg Size</th>
+                        <th>Total Eggs</th>
+                        <th width="120">Action</th>
 
-                </tr>
+                    </tr>
 
                 </thead>
 
                 <tbody>
 
-@forelse($transactions as $transaction)
+                @forelse($transactions as $transaction)
 
-<tr>
+                    <tr>
 
-    <td>{{ $transaction->qrRecord->qr_code }}</td>
+                        <td>{{ $transaction->qrRecord->qr_code }}</td>
 
-    <td>{{ $transaction->qrRecord->egg_size }}</td>
+                        <td>{{ $transaction->qrRecord->egg_size }}</td>
 
-    <td>{{ number_format($transaction->total_eggs) }}</td>
+                        <td>{{ number_format($transaction->total_eggs) }}</td>
 
-    <td>
+                        <td>
 
-        <button
-            class="btn btn-success btn-sm editQR"
-            data-id="{{ $transaction->id }}"
-            data-code="{{ $transaction->qrRecord->qr_code }}"
-            data-size="{{ $transaction->qrRecord->egg_size }}"
-            data-eggs="{{ $transaction->total_eggs }}">
+                            <button
+                                class="btn-edit editQR"
+                                data-id="{{ $transaction->id }}"
+                                data-code="{{ $transaction->qrRecord->qr_code }}"
+                                data-size="{{ $transaction->qrRecord->egg_size }}"
+                                data-eggs="{{ $transaction->total_eggs }}">
 
-            Edit
+                                Edit
 
-        </button>
+                            </button>
 
-    </td>
+                        </td>
 
-</tr>
+                    </tr>
 
-@empty
+                @empty
 
-<tr>
+                    <tr>
 
-    <td colspan="4" class="text-center">
+                        <td colspan="4" class="text-center">
 
-        No QR Records
+                            No QR Records
 
-    </td>
+                        </td>
 
-</tr>
+                    </tr>
 
-@endforelse
+                @endforelse
 
-@if($transactions->count()==0)
+                @if($transactions->count()==0)
 
-<tr>
+                    <tr>
 
-<td colspan="4" class="text-center">
+                        <td colspan="4" class="text-center">
 
-No QR Records
+                            No QR Records
 
-</td>
+                        </td>
 
-</tr>
+                    </tr>
 
-@endif
+                @endif
 
-</tbody>
+                </tbody>
 
             </table>
 
-            <div class="d-flex justify-content-end mt-3">
+            <div class="pagination-wrapper">
+
                 {{ $transactions->links() }}
+
             </div>
 
         </div>
@@ -281,8 +281,6 @@ document.getElementById('saveQR').addEventListener('click', function () {
     })
 
     .then(data => {
-
-        console.log(data);
 
         if(data.success){
 

@@ -3,70 +3,125 @@
 namespace App\Services;
 
 use App\Models\Production;
-use App\Models\Forecast;
+use Carbon\Carbon;
+
+use Illuminate\Support\Facades\DB;
 
 class ForecastingService
 {
-    public function generateDailyForecast()
+    public static function latestPrediction()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | GET DAILY TOTAL PRODUCTION
-        |--------------------------------------------------------------------------
-        | Instead of forecasting every batch separately,
-        | pagsasamahin muna ang Batch 1,2,3 bawat araw.
-        |
-        */
+        // Latest production date
+        $latestDate = Production::max('production_date');
 
-        $records = Production::selectRaw('production_date, SUM(eggs_produced) as eggs_produced')
-            ->groupBy('production_date')
-            ->orderBy('production_date')
-            ->get();
-
-        if ($records->count() < 2) {
+        if (!$latestDate) {
             return 0;
         }
 
-        $n = $records->count();
 
-        $sumX = 0;
-        $sumY = 0;
+        // Get daily production totals for last 7 days
+        $productions = Production::select(
+                DB::raw('DATE(production_date) as date'),
+                DB::raw('SUM(eggs_produced) as total')
+            )
+            ->whereBetween(
+                'production_date',
+                [
+                    Carbon::parse($latestDate)
+                        ->subDays(7),
+
+                    Carbon::parse($latestDate)
+                ]
+            )
+            ->groupBy(
+                DB::raw('DATE(production_date)')
+            )
+            ->orderBy('date')
+            ->get();
+
+
+        if ($productions->count() < 2) {
+            return 0;
+        }
+
+
+        // Linear Regression
+        $x = [];
+        $y = [];
+
+
+        foreach ($productions as $index => $production) {
+
+            $x[] = $index;
+            $y[] = $production->total;
+
+        }
+
+
+        $n = count($x);
+
+
+        $sumX = array_sum($x);
+        $sumY = array_sum($y);
+
+
         $sumXY = 0;
         $sumXX = 0;
 
-        foreach ($records as $index => $row) {
 
-            $x = $index + 1;
-            $y = $row->eggs_produced;
+        for ($i = 0; $i < $n; $i++) {
 
-            $sumX += $x;
-            $sumY += $y;
-            $sumXY += ($x * $y);
-            $sumXX += ($x * $x);
+            $sumXY += $x[$i] * $y[$i];
+            $sumXX += $x[$i] * $x[$i];
+
         }
 
-        $b = (($n * $sumXY) - ($sumX * $sumY))
+
+        $denominator =
+            ($n * $sumXX) - ($sumX * $sumX);
+
+
+        if ($denominator == 0) {
+            return round(
+                $sumY / $n
+            );
+        }
+
+
+        $slope =
+            (
+                ($n * $sumXY)
+                -
+                ($sumX * $sumY)
+            )
             /
-            (($n * $sumXX) - ($sumX * $sumX));
+            $denominator;
 
-        $a = ($sumY - ($b * $sumX)) / $n;
 
-        $nextX = $n + 1;
+        $intercept =
+            (
+                $sumY
+                -
+                ($slope * $sumX)
+            )
+            /
+            $n;
 
-        $forecast = round($a + ($b * $nextX));
 
-        Forecast::updateOrCreate(
 
-            [
-                'forecast_date' => now()->addDay()->toDateString(),
-            ],
+        // Next day forecast
+        $nextX = $n;
 
-            [
-                'predicted_eggs' => $forecast,
-            ]
 
+        $prediction =
+            ($slope * $nextX)
+            +
+            $intercept;
+
+
+        return max(
+            0,
+            round($prediction)
         );
-
-        return $forecast;
     }
 }

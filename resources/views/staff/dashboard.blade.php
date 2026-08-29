@@ -4,7 +4,7 @@
 
 @section('content')
 
-@push('styles')
+    @push('styles')
         <link rel="stylesheet" href="{{ asset('css/staffdashboard.css') }}">
     @endpush
     <!-- SUMMARY -->
@@ -138,20 +138,17 @@
 
             data: {
 
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                labels: {!! json_encode(
+        $weeklyProduction->map(function ($item) {
+            return \Carbon\Carbon::parse($item['production_date'])->format('D');
+        })
+    ) !!},
 
                 datasets: [{
 
                     label: 'Egg Production',
 
-                    data: [7200, 7350, 7100, 7520, 7670, 7480, 7800],
-
-                    backgroundColor: '#2E7D32',
-
-                    borderRadius: 8,
-
-                    borderSkipped: false
-
+                    data: {!! json_encode($weeklyProduction->pluck('total')) !!},
                 }]
 
             },

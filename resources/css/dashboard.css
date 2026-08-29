@@ -159,7 +159,7 @@
 
 .main-content{
 
-    margin-left:230px;
+    margin-left:250px;
 
     padding:25px;
 
@@ -320,6 +320,11 @@
 
     margin:0;
 
+}
+
+.chart-wrapper {
+    height: 350px;
+    width: 100%;
 }
 
 /* ===================================

@@ -80,10 +80,14 @@
                 @csrf
 
                 <label class="field-label">Username</label>
-                <input type="text" name="username" value="{{ old('username') }}" placeholder="Enter your username" required>
+                <div class="input-icon-wrap">
+                    <span class="input-icon">👤</span>
+                    <input type="text" name="username" value="{{ old('username') }}" placeholder="Enter your username" required>
+                </div>
 
                 <label class="field-label">Password</label>
-                <div class="password-container">
+                <div class="password-container input-icon-wrap">
+                    <span class="input-icon">🔒</span>
                     <input type="password" id="password" name="password" placeholder="Enter your password" required>
                     <span class="toggle-password" onclick="togglePassword()">👁️</span>
                 </div>
@@ -104,7 +108,9 @@
                     <a href="{{ route('forgot.password') }}" class="forgot-password">Forgot Password?</a>
                 </div>
 
-                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                <div class="recaptcha-frame">
+                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                </div>
 
                 @error('g-recaptcha-response')
                     <div style="margin-top:-14px; margin-bottom:18px; color:#A63D2F; font-size:13.5px; font-weight:500;">

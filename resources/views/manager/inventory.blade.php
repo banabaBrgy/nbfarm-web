@@ -357,4 +357,4 @@ document.querySelectorAll('.delete-item-form').forEach(form => {
 });
 @endif
 </script>
-@endpush
+@endpush    

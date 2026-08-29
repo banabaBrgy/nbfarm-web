@@ -1,0 +1,466 @@
+/* =====================================================
+   NB POULTRY FARM
+   GLOBAL DESIGN SYSTEM
+===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root{
+
+    /* =========================
+       COLOR PALETTE
+    ========================== */
+
+    --primary:#00B906;
+    --primary-dark:#009905;
+    --primary-light:#B9E937;
+
+   --dark:#25671E;
+
+    --background:#F5F5F5;
+    --surface:#FFFFFF;
+
+  --text:#25671E;
+    --text-light:#6B7280;
+
+    --border:#E5E7EB;
+
+    --danger:#E53935;
+    --warning:#F9A825;
+    --info:#039BE5;
+
+    /* ========================= */
+
+    --radius:14px;
+
+    --shadow:
+        0 8px 25px rgba(0,0,0,.08);
+
+    --transition:.25s ease;
+
+}
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+
+    margin:0;
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    background:var(--background);
+
+    color:var(--text);
+
+    font-family:'Poppins',sans-serif;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+}
+
+/* =====================================================
+   TYPOGRAPHY
+===================================================== */
+
+h1{
+
+    font-size:30px;
+
+    font-weight:700;
+
+}
+
+h2{
+
+    font-size:24px;
+
+    font-weight:600;
+
+}
+
+h3{
+
+    font-size:20px;
+
+    font-weight:600;
+
+}
+
+h4{
+
+    font-size:18px;
+
+    font-weight:600;
+
+}
+
+h5{
+
+    font-size:16px;
+
+    font-weight:600;
+
+}
+
+h6{
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+p{
+
+    margin-bottom:0;
+
+}
+
+small{
+
+    color:var(--text-light);
+
+}
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.card{
+
+    border:none;
+
+    border-radius:var(--radius);
+
+    background:var(--surface);
+
+    box-shadow:var(--shadow);
+
+}
+
+.card-header{
+
+    background:transparent;
+
+    border-bottom:1px solid var(--border);
+
+    font-weight:600;
+
+}
+
+.card-body{
+
+    padding:25px;
+
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.btn{
+
+    border-radius:10px;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    padding:10px 18px;
+
+    transition:var(--transition);
+
+}
+
+.btn-success{
+
+    background:var(--primary);
+
+    border-color:var(--primary);
+
+}
+
+.btn-success:hover{
+
+    background:var(--primary-dark);
+
+    border-color:var(--primary-dark);
+
+}
+
+.btn-primary{
+
+    background:var(--dark);
+
+    border-color:var(--dark);
+
+}
+
+.btn-primary:hover{
+
+    background:#2b2b2b;
+
+}
+
+.btn-danger{
+
+    background:var(--danger);
+
+    border:none;
+
+}
+
+.btn-secondary{
+
+    background:#9CA3AF;
+
+    border:none;
+
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table{
+
+    margin-bottom:0;
+
+    border-collapse:collapse;
+
+}
+
+.table thead{
+
+    background:var(--primary);
+
+}
+
+.table thead th{
+
+    color:#fff;
+
+    border:none;
+
+    padding:14px;
+
+    font-weight:600;
+
+    font-size:14px;
+
+}
+
+.table tbody td{
+
+    padding:14px;
+
+    vertical-align:middle;
+
+}
+
+.table tbody tr{
+
+    transition:var(--transition);
+
+}
+
+.table tbody tr:hover{
+
+    background:#F1FFE8;
+
+}
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.form-control{
+
+    border-radius:10px;
+
+    border:1px solid var(--border);
+
+    min-height:44px;
+
+    font-size:14px;
+
+}
+
+.form-control:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 .2rem rgba(0,185,6,.15);
+
+}
+
+/* =====================================================
+   BADGES
+===================================================== */
+
+.badge{
+
+    border-radius:30px;
+
+    padding:7px 14px;
+
+    font-size:12px;
+
+    font-weight:500;
+
+}
+
+.bg-success{
+
+    background:var(--primary)!important;
+
+}
+
+.bg-warning{
+
+    background:var(--warning)!important;
+
+}
+
+.bg-danger{
+
+    background:var(--danger)!important;
+
+}
+
+/* =====================================================
+   ICON CIRCLE
+===================================================== */
+
+.icon-circle{
+
+    width:58px;
+
+    height:58px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:rgba(0,185,6,.12);
+
+    color:var(--primary);
+
+    font-size:24px;
+
+}
+
+/* =====================================================
+   PAGE TITLE
+===================================================== */
+
+.page-title{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin-bottom:25px;
+
+}
+
+/* =====================================================
+   CONTAINERS
+===================================================== */
+
+.table-container{
+
+    background:#fff;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    padding:25px;
+
+}
+
+.summary-card{
+
+    background:#fff;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    padding:25px;
+
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal-content{
+
+    border:none;
+
+    border-radius:16px;
+
+}
+
+.modal-header{
+
+    background:var(--primary);
+
+    color:#fff;
+
+}
+
+.modal-header .btn-close{
+
+    filter:invert(1);
+
+}
+
+/* =====================================================
+   UTILITIES
+===================================================== */
+
+.shadow-soft{
+
+    box-shadow:var(--shadow);
+
+}
+
+.rounded-lg{
+
+    border-radius:var(--radius);
+
+}
+
+.text-primary{
+
+    color:var(--primary)!important;
+
+}
+
+.bg-primary-light{
+
+    background:rgba(0,185,6,.12);
+
+}

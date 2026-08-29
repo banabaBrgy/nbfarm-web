@@ -83,9 +83,9 @@ SUMMARY CARDS
                         Predicted Eggs
                     </small>
 
-                    <h2 class="fw-bold mt-2 text-success">
-                        8,250
-                    </h2>
+                     <h2 class="fw-bold mt-2 text-success">
+                                 {{ number_format($predictedEggs) }}
+                            </h2>
 
                     <small class="text-muted">
                         Forecast
@@ -123,12 +123,8 @@ PRODUCTION TABLE
         class="form-control"
         placeholder="Search Batch">
 
-    <input
-        type="date"
-        name="date"
-        class="form-control"
-        value="{{ $selectedDate }}"
-        onchange="this.form.submit()">
+   <input type="date" name="date" class="form-control" value="{{ $selectedDate->toDateString() }}"
+                    onchange="this.form.submit()">
 
 </form>
 
