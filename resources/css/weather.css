@@ -1,0 +1,331 @@
+.dashboard-header:has(.farm-weather),
+.page-header:has(.farm-weather) {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 12px;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.dashboard-header:has(.farm-weather) > div:first-child,
+.page-header:has(.farm-weather) > div:first-child {
+    flex: 0 1 auto;
+    min-width: 0;
+    text-align: left;
+}
+
+.dashboard-header:has(.farm-weather) h2,
+.dashboard-header:has(.farm-weather) p,
+.page-header:has(.farm-weather) h2,
+.page-header:has(.farm-weather) p {
+    text-align: left;
+}
+
+.page-header:has(.farm-weather) p {
+    margin: 6px 0 0;
+    color: #6B7280;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.farm-weather {
+    container-type: inline-size;
+    flex: none;
+    align-self: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: fit-content;
+    margin-left: 0;
+    padding: 14px 16px 8px;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(37, 103, 30, 0.06);
+}
+
+.farm-weather p {
+    margin-bottom: 0;
+}
+
+.farm-weather__inner {
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    grid-template-areas:
+        "now forecast"
+        "credit credit";
+    gap: 8px 16px;
+    min-width: 0;
+    height: auto;
+    align-content: start;
+    align-items: start;
+}
+
+.farm-weather--empty .farm-weather__forecast,
+.farm-weather--empty .farm-weather__credit {
+    opacity: 0.55;
+}
+
+.farm-weather__now {
+    grid-area: now;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.farm-weather__now-copy {
+    min-width: 0;
+}
+
+.farm-weather__icon {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 22px;
+    background: #E8F5E9;
+    color: #25671E;
+}
+
+.farm-weather__icon--sun {
+    background: #FFF6E5;
+    color: #D97706;
+}
+
+.farm-weather__icon--cloud {
+    background: #EEF2F7;
+    color: #64748B;
+}
+
+.farm-weather__icon--rain {
+    background: #E8F4FC;
+    color: #0284C7;
+}
+
+.farm-weather__icon--storm {
+    background: #F3EEFF;
+    color: #6D28D9;
+}
+
+.farm-weather__icon--fog {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+.farm-weather__temp-row {
+    display: flex;
+    align-items: flex-start;
+    line-height: 1;
+}
+
+.farm-weather__temp {
+    font-size: 32px;
+    font-weight: 700;
+    color: #25671E;
+    letter-spacing: -0.6px;
+}
+
+.farm-weather__unit {
+    margin-top: 4px;
+    margin-left: 2px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.farm-weather__condition {
+    margin: 4px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.farm-weather__date {
+    margin: 2px 0 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4B5563;
+}
+
+.farm-weather__date:empty {
+    display: none;
+}
+
+.farm-weather__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: #6B7280;
+    overflow-wrap: anywhere;
+}
+
+.farm-weather__dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #C5CBD3;
+}
+
+.farm-weather__forecast {
+    grid-area: forecast;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 4px;
+    min-width: 0;
+    width: 100%;
+}
+
+.farm-weather__day {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    min-width: 0;
+    padding: 6px 4px;
+    border-radius: 12px;
+    color: #6B7280;
+    text-align: center;
+}
+
+.farm-weather__day.is-today {
+    background: #F3F8F3;
+    color: #25671E;
+}
+
+.farm-weather__day-name {
+    display: block;
+    width: 100%;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.farm-weather__day-num {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #1F2937;
+    text-align: center;
+}
+
+.farm-weather__day.is-today .farm-weather__day-num {
+    color: #25671E;
+}
+
+.farm-weather__day i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 18px;
+    font-size: 14px;
+    color: #25671E;
+    text-align: center;
+}
+
+.farm-weather__day:not(.is-today) i {
+    color: #7A8B80;
+}
+
+.farm-weather__day-temps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 2px 4px;
+    font-size: 12px;
+}
+
+.farm-weather__day-temps strong {
+    font-weight: 700;
+    color: #1F2937;
+}
+
+.farm-weather__day.is-today .farm-weather__day-temps strong {
+    color: #25671E;
+}
+
+.farm-weather__credit {
+    grid-area: credit;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    margin: 0;
+    padding-top: 2px;
+    font-size: 11px;
+    color: #9CA3AF;
+}
+
+.farm-weather__credit a {
+    color: #6B7280;
+    text-decoration: none;
+}
+
+.farm-weather__credit a:hover {
+    color: #25671E;
+    text-decoration: underline;
+}
+
+@container (max-width: 520px) {
+    .farm-weather__inner {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "now"
+            "forecast"
+            "credit";
+        gap: 12px;
+    }
+
+    .farm-weather__now {
+        align-items: flex-start;
+    }
+}
+
+@container (max-width: 400px) {
+    .farm-weather__icon {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+        border-radius: 12px;
+    }
+
+    .farm-weather__temp {
+        font-size: 28px;
+    }
+
+    .farm-weather__day {
+        padding: 6px 2px;
+        gap: 3px;
+    }
+
+    .farm-weather__day-name {
+        font-size: 10px;
+    }
+
+    .farm-weather__day-temps {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 768px) {
+    .farm-weather {
+        padding: 12px 14px 8px;
+    }
+}

@@ -7,6 +7,14 @@
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/staffdashboard.css') }}">
     @endpush
+    <div class="page-header">
+        <div>
+            <h2>Dashboard</h2>
+            <p>Welcome back! Here's today's poultry farm overview.</p>
+        </div>
+        <x-weather-widget />
+    </div>
+
     <!-- SUMMARY -->
 
     <div class="summary">

@@ -16,6 +16,7 @@ export default defineConfig({
                 'resources/css/dashboard.css',
 
                 'resources/css/owner.dashboard.css',
+                'resources/css/weather.css',
 
                 'resources/js/app.js',
 

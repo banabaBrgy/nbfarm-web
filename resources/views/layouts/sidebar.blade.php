@@ -20,6 +20,7 @@
     'resources/css/app.css',
     'resources/css/sidebar.css',
     'resources/css/owner.dashboard.css',
+    'resources/css/weather.css',
     'resources/css/production.css',
     'resources/css/inventory.css',
     'resources/css/users.css',

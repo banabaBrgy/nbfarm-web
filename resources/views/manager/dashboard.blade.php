@@ -49,6 +49,7 @@
             <h2>Manager Dashboard</h2>
             <p>Welcome back! Here's today's poultry farm overview.</p>
         </div>
+        <x-weather-widget />
     </div>
 
 

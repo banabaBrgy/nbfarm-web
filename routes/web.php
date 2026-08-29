@@ -18,6 +18,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\OwnerReportController;
+use App\Http\Controllers\WeatherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,6 +62,9 @@ Route::view('/terms', 'terms')->name('terms');
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+Route::middleware('auth')->get('/weather', [WeatherController::class, 'current'])
+    ->name('weather.current');
 
 /*
 |--------------------------------------------------------------------------
