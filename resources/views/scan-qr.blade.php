@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <a href="{{ route(auth()->user()->role . '.production') }}" class="scan-back-button">
+        <a href="{{ $productionUrl }}" class="scan-back-button">
             <i class="fas fa-arrow-left"></i>
             Back to production
         </a>
@@ -31,7 +31,7 @@
                     </span>
                     <h3 id="scanner-title">Camera scanner</h3>
                 </div>
-                <span class="scanner-status">Ready to scan</span>
+                <span class="scanner-status" id="scannerStatus">Ready to scan</span>
             </div>
 
             <div class="scanner-frame">
@@ -40,7 +40,7 @@
 
             <p class="scanner-instruction">
                 <i class="fas fa-lightbulb"></i>
-                <span>Allow camera access, then position the QR code inside the frame.</span>
+                <span>Choose your camera, tap <strong>Start Camera</strong>, or upload a photo of the farm QR label.</span>
             </p>
         </section>
 
@@ -98,11 +98,41 @@
 
 @push('scripts')
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <script>
 
 let scannerPaused = false;
+
+function isCameraScanning() {
+    const video = document.querySelector('#reader video');
+
+    return Boolean(video && video.srcObject);
+}
+
+function pauseScannerIfNeeded() {
+    if (!isCameraScanning()) {
+        return;
+    }
+
+    try {
+        html5QrcodeScanner.pause(true);
+    } catch (error) {
+        console.warn('Scanner pause skipped:', error);
+    }
+}
+
+function resumeScannerIfNeeded() {
+    if (!isCameraScanning()) {
+        return;
+    }
+
+    try {
+        html5QrcodeScanner.resume();
+    } catch (error) {
+        console.warn('Scanner resume skipped:', error);
+    }
+}
 
 function onScanSuccess(decodedText) {
 
@@ -113,10 +143,10 @@ function onScanSuccess(decodedText) {
 
     scannerPaused = true;
 
-    // I-pause ang camera
-    html5QrcodeScanner.pause(true);
+    updateScannerStatus('processing');
+    pauseScannerIfNeeded();
 
-    fetch("{{ route(auth()->user()->role . '.scan.store') }}", {
+    fetch("{{ $scanStoreUrl }}", {
 
         method: "POST",
 
@@ -180,7 +210,8 @@ function onScanSuccess(decodedText) {
 
                 scannerPaused = false;
 
-                html5QrcodeScanner.resume();
+                updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
+                resumeScannerIfNeeded();
 
             });
 
@@ -209,7 +240,8 @@ function onScanSuccess(decodedText) {
 
                 scannerPaused = false;
 
-                html5QrcodeScanner.resume();
+                updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
+                resumeScannerIfNeeded();
 
             });
 
@@ -243,7 +275,8 @@ function onScanSuccess(decodedText) {
 
             scannerPaused = false;
 
-            html5QrcodeScanner.resume();
+            updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
+            resumeScannerIfNeeded();
 
         });
 
@@ -256,8 +289,17 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",
 
     {
-        fps:10,
-        qrbox:250
+        fps: 10,
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const size = Math.max(180, Math.floor(minEdge * 0.7));
+
+            return { width: size, height: size };
+        },
+        aspectRatio: 1.0,
+        videoConstraints: {
+            facingMode: { ideal: "environment" }
+        }
     },
 
     false
@@ -266,10 +308,96 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 
 html5QrcodeScanner.render(onScanSuccess);
 
-const imageScanLink = document.getElementById("reader__dashboard_section_swaplink");
-if (imageScanLink) {
-    imageScanLink.removeAttribute("style");
+function updateScannerStatus(state) {
+    const badge = document.getElementById('scannerStatus');
+    if (!badge) {
+        return;
+    }
+
+    badge.classList.remove('scanner-status--active');
+
+    if (state === 'scanning') {
+        badge.textContent = 'Scanning';
+        badge.classList.add('scanner-status--active');
+    } else if (state === 'processing') {
+        badge.textContent = 'Processing';
+    } else {
+        badge.textContent = 'Ready to scan';
+    }
 }
+
+let scannerUiPolished = false;
+
+function polishScannerUi() {
+    if (scannerUiPolished) {
+        return;
+    }
+
+    const cameraLabel = document.querySelector('#reader__dashboard_section_csr > span');
+    const startBtn = document.getElementById('html5-qrcode-button-camera-start');
+    const swapLink = document.getElementById('reader__dashboard_section_swaplink');
+
+    if (!startBtn && !swapLink) {
+        return;
+    }
+
+    if (cameraLabel && cameraLabel.textContent !== 'Camera source') {
+        cameraLabel.textContent = 'Camera source';
+    }
+
+    if (startBtn && startBtn.textContent !== 'Start Camera') {
+        startBtn.textContent = 'Start Camera';
+    }
+
+    const stopBtn = document.getElementById('html5-qrcode-button-camera-stop');
+    if (stopBtn && stopBtn.textContent !== 'Stop Camera') {
+        stopBtn.textContent = 'Stop Camera';
+    }
+
+    if (swapLink && !swapLink.dataset.polished) {
+        swapLink.dataset.polished = '1';
+        swapLink.innerHTML = '<i class="fas fa-image"></i> Upload QR Image';
+        swapLink.removeAttribute('style');
+    }
+
+    const statusSpan = document.getElementById('reader__status_span');
+    if (statusSpan && statusSpan.textContent.toLowerCase().includes('error')) {
+        statusSpan.classList.add('scanner-error');
+    }
+
+    scannerUiPolished = true;
+}
+
+function watchForActiveCamera() {
+    const video = document.querySelector('#reader video');
+
+    if (video && video.srcObject && !video.dataset.statusWatched) {
+        video.dataset.statusWatched = '1';
+        updateScannerStatus('scanning');
+
+        video.addEventListener('pause', () => {
+            if (!scannerPaused) {
+                updateScannerStatus('ready');
+            }
+        });
+
+        video.addEventListener('play', () => {
+            if (!scannerPaused) {
+                updateScannerStatus('scanning');
+            }
+        });
+    }
+}
+
+let polishAttempts = 0;
+const polishTimer = setInterval(() => {
+    polishScannerUi();
+    watchForActiveCamera();
+
+    if (scannerUiPolished || ++polishAttempts >= 15) {
+        clearInterval(polishTimer);
+    }
+}, 200);
 
 </script>
 @endpush

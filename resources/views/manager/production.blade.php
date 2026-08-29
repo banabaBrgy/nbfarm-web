@@ -20,7 +20,7 @@ SUMMARY CARDS
 <div class="row g-4 mb-4">
     <h1>Production Overview</h1>
     <!-- Today's Production -->
-    <div class="col-lg-4 col-md-6">
+    <div class="col-lg-3 col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body d-flex justify-content-between align-items-start">
 
@@ -47,7 +47,7 @@ SUMMARY CARDS
     </div>
 
     <!-- Active Batches -->
-    <div class="col-lg-4 col-md-6">
+    <div class="col-lg-3 col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body d-flex justify-content-between align-items-start">
 
@@ -74,7 +74,7 @@ SUMMARY CARDS
     </div>
 
     <!-- Forecast -->
-    <div class="col-lg-4 col-md-12">
+    <div class="col-lg-3 col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body d-flex justify-content-between align-items-start">
 
@@ -100,6 +100,32 @@ SUMMARY CARDS
         </div>
     </div>
 
+    <!-- QR Management -->
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+
+                <small class="text-muted text-uppercase fw-semibold">
+                    QR Management
+                </small>
+
+                <form action="{{ route('manager.qr.generate') }}" method="POST" class="mt-3">
+                    @csrf
+                    <button class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-qrcode"></i>
+                        Generate QR
+                    </button>
+                </form>
+
+                <a href="{{ route('manager.production.scan') }}" class="btn btn-success w-100">
+                    <i class="fas fa-camera"></i>
+                    Scan QR
+                </a>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
@@ -115,7 +141,7 @@ PRODUCTION TABLE
 
         <h2>Today's Egg Production</h2>
 
-        <form method="GET" action="{{ route('owner.production') }}" class="d-flex gap-2">
+        <form method="GET" action="{{ route('manager.production') }}" class="d-flex gap-2">
 
     <input
         type="text"

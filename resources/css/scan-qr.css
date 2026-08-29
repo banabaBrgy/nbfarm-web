@@ -173,16 +173,27 @@
     content: "";
 }
 
+.scanner-status--active::before {
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+    animation: scan-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes scan-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
 .scanner-frame {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 330px;
-    border: 1px solid #e3ebe5;
-    border-radius: 14px;
-    padding: 16px;
-    background: #f7faf8;
+    border: 1px dashed #cfe0d2;
+    border-radius: 16px;
+    padding: 12px;
+    background: linear-gradient(180deg, #f8fbf9 0%, #f1f6f2 100%);
 }
 
 .scanner-frame::before,
@@ -193,106 +204,216 @@
 #reader {
     position: relative;
     width: 100%;
-    max-width: 650px;
-    border: 1px solid #dfe9e2;
+    max-width: 520px;
+    border: none;
     border-radius: 14px;
-    padding: 18px 20px;
-    background: #ffffff;
-    box-shadow: 0 4px 14px rgba(31, 41, 55, 0.04);
-    font-size: 16px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 15px;
+    font-family: inherit;
 }
 
 #reader::before,
 #reader::after {
-    position: absolute;
-    z-index: 2;
-    width: 22px;
-    height: 22px;
-    border-color: #1f2937;
-    content: "";
-    pointer-events: none;
+    display: none;
 }
 
-#reader::before {
-    top: 8px;
-    left: 8px;
-    border-top: 3px solid;
-    border-left: 3px solid;
-}
-
-#reader::after {
-    right: 8px;
-    bottom: 8px;
-    border-right: 3px solid;
-    border-bottom: 3px solid;
+#reader__header_message {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: #4b5563;
+    background: #ffffff;
+    border: 1px solid #e5ebe7;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: center;
 }
 
 #reader__scan_region {
-    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    margin-bottom: 4px;
+    padding: 28px 20px 20px;
+    border-radius: 14px;
     color: #6b7280;
+    background: #ffffff;
+    border: 1px solid #e8efea;
+    text-align: center;
 }
 
-#reader__scan_region img {
-    max-width: 64px;
-    opacity: 0.9;
+#reader__scan_region:has(video) {
+    min-height: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+#reader__scan_region > img {
+    display: none !important;
+}
+
+#reader__scan_region:not(:has(video))::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    color: #2e7d32;
+    background: linear-gradient(135deg, #eaf6ed, #dff2e3);
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 28px;
+    content: "\f029";
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.12);
+}
+
+#reader__scan_region:not(:has(video))::after {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    content: "Point your camera at a farm QR label\A or upload a photo below";
+    white-space: pre-line;
 }
 
 #reader__dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-top: 14px;
-    border-top: 1px solid #edf2ee;
-    padding-top: 14px;
+    border: none;
+    border-top: none;
+    padding: 18px;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #e8efea;
+    box-shadow: 0 2px 10px rgba(31, 41, 55, 0.04);
 }
 
 #reader__dashboard_section_csr {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    color: #374151;
+    padding-bottom: 0;
+}
+
+#reader__dashboard_section_csr > span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: #6b7280;
-    padding-bottom: 8px;
+}
+
+#reader__dashboard_section_csr select,
+#reader select {
+    width: 100%;
+    border: 1px solid #d8e3dc;
+    border-radius: 10px;
+    padding: 11px 36px 11px 12px;
+    color: #1f2937;
+    background: #fafcfb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+    font-size: 14px;
+    font-weight: 500;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#reader__dashboard_section_csr select:focus,
+#reader select:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+}
+
+#reader__dashboard_section {
+    width: 100%;
 }
 
 #reader video {
     display: block;
     width: 100%;
-    max-height: 330px;
-    border-radius: 10px;
+    max-height: 340px;
+    border-radius: 12px;
     object-fit: cover;
+    border: 1px solid #dfe9e2;
+    background: #000;
 }
 
 #reader img {
     margin: 0 auto;
+    border-radius: 10px;
 }
 
 #reader button {
-    border: 1px solid #2e7d32;
-    border-radius: 10px;
-    padding: 11px 20px;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 20px;
     color: #ffffff;
-    background: #2e7d32;
-    box-shadow: 0 5px 12px rgba(46, 125, 50, 0.18);
+    background: linear-gradient(135deg, #2e7d32, #25671e);
+    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.22);
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 #reader button:hover {
-    background: #25671e;
-    box-shadow: 0 7px 16px rgba(46, 125, 50, 0.24);
+    filter: brightness(1.05);
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.28);
     transform: translateY(-1px);
 }
 
+#reader button:active {
+    transform: translateY(0);
+}
+
 #reader__dashboard_section_swaplink {
-    display: block;
-    width: max-content;
-    margin: 34px auto 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin: 4px 0 0;
     border: 1px solid #cfe0d2;
-    border-radius: 9px;
-    padding: 9px 15px;
+    border-radius: 12px;
+    padding: 12px 16px;
     color: #25671e;
     background: #f7fbf8;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
     transition: 0.2s ease;
+}
+
+#reader__dashboard_section_swaplink::before {
+    content: "or";
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 10px;
+    border-radius: 999px;
+    color: #9ca3af;
+    background: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 #reader__dashboard_section_swaplink:hover {
@@ -302,11 +423,69 @@
     transform: translateY(-1px);
 }
 
-#reader select {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 8px;
-    background: #ffffff;
+/* File-upload mode */
+#reader input[type="file"] {
+    font-size: 14px;
+}
+
+#reader__filescan_input {
+    width: 100%;
+}
+
+#reader label[for="html5-qrcode-private-filescan-input"] {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    border: 1px dashed #2e7d32;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #25671e;
+    background: #f3faf4;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#reader label[for="html5-qrcode-private-filescan-input"]:hover {
+    background: #eaf6ed;
+    border-color: #25671e;
+}
+
+#reader__status_span {
+    display: block;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+#reader__status_span[style*="color: red"],
+#reader__status_span.scanner-error {
+    color: #b42318 !important;
+    background: #fff0ee;
+    border: 1px solid #f5d0cb;
+}
+
+#reader a[href="#"] {
+    color: #25671e;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+#reader a[href="#"]:hover {
+    text-decoration: underline;
+}
+
+/* Hide library info icons */
+#reader img[alt="Info icon"],
+#reader span[title] img {
+    display: none !important;
 }
 
 .scanner-instruction {
@@ -433,10 +612,6 @@
     .scanner-card {
         padding: 18px;
     }
-
-    #reader {
-        padding: 14px 16px;
-    }
 }
 
 @media (max-width: 980px) {
@@ -503,19 +678,27 @@
 
     .scanner-frame {
         min-height: 280px;
+        padding: 10px;
     }
 
-    #reader {
-        padding: 12px 10px;
+    #reader__scan_region:not(:has(video)) {
+        min-height: 130px;
+        padding: 22px 16px 18px;
     }
 
-    #reader__scan_region {
-        min-height: 70px;
+    #reader__scan_region:not(:has(video))::before {
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+    }
+
+    #reader__scan_region:not(:has(video))::after {
+        font-size: 13px;
     }
 
     #reader__dashboard {
-        margin-top: 9px;
-        padding-top: 9px;
+        padding: 14px;
+        gap: 10px;
     }
 
     #reader button {
@@ -598,20 +781,29 @@
 
     .scanner-frame {
         min-height: 240px;
-        border-radius: 10px;
+        border-radius: 12px;
     }
 
-    #reader {
-        padding: 10px 8px;
-        border-radius: 10px;
+    #reader__scan_region:not(:has(video)) {
+        min-height: 110px;
+        padding: 18px 12px 14px;
     }
 
-    #reader__scan_region {
-        min-height: 60px;
+    #reader__scan_region:not(:has(video))::before {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 8px;
+        font-size: 20px;
+        border-radius: 12px;
     }
 
-    #reader__scan_region img {
-        max-width: 50px;
+    #reader__scan_region:not(:has(video))::after {
+        font-size: 12px;
+    }
+
+    #reader__dashboard {
+        padding: 12px;
+        border-radius: 12px;
     }
 
     #reader button {

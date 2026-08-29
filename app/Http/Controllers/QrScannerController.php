@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
+use App\Models\Production;
 use App\Models\QrRecord;
 use App\Models\QrTransaction;
-use App\Models\Production;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Carbon\Carbon;
-use App\Models\Inventory;
+use Illuminate\Http\Request;
 
 class QrScannerController extends Controller
 {
     public function index()
     {
-        return view('scan-qr');
+        $routeRole = User::routeRole();
+
+        return view('scan-qr', [
+            'scanStoreUrl' => route($routeRole . '.scan.store'),
+            'productionUrl' => route($routeRole . '.production'),
+        ]);
     }
 
     public function store(Request $request)
@@ -22,13 +28,15 @@ class QrScannerController extends Controller
             'qr_code' => 'required'
         ]);
 
+        $qrCode = trim($request->qr_code);
+
         /*
         ---------------------------------------
         Hanapin ang QR Record
         ---------------------------------------
         */
 
-        $qr = QrRecord::where('qr_code', $request->qr_code)->first();
+        $qr = QrRecord::where('qr_code', $qrCode)->first();
 
         if (!$qr) {
             return response()->json([

@@ -49,4 +49,19 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
         ];
     }
+
+    /**
+     * Normalize stored role values to route prefixes (staff, manager, owner).
+     */
+    public static function routeRole(?string $role = null): string
+    {
+        $role = strtolower(trim($role ?? auth()->user()?->role ?? ''));
+
+        return match ($role) {
+            'poultry staff', 'staff' => 'staff',
+            'farm manager', 'manager' => 'manager',
+            'farm owner', 'owner' => 'owner',
+            default => $role,
+        };
+    }
 }

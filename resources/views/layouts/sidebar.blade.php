@@ -56,20 +56,7 @@
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     @php
-        $role = strtolower(trim(auth()->user()->role));
-
-        if ($role === 'poultry staff') {
-            $role = 'staff';
-        }
-
-        if ($role === 'farm manager') {
-            $role = 'manager';
-        }
-
-        if ($role === 'farm owner') {
-            $role = 'owner';
-
-        }
+        $role = \App\Models\User::routeRole();
 
         $roleLabels = [
             'owner' => 'FARM OWNER',

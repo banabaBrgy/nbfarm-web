@@ -153,6 +153,12 @@ Route::middleware('auth')->prefix('owner')->name('owner.')->group(function () {
     Route::get('/production/batch/{batch}', [BatchController::class, 'show'])->name('batch.details');
     Route::get('/production/scan-qr', [QrScannerController::class, 'index'])->name('production.scan');
 
+    Route::post('/scan/store', [QrScannerController::class, 'store'])->name('scan.store');
+
+    Route::post('/qr/generate', [QrRecordController::class, 'generate'])->name('qr.generate');
+    Route::get('/qr/list', [QrRecordController::class, 'index'])->name('qr.list');
+    Route::get('/qr/print', [QrRecordController::class, 'print'])->name('qr.print');
+
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
     Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
     Route::delete('/inventory/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
