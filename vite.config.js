@@ -23,6 +23,8 @@ export default defineConfig({
 
                 'resources/css/production.css',
 
+                'resources/css/scan-qr.css',
+
                 'resources/css/users.css',
 
                 'resources/css/inventory.css',

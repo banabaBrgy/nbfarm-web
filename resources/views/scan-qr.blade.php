@@ -4,188 +4,99 @@
 
 @section('content')
 
-<div class="container-fluid">
-
-    <!-- Header -->
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h2 class="fw-bold">
-
-                QR Code Scanner
-
-            </h2>
-
-            <p class="text-muted mb-0">
-
-                Scan the QR Code attached to the egg stack.
-
-            </p>
-
+<div class="scan-page">
+    <div class="scan-page-header">
+        <div class="scan-page-heading">
+            <span class="scan-page-icon" aria-hidden="true">
+                <i class="fas fa-qrcode"></i>
+            </span>
+            <div>
+                <h2>QR Code Scanner</h2>
+                <p>Scan the QR code attached to an egg stack.</p>
+            </div>
         </div>
 
-        <a href="{{ route(auth()->user()->role . '.production') }}" class="btn btn-secondary">
-
+        <a href="{{ route(auth()->user()->role . '.production') }}" class="scan-back-button">
             <i class="fas fa-arrow-left"></i>
-
-            Back
-
+            Back to production
         </a>
-
     </div>
 
-
-    <!-- Scanner -->
-
-    <div class="card shadow-sm border-0 rounded-4">
-
-        <div class="card-body text-center">
-
-            <div id="reader"
-                style="
-                width:100%;
-                max-width:650px;
-                margin:auto;
-                ">
+    <div class="scan-content-grid">
+        <section class="scanner-card" aria-labelledby="scanner-title">
+            <div class="scanner-card-header">
+                <div class="scanner-card-title">
+                    <span class="scanner-card-title-icon" aria-hidden="true">
+                        <i class="fas fa-camera"></i>
+                    </span>
+                    <h3 id="scanner-title">Camera scanner</h3>
+                </div>
+                <span class="scanner-status">Ready to scan</span>
             </div>
 
-            <hr>
+            <div class="scanner-frame">
+                <div id="reader"></div>
+            </div>
 
-            <h5 class="fw-bold">
-
-                Waiting for QR Code...
-
-            </h5>
-
-            <p class="text-muted">
-
-                Position the QR Code inside the camera frame.
-
+            <p class="scanner-instruction">
+                <i class="fas fa-lightbulb"></i>
+                <span>Allow camera access, then position the QR code inside the frame.</span>
             </p>
+        </section>
 
-        </div>
+        <section class="scan-result-card" aria-labelledby="result-title">
+            <div class="scan-result-header">
+                <div class="scanner-card-title">
+                    <span class="scan-result-header-icon" aria-hidden="true">
+                        <i class="fas fa-clipboard-check"></i>
+                    </span>
+                    <h3 id="result-title">Scan result</h3>
+                </div>
+            </div>
 
+            <div class="scan-result-body">
+                <table class="scan-result-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">QR code</th>
+                            <td id="qrCode"><span class="scan-value-muted">Not scanned</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Batch</th>
+                            <td id="batch"><span class="scan-value-muted">Not scanned</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Egg size</th>
+                            <td id="size"><span class="scan-value-muted">Not scanned</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total eggs</th>
+                            <td id="eggs"><span class="scan-value-muted">Not scanned</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Status</th>
+                            <td id="status">
+                                <span class="scan-status-badge scan-status-badge--waiting">
+                                    <i class="fas fa-clock"></i>
+                                    Waiting
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
-
-
-    <!-- Result -->
-
-    <div class="card shadow-sm border-0 rounded-4 mt-4">
-
-        <div class="card-header bg-success text-white">
-
-            <h5 class="mb-0">
-
-                Scan Result
-
-            </h5>
-
-        </div>
-
-        <div class="card-body">
-
-            <table class="table">
-
-                <tr>
-
-                    <th width="180">
-
-                        QR Code
-
-                    </th>
-
-                    <td id="qrCode">
-
-                        -
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <th>
-
-                        Batch
-
-                    </th>
-
-                    <td id="batch">
-
-                        -
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <th>
-
-                        Egg Size
-
-                    </th>
-
-                    <td id="size">
-
-                        -
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <th>
-
-                        Total Eggs
-
-                    </th>
-
-                    <td id="eggs">
-
-                        -
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <th>
-
-                        Status
-
-                    </th>
-
-                    <td id="status">
-
-                        Waiting...
-
-                    </td>
-
-                </tr>
-
-            </table>
-
-        </div>
-
-    </div>
-
 </div>
 
 @endsection
 
 
+@push('styles')
+    @vite('resources/css/scan-qr.css')
+@endpush
+
 @push('scripts')
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-
-<<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -225,22 +136,16 @@ function onScanSuccess(decodedText) {
     .then(res => {
 
         if(res.success){
- 
-document.getElementById("status").innerHTML = `
-<div class="alert alert-success mt-3">
-
-    <strong>Scan Successful!</strong><br>
-
-    <b>QR Code:</b> ${res.qr_code}<br>
-
-    <b>Batch:</b> ${res.batch}<br>
-
-    <b>Egg Size:</b> ${res.size}<br>
-
-    <b>Total Eggs:</b> ${res.eggs}
-
-</div>
-`;
+            document.getElementById("qrCode").textContent = res.qr_code;
+            document.getElementById("batch").textContent = res.batch;
+            document.getElementById("size").textContent = res.size;
+            document.getElementById("eggs").textContent = res.eggs;
+            document.getElementById("status").innerHTML = `
+                <span class="scan-status-badge scan-status-badge--success">
+                    <i class="fas fa-check-circle"></i>
+                    Scan successful
+                </span>
+            `;
 
             Swal.fire({
 
@@ -281,13 +186,12 @@ document.getElementById("status").innerHTML = `
 
         }else{
 
-        document.getElementById("status").innerHTML = `
-<div class="alert alert-danger mt-3">
-
-${res.message}
-
-</div>
-`;
+            document.getElementById("status").innerHTML = `
+                <span class="scan-status-badge scan-status-badge--error">
+                    <i class="fas fa-circle-exclamation"></i>
+                    Scan failed
+                </span>
+            `;
             Swal.fire({
 
                 icon:'error',
@@ -316,6 +220,12 @@ ${res.message}
     .catch(error=>{
 
         console.log(error);
+        document.getElementById("status").innerHTML = `
+            <span class="scan-status-badge scan-status-badge--error">
+                <i class="fas fa-triangle-exclamation"></i>
+                Connection error
+            </span>
+        `;
 
         Swal.fire({
 
@@ -355,6 +265,11 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 );
 
 html5QrcodeScanner.render(onScanSuccess);
+
+const imageScanLink = document.getElementById("reader__dashboard_section_swaplink");
+if (imageScanLink) {
+    imageScanLink.removeAttribute("style");
+}
 
 </script>
 @endpush

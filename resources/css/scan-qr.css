@@ -1,0 +1,445 @@
+/* ==================================================
+   QR SCANNER
+   NB Poultry Farm Design System
+================================================== */
+
+.scan-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+.scan-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.scan-page-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.scan-page-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 14px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2e7d32, #15965d);
+    box-shadow: 0 8px 18px rgba(46, 125, 50, 0.2);
+    font-size: 22px;
+}
+
+.scan-page-header h2 {
+    margin: 0 0 6px;
+    color: #1f2937;
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.scan-page-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 18px;
+}
+
+.scan-back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #dbe4de;
+    border-radius: 10px;
+    padding: 9px 15px;
+    color: #25671e;
+    background: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.scan-back-button:hover {
+    border-color: #25671e;
+    color: #ffffff;
+    background: #25671e;
+}
+
+.scan-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    align-items: start;
+    gap: 22px;
+}
+
+.scanner-card,
+.scan-result-card {
+    overflow: hidden;
+    border: 1px solid #e5ebe7;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(31, 41, 55, 0.06);
+}
+
+.scanner-card {
+    padding: 22px;
+}
+
+.scanner-card-header,
+.scan-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.scanner-card-header {
+    margin-bottom: 18px;
+}
+
+.scanner-card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.scanner-card-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    color: #25671e;
+    background: #eaf6ed;
+}
+
+.scanner-card h3,
+.scan-result-header h3 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.scanner-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid #dbe4de;
+    border-radius: 999px;
+    padding: 6px 10px;
+    color: #66746b;
+    background: #f8faf9;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.scanner-status::before {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f0ad4e;
+    content: "";
+}
+
+.scanner-frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 330px;
+    border: 1px solid #e3ebe5;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f7faf8;
+}
+
+.scanner-frame::before,
+.scanner-frame::after {
+    display: none;
+}
+
+#reader {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    border: 1px solid #dfe9e2;
+    border-radius: 14px;
+    padding: 18px 20px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(31, 41, 55, 0.04);
+    font-size: 16px;
+}
+
+#reader::before,
+#reader::after {
+    position: absolute;
+    z-index: 2;
+    width: 22px;
+    height: 22px;
+    border-color: #1f2937;
+    content: "";
+    pointer-events: none;
+}
+
+#reader::before {
+    top: 8px;
+    left: 8px;
+    border-top: 3px solid;
+    border-left: 3px solid;
+}
+
+#reader::after {
+    right: 8px;
+    bottom: 8px;
+    border-right: 3px solid;
+    border-bottom: 3px solid;
+}
+
+#reader__scan_region {
+    min-height: 92px;
+    color: #6b7280;
+}
+
+#reader__scan_region img {
+    max-width: 64px;
+    opacity: 0.9;
+}
+
+#reader__dashboard {
+    margin-top: 14px;
+    border-top: 1px solid #edf2ee;
+    padding-top: 14px;
+}
+
+#reader__dashboard_section_csr {
+    color: #6b7280;
+    padding-bottom: 8px;
+}
+
+#reader video {
+    display: block;
+    width: 100%;
+    max-height: 330px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+#reader img {
+    margin: 0 auto;
+}
+
+#reader button {
+    border: 1px solid #2e7d32;
+    border-radius: 10px;
+    padding: 11px 20px;
+    color: #ffffff;
+    background: #2e7d32;
+    box-shadow: 0 5px 12px rgba(46, 125, 50, 0.18);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#reader button:hover {
+    background: #25671e;
+    box-shadow: 0 7px 16px rgba(46, 125, 50, 0.24);
+    transform: translateY(-1px);
+}
+
+#reader__dashboard_section_swaplink {
+    display: block;
+    width: max-content;
+    margin: 22px auto 0;
+    border: 1px solid #cfe0d2;
+    border-radius: 9px;
+    padding: 9px 15px;
+    color: #25671e;
+    background: #f7fbf8;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#reader__dashboard_section_swaplink:hover {
+    border-color: #2e7d32;
+    color: #174d18;
+    background: #eaf6ed;
+    transform: translateY(-1px);
+}
+
+#reader select {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px;
+    background: #ffffff;
+}
+
+.scanner-instruction {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 17px 2px 0;
+    color: #6b7280;
+    font-size: 17px;
+    line-height: 1.5;
+}
+
+.scanner-instruction i {
+    margin-top: 2px;
+    color: #2e7d32;
+}
+
+.scan-result-card {
+    position: sticky;
+    top: 24px;
+}
+
+.scan-result-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e7eee9;
+    background: linear-gradient(135deg, #f1faf3, #f8fbf9);
+}
+
+.scan-result-header-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    color: #2e7d32;
+    background: #dff2e3;
+}
+
+.scan-result-body {
+    padding: 8px 20px 18px;
+}
+
+.scan-result-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+}
+
+.scan-result-table tr {
+    border-bottom: 1px solid #eef2ef;
+}
+
+.scan-result-table tr:last-child {
+    border-bottom: 0;
+}
+
+.scan-result-table th,
+.scan-result-table td {
+    padding: 15px 0;
+    vertical-align: middle;
+    font-size: 17px;
+}
+
+.scan-result-table th {
+    width: 42%;
+    color: #6b7280;
+    font-weight: 600;
+    text-align: left;
+}
+
+.scan-result-table td {
+    color: #1f2937;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.scan-value-muted {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.scan-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.scan-status-badge--waiting {
+    color: #8a6500;
+    background: #fff7d6;
+}
+
+.scan-status-badge--success {
+    color: #1f7a38;
+    background: #e4f7e8;
+}
+
+.scan-status-badge--error {
+    color: #b42318;
+    background: #fff0ee;
+}
+
+.scan-status-badge i {
+    font-size: 10px;
+}
+
+@media (max-width: 980px) {
+    .scan-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scan-result-card {
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .scan-page {
+        padding-bottom: 8px;
+    }
+
+    .scan-page-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .scan-back-button {
+        justify-content: center;
+    }
+
+    .scanner-card {
+        padding: 15px;
+    }
+
+    .scanner-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .scanner-frame {
+        min-height: 260px;
+        padding: 10px;
+    }
+
+    .scan-result-body,
+    .scan-result-header {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}
