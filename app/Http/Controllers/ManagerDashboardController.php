@@ -195,10 +195,11 @@ class ManagerDashboardController extends Controller
 
             if($cursor->lte($today)){
 
-                $eggChartData[] =
-                    $weekly->has($key)
-                    ? (int)$weekly[$key]->total
+                $total = $weekly->has($key)
+                    ? (int) $weekly[$key]->total
                     : 0;
+
+                $eggChartData[] = $total > 0 ? $total : null;
 
             }else{
 

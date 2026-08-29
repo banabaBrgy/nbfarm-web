@@ -27,7 +27,7 @@
         <div>
             <div class="detail-card">
                 <small>Total Eggs</small>
-                <h1>{{ number_format($production->eggs_produced) }}</h1>
+                <h1><x-egg-count :value="$production->totalEggCount()" /></h1>
             </div>
         </div>
 

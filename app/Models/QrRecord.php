@@ -12,6 +12,7 @@ class QrRecord extends Model
         'production_id',
         'batch_id',
         'qr_code',
+        'qr_date',
         'egg_size',
         'tray_count',
         'eggs_per_tray'

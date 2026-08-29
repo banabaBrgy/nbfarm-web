@@ -104,7 +104,7 @@ class DashboardController extends Controller
 
             $weeklyProduction->push([
                 'production_date' => $date->toDateString(),
-                'total' => $total
+                'total' => $total > 0 ? $total : null,
             ]);
         }
 

@@ -201,7 +201,7 @@ PRODUCTION TABLE
         $large += $production->large_eggs;
         $xl += $production->extra_large_eggs;
         $cracked += $production->cracked_eggs;
-        $total += $production->eggs_produced;
+        $total += $production->totalEggCount();
 
         @endphp
 
@@ -217,21 +217,21 @@ PRODUCTION TABLE
 
             </td>
 
-            <td>{{ number_format($production->small_eggs) }}</td>
+            <td><x-egg-count :value="$production->small_eggs" /></td>
 
-            <td>{{ number_format($production->medium_eggs) }}</td>
+            <td><x-egg-count :value="$production->medium_eggs" /></td>
 
-            <td>{{ number_format($production->large_eggs) }}</td>
+            <td><x-egg-count :value="$production->large_eggs" /></td>
 
-            <td>{{ number_format($production->extra_large_eggs) }}</td>
+            <td><x-egg-count :value="$production->extra_large_eggs" /></td>
 
-            <td>{{ number_format($production->cracked_eggs) }}</td>
+            <td><x-egg-count :value="$production->cracked_eggs" /></td>
 
             <td>
 
                 <strong>
 
-                    {{ number_format($production->eggs_produced) }}
+                    <x-egg-count :value="$production->totalEggCount()" />
 
                 </strong>
 
@@ -257,17 +257,17 @@ PRODUCTION TABLE
 
             <th>TOTAL</th>
 
-            <th>{{ number_format($small) }}</th>
+            <th><x-egg-count :value="$small" /></th>
 
-            <th>{{ number_format($medium) }}</th>
+            <th><x-egg-count :value="$medium" /></th>
 
-            <th>{{ number_format($large) }}</th>
+            <th><x-egg-count :value="$large" /></th>
 
-            <th>{{ number_format($xl) }}</th>
+            <th><x-egg-count :value="$xl" /></th>
 
-            <th>{{ number_format($cracked) }}</th>
+            <th><x-egg-count :value="$cracked" /></th>
 
-            <th>{{ number_format($total) }}</th>
+            <th><x-egg-count :value="$total" /></th>
 
             <th>-</th>
 

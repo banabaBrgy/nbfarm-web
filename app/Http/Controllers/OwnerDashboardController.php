@@ -92,8 +92,8 @@ class OwnerDashboardController extends Controller
             $eggChartLabels[] = $cursor->format('D');
 
             if ($cursor->lte($today)) {
-                // Araw na nakalipas na o kasalukuyan — zero-fill kung walang record
-                $eggChartData[] = $weekly->has($key) ? (int) $weekly[$key]->total : 0;
+                $total = $weekly->has($key) ? (int) $weekly[$key]->total : 0;
+                $eggChartData[] = $total > 0 ? $total : null;
             } else {
                 // Araw pa lang darating — null para walang bar na lalabas
                 $eggChartData[] = null;

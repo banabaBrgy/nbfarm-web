@@ -31,4 +31,13 @@ class Production extends Model
         'production_id'
     );
 }
+
+    public function totalEggCount(): int
+    {
+        return $this->small_eggs
+            + $this->medium_eggs
+            + $this->large_eggs
+            + $this->extra_large_eggs
+            + $this->cracked_eggs;
+    }
 }
