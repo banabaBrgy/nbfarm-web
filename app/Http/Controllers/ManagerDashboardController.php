@@ -9,7 +9,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Services\ForecastingService;
+use App\Services\Forecasting\GenerateEggForecast;
 
 class ManagerDashboardController extends Controller
 {
@@ -121,15 +121,6 @@ class ManagerDashboardController extends Controller
 
 
         // ============================
-        // FORECAST CARD
-        // ALWAYS FROM LATEST PRODUCTION
-        // ============================
-
-        $predictedEggs = ForecastingService::latestPrediction();
-
-
-
-        // ============================
         // WEEKLY PRODUCTION CHART
         // ============================
 
@@ -214,76 +205,10 @@ class ManagerDashboardController extends Controller
 
 
 
-        // ============================
-        // PYTHON FORECAST CHART LINE
-        // ============================
-
-        $eggForecastLabels = [];
-        $eggForecastData = [];
-
-
-        $pythonPath = env(
-            'PYTHON_PATH',
-            'python'
-        );
-
-
-        $scriptPath = base_path(
-            'scripts/forecast_eggs.py'
-        );
-
-
-
-        if(file_exists($scriptPath)){
-
-
-            $command =
-                escapeshellcmd($pythonPath)
-                .' '
-                .escapeshellarg($scriptPath)
-                .' --host='
-                .escapeshellarg(env('DB_HOST','127.0.0.1'))
-                .' --database='
-                .escapeshellarg(env('DB_DATABASE'))
-                .' --user='
-                .escapeshellarg(env('DB_USERNAME'))
-                .' --password='
-                .escapeshellarg(env('DB_PASSWORD'))
-                .' --start-date='
-                .escapeshellarg($weekStart->format('Y-m-d'))
-                .' --end-date='
-                .escapeshellarg($weekEnd->format('Y-m-d'));
-
-
-
-            $output = shell_exec(
-                $command.' 2>&1'
-            );
-
-
-            $pythonForecast = json_decode(
-                $output,
-                true
-            );
-
-
-
-            if(
-                is_array($pythonForecast)
-                &&
-                empty($pythonForecast['error'])
-            ){
-
-                $eggForecastLabels =
-                    $pythonForecast['labels'] ?? [];
-
-
-                $eggForecastData =
-                    $pythonForecast['data'] ?? [];
-
-            }
-
-        }
+        $forecast = app(GenerateEggForecast::class)->forWeek($weekStart, $weekEnd);
+        $eggForecastLabels = $forecast['labels'];
+        $eggForecastData = $forecast['data'];
+        $predictedEggs = $forecast['predicted_eggs'];
 
 
 

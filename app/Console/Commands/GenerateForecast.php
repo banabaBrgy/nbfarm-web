@@ -2,20 +2,22 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Forecasting\GenerateEggForecast;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Services\ForecastingService;
 
 class GenerateForecast extends Command
 {
     protected $signature = 'forecast:daily';
 
-    protected $description = 'Generate daily egg production forecast';
+    protected $description = 'Generate daily egg production forecast via the Python API';
 
-    public function handle(ForecastingService $service)
+    public function handle(GenerateEggForecast $service)
     {
-        $forecast = $service->generateDailyForecast();
+        $weekStart = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        $result = $service->forWeek($weekStart, $weekStart->copy()->addDays(6));
 
-        $this->info('Forecast Generated: '.$forecast);
+        $this->info('Forecast Generated: '.$result['predicted_eggs']);
 
         return self::SUCCESS;
     }

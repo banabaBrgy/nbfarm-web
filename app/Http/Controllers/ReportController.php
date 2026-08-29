@@ -10,7 +10,7 @@ use App\Models\Dispatch;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use App\Models\InventoryItem;
-use App\Models\Forecast;
+use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -83,7 +83,7 @@ class ReportController extends Controller
                 SUM(eggs_produced) as total
             ")->first();
 
-                $forecast = Forecast::latest('forecast_date')->first();
+                $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
                 $content =
                     "========== PRODUCTION REPORT ==========\n\n"
@@ -99,7 +99,7 @@ class ReportController extends Controller
                     . "TOTAL EGGS : {$production->total}\n\n"
 
                     . "Forecast Next Production : "
-                    . ($forecast->predicted_eggs ?? 0)
+                    . $predictedEggs
                     . " eggs\n\n"
 
                     . "Prepared by Farm Manager.";
@@ -200,7 +200,7 @@ class ReportController extends Controller
         SUM(eggs_produced) as total
     ")->first();
 
-                $forecast = Forecast::latest('forecast_date')->first();
+                $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
                 $dispatch = Dispatch::count();
 
@@ -267,7 +267,7 @@ class ReportController extends Controller
 
                     . "Predicted Egg Production\n"
 
-                    . ($forecast->predicted_eggs ?? 0)
+                    . $predictedEggs
 
                     . " eggs\n\n"
 

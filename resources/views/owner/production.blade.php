@@ -84,7 +84,7 @@ SUMMARY CARDS
                     </small>
 
                     <h2 class="fw-bold mt-2 text-success">
-                        8,250
+                        {{ number_format($predictedEggs) }}
                     </h2>
 
                     <small class="text-muted">

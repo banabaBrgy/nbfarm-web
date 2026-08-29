@@ -32,6 +32,17 @@
 
         <div class="dashboard-card-small">
             <div class="card-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+                <h5>Predicted Eggs</h5>
+                <h2>{{ number_format($predictedEggs ?? 0) }}</h2>
+                <small>Next-day forecast</small>
+            </div>
+        </div>
+
+        <div class="dashboard-card-small">
+            <div class="card-icon">
                 <i class="fas fa-dove"></i>
             </div>
             <div>

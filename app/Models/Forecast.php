@@ -11,6 +11,12 @@ class Forecast extends Model
     protected $fillable = [
         'forecast_date',
         'predicted_eggs',
+        'series',
+    ];
+
+    protected $casts = [
+        'forecast_date' => 'date',
+        'series' => 'array',
     ];
 
     public $timestamps = true;

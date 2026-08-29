@@ -6,6 +6,7 @@ use App\Models\Production;
 use App\Models\InventoryItem;
 use App\Models\Dispatch;
 use App\Models\Transaction;
+use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -102,38 +103,10 @@ class OwnerDashboardController extends Controller
             $cursor->addDay();
         }
 
-        // ============================
-        // FORECAST (Linear Regression via Python script)
-        // Buong linggo (Mon-Sun) ang tinatanong, kasama yung mga araw
-        // na nakalipas na, para may makumparang forecast vs actual
-        // ============================
-        $eggForecastLabels = [];
-        $eggForecastData = [];
-
-        $pythonPath = env('PYTHON_PATH', 'python');
-        $scriptPath = base_path('scripts/forecast_eggs.py');
-
-        if (file_exists($scriptPath)) {
-            $command = escapeshellcmd($pythonPath) . ' ' . escapeshellarg($scriptPath)
-                . ' --host=' . escapeshellarg(env('DB_HOST', '127.0.0.1'))
-                . ' --database=' . escapeshellarg(env('DB_DATABASE'))
-                . ' --user=' . escapeshellarg(env('DB_USERNAME'))
-                . ' --password=' . escapeshellarg(env('DB_PASSWORD'))
-                . ' --start-date=' . escapeshellarg($weekStart->format('Y-m-d'))
-                . ' --end-date=' . escapeshellarg($weekEnd->format('Y-m-d'));
-
-            $output = shell_exec($command . ' 2>&1');
-            $forecast = json_decode($output, true);
-
-            if (is_array($forecast) && empty($forecast['error'])) {
-                $eggForecastLabels = $forecast['labels'] ?? [];
-                $eggForecastData = $forecast['data'] ?? [];
-            } else {
-                // Silent fail lang muna — bar chart mag-render pa rin,
-                // wala lang dashed forecast line. Pwede i-log kung kailangan:
-                // \Log::warning('Forecast script failed', ['output' => $output]);
-            }
-        }
+        $forecast = app(GenerateEggForecast::class)->forWeek($weekStart, $weekEnd);
+        $eggForecastLabels = $forecast['labels'];
+        $eggForecastData = $forecast['data'];
+        $predictedEggs = $forecast['predicted_eggs'];
 
         return view('owner.dashboard', compact(
             'eggsToday',
@@ -151,7 +124,8 @@ class OwnerDashboardController extends Controller
             'eggChartLabels',
             'eggChartData',
             'eggForecastLabels',
-            'eggForecastData'
+            'eggForecastData',
+            'predictedEggs'
         ));
     }
 }

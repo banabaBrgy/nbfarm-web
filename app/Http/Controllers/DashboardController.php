@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Production;
 use Illuminate\Support\Facades\DB;
 use App\Models\DailyInventoryLog;
-use App\Models\Forecast;
+use App\Services\Forecasting\GenerateEggForecast;
 use App\Models\InventoryItem;
 
 class DashboardController extends Controller
@@ -115,11 +115,7 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $forecast = Forecast::latest('forecast_date')
-            ->first();
-
-
-        $predictedEggs = $forecast?->predicted_eggs ?? 0;
+        $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
 
 

@@ -7,7 +7,7 @@ use App\Models\QrRecord;
 use App\Models\QrTransaction;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use App\Models\Forecast;
+use App\Services\Forecasting\GenerateEggForecast;
 
 class ProductionController extends Controller
 {
@@ -48,8 +48,7 @@ class ProductionController extends Controller
 
         $totalEggs = $productions->sum('eggs_produced');
 
-        $predictedEggs = Forecast::latest('forecast_date')
-    ->value('predicted_eggs') ?? 0;
+        $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
         // Fetch QR transactions related to the selected productions
         $productionIds = $productions->pluck('production_id');

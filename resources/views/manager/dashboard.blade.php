@@ -99,8 +99,17 @@
 
         </div>
 
-
-
+        {{-- Predicted eggs (Python linear regression) --}}
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-title">Predicted Eggs</span>
+                <h2>{{ number_format($predictedEggs) }}</h2>
+                <small>Next-day forecast</small>
+            </div>
+        </div>
 
         {{-- FEEDS --}}
         <div class="stat-card">
