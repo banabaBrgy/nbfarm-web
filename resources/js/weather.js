@@ -28,7 +28,9 @@ function renderForecast(days) {
         <div class="farm-weather__day${day.day === 'Today' ? ' is-today' : ''}">
             <span class="farm-weather__day-name">${day.day}</span>
             <span class="farm-weather__day-num">${day.day_num ?? ''}</span>
-            <i class="fas ${day.icon}" aria-hidden="true"></i>
+            <span class="farm-weather__day-icon" aria-hidden="true">
+                <i class="fas ${day.icon}"></i>
+            </span>
             <span class="farm-weather__day-temps">
                 <strong>${day.max}°</strong>
                 <span>${day.min}°</span>
