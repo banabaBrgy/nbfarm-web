@@ -74,73 +74,38 @@ document.addEventListener('DOMContentLoaded', () => {
 // Mobile sidebar toggle
 document.addEventListener('DOMContentLoaded', () => {
 
-    const toggle = document.querySelector('.sidebar-toggle');
-    const backdrop = document.querySelector('.sidebar-backdrop');
-    const sidebarLinks = document.querySelectorAll('.sidebar nav a');
-    const mobileNavBar = document.querySelector('.mobile-nav-bar');
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const menuBtn   = document.getElementById('headerMenuBtn');
+    const closeBtn  = document.getElementById('sidebarCloseBtn');
+    const backdrop  = document.getElementById('sidebarBackdrop');
+    const navLinks  = document.querySelectorAll('.sidebar nav a');
 
-    // Show mobile nav bar on mobile, hide on desktop
-    const updateMobileNav = () => {
-        if (window.innerWidth <= 768) {
-            if (mobileNavBar) mobileNavBar.style.display = 'flex';
-        } else {
-            if (mobileNavBar) mobileNavBar.style.display = 'none';
-        }
+    if (!menuBtn) return;
+
+    const open = () => {
+        document.body.classList.add('sidebar-open');
+        menuBtn.setAttribute('aria-expanded', 'true');
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
     };
 
-    // Initial check
-    updateMobileNav();
-    window.addEventListener('resize', updateMobileNav);
+    const close = () => {
+        document.body.classList.remove('sidebar-open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    };
 
-    // Mobile menu toggle functionality
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            const isOpen = document.body.classList.toggle('sidebar-open');
-            
-            if (backdrop) {
-                if (isOpen) {
-                    backdrop.style.display = 'block';
-                } else {
-                    backdrop.style.display = 'none';
-                }
-            }
-        });
-    }
-
-    if (backdrop) {
-        backdrop.addEventListener('click', () => {
-            document.body.classList.remove('sidebar-open');
-            backdrop.style.display = 'none';
-        });
-    }
-
-    // Close sidebar when clicking on a mobile nav item (if it's not the menu toggle)
-    const mobileNavItems = document.querySelectorAll('.mobile-nav-item:not(.mobile-menu-toggle)');
-    mobileNavItems.forEach((item) => {
-        item.addEventListener('click', () => {
-            document.body.classList.remove('sidebar-open');
-            if (backdrop) backdrop.style.display = 'none';
-        });
+    menuBtn.addEventListener('click', () => {
+        document.body.classList.contains('sidebar-open') ? close() : open();
     });
 
-    // Close sidebar when clicking on sidebar links
-    if (sidebarLinks && backdrop) {
-        sidebarLinks.forEach((link) => {
-            link.addEventListener('click', () => {
-                document.body.classList.remove('sidebar-open');
-                backdrop.style.display = 'none';
-            });
-        });
-    }
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (backdrop)  backdrop.addEventListener('click', close);
 
-    // Close sidebar when screen resizes to desktop
+    navLinks.forEach(link => link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) close();
+    }));
+
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            document.body.classList.remove('sidebar-open');
-            if (backdrop) backdrop.style.display = 'none';
-        }
+        if (window.innerWidth > 768) close();
     });
 
 });

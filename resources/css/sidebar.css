@@ -20,13 +20,143 @@ body {
     overflow-x: hidden;
 }
 
+/* ============================================
+   APP HEADER
+   Desktop: offset left by sidebar width
+   Mobile: full width + hamburger shown
+   ============================================ */
+.mobile-header {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 250px;
+    right: 0;
+    height: 56px;
+    background: linear-gradient(135deg, #25671E 0%, #1d5018 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 20px;
+    z-index: 1040;
+    gap: 12px;
+}
+
+/* Hamburger hidden on desktop — sidebar is always visible */
+.header-menu-btn {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.header-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.header-menu-btn:active {
+    transform: scale(0.93);
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.header-logo {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #B9E937;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.header-title {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-subtitle {
+    margin: 0;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================
+   SIDEBAR CLOSE BUTTON — mobile only
+   ============================================ */
+.sidebar-close-btn {
+    display: none;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 17px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+    z-index: 2;
+}
+
+.sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* ============================================
+   DESKTOP SHELL
+   Sidebar full height, content below header
+   ============================================ */
 .wrapper {
     min-width: 0;
+    padding-top: 56px;
 }
 
 .wrapper > .sidebar {
     position: fixed;
+    top: 0;
+    left: 0;
     width: 250px;
+    height: 100vh;
 }
 
 .wrapper > .main-content {
@@ -56,7 +186,14 @@ body {
     display: none;
 }
 
+/* ============================================
+   TABLET  (≤ 992px)
+   ============================================ */
 @media (max-width: 992px) {
+    .mobile-header {
+        left: 220px;
+    }
+
     .wrapper > .sidebar {
         width: 220px;
     }
@@ -70,127 +207,100 @@ body {
     }
 }
 
+/* ============================================
+   MOBILE  (≤ 768px)
+   Header full-width, sidebar off-canvas, overlays header
+   ============================================ */
 @media (max-width: 768px) {
+
+    /* Header spans full width */
+    .mobile-header {
+        left: 0;
+        padding: 0 12px;
+    }
+
+    /* Show hamburger button */
+    .header-menu-btn {
+        display: flex;
+    }
+
+    /* Sidebar overlays everything including header */
     .wrapper > .sidebar {
-        width: 250px;
+        top: 0;
         height: 100vh;
+        width: 260px;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
-        z-index: 1050;
+        z-index: 1060;
     }
 
     body.sidebar-open .wrapper > .sidebar {
         transform: translateX(0);
     }
 
-    .sidebar-toggle {
-        display: none;
+    /* Show close button inside sidebar */
+    .sidebar-close-btn {
+        display: flex;
     }
 
+    /* Backdrop sits above the header but below the sidebar */
     .sidebar-backdrop {
         position: fixed;
         inset: 0;
-        z-index: 1049;
-        display: none;
-        visibility: hidden;
-        background: rgba(15, 35, 25, 0.5);
+        z-index: 1050;
+        background: rgba(10, 30, 18, 0.55);
         opacity: 0;
+        visibility: hidden;
         transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     body.sidebar-open .sidebar-backdrop {
-        visibility: visible;
-        opacity: 1;
         display: block;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* No wrapper padding — handled in main-content */
+    .wrapper {
+        padding-top: 0;
     }
 
     .wrapper > .main-content {
         margin-left: 0;
-        padding: 20px 16px 100px;
+        padding: 76px 16px 24px;
         width: 100%;
     }
 
     .wrapper + .footer {
         left: 0;
-        bottom: 60px;
-    }
-
-    /* ============================================
-       MOBILE BOTTOM NAVIGATION BAR
-       ============================================ */
-    .mobile-nav-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background: #25671E;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: stretch;
-        z-index: 1040;
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .mobile-nav-item {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        color: rgba(255, 255, 255, 0.6);
-        text-decoration: none;
-        font-size: 11px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        border-bottom: 3px solid transparent;
-        cursor: pointer;
-    }
-
-    .mobile-nav-item:active {
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .mobile-nav-item.active {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.08);
-        border-bottom-color: #B9E937;
-    }
-
-    .mobile-nav-item i {
-        font-size: 20px;
-        line-height: 1;
     }
 }
 
+/* ============================================
+   SMALL MOBILE  (≤ 480px)
+   ============================================ */
 @media (max-width: 480px) {
     .wrapper > .sidebar {
-        width: min(250px, 90vw);
+        width: min(260px, 88vw);
     }
 
     .wrapper > .main-content {
-        padding: 20px 12px 100px;
+        padding: 72px 12px 20px;
     }
 
-    .wrapper + .footer {
-        left: 0;
-        font-size: 11px;
-        bottom: 60px;
+    .header-title h1 {
+        font-size: 14px;
     }
 
-    /* Mobile nav bar adjustments for small screens */
-    .mobile-nav-bar {
-        height: 60px;
+    .header-subtitle {
+        font-size: 9px;
     }
 
-    .mobile-nav-item {
-        font-size: 10px;
-        gap: 3px;
-    }
-
-    .mobile-nav-item i {
-        font-size: 18px;
+    .header-menu-btn,
+    .header-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
     }
 }
 
@@ -245,80 +355,61 @@ body {
    PROFILE
 ================================================== */
 
-.profile{
-
-    padding:26px 20px 24px;
-
-    text-align:center;
-
-    border-bottom:1px solid rgba(255,255,255,.08);
-
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 14px 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.profile::before{
-    display:block;
-    margin-bottom:20px;
-    color:#f1fff4;
-    content:'NB POULTRY FARM';
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:1.6px;
+.profile-image {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #e5f5e8;
+    color: #25671e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
 }
 
-.profile-image{
-
-    width:76px;
-    height:76px;
-
-    margin:auto;
-
-    border-radius:50%;
-
-    background:#e5f5e8;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    color:#25671e;
-
-    font-size:28px;
-
-    font-weight:600;
-
-    box-shadow:
-
-        0 8px 18px rgba(9,38,18,.18);
-
+.profile-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.profile h5{
-
-    margin-top:15px;
-
-    margin-bottom:5px;
-
-    font-size:18px;
-
-    color:#fff;
-
-    font-weight:600;
-
+.profile-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.role{
-
-    margin-top:14px;
-    font-size:12px;
-
-    color:#d9ede0;
-
-    font-weight:600;
-    letter-spacing:1.1px;
-
-    text-transform:uppercase;
-
+.role {
+    display: inline-flex;
+    align-self: flex-start;
+    margin: 0;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(185, 233, 55, 0.16);
+    color: #d7f07a;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    line-height: 1.4;
 }
 
 /* ==================================================
@@ -538,19 +629,9 @@ body {
 
 }
 
-.profile{
-
-    padding:22px 15px;
-
-}
-
-.profile-image{
-
-    width:70px;
-    height:70px;
-
-    font-size:26px;
-
+.profile {
+    margin: 16px 12px 6px;
+    padding: 9px 10px;
 }
 
 .sidebar a{
@@ -597,33 +678,8 @@ body {
 
 }
 
-.profile{
-
-    padding:20px 14px;
-
-}
-
-.profile::before{
-
-    font-size:10px;
-    margin-bottom:15px;
-
-}
-
-.profile-image{
-
-    width:65px;
-    height:65px;
-
-    font-size:24px;
-
-}
-
-.role{
-
-    font-size:11px;
-    margin-top:12px;
-
+.profile {
+    margin: 52px 12px 6px;
 }
 
 .sidebar nav{
@@ -688,33 +744,9 @@ body {
 
 }
 
-.profile{
-
-    padding:18px 12px;
-
-}
-
-.profile::before{
-
-    font-size:9px;
-    margin-bottom:12px;
-
-}
-
-.profile-image{
-
-    width:60px;
-    height:60px;
-
-    font-size:22px;
-
-}
-
-.role{
-
-    font-size:10px;
-    margin-top:10px;
-
+.profile {
+    margin: 50px 10px 6px;
+    padding: 8px 10px;
 }
 
 .sidebar nav{

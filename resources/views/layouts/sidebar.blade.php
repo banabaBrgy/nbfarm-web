@@ -36,10 +36,23 @@
 </head>
 
 <body>
-    <button class="sidebar-toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="sidebar-backdrop"></div>
+    <!-- MOBILE HEADER (visible only on ≤768px) -->
+    <header class="mobile-header">
+        <button class="header-menu-btn" id="headerMenuBtn" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-title-group">
+            <div class="header-logo">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="header-title">
+                <h1>NB Farm</h1>
+                <p class="header-subtitle">Poultry Management</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     @php
         $role = strtolower(trim(auth()->user()->role));
@@ -138,12 +151,21 @@
         <!-- SIDEBAR -->
     <aside class="sidebar" id="app-sidebar">
 
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close navigation">
+            <i class="fas fa-xmark"></i>
+        </button>
+
         <div class="profile">
-            <div class="profile-image">
-                <i class="fas fa-user"></i>
+            <div class="profile-image" aria-hidden="true">
+                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
             </div>
-            <div class="role">
-                {{ $roleLabels[$role] ?? strtoupper($role) }}
+            <div class="profile-meta">
+                <div class="profile-name" title="{{ auth()->user()->name ?? 'User' }}">
+                    {{ auth()->user()->name ?? 'User' }}
+                </div>
+                <div class="role">
+                    {{ $roleLabels[$role] ?? strtoupper($role) }}
+                </div>
             </div>
         </div>
 
@@ -181,71 +203,6 @@
         </main>
 
     </div>
-
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
-    <nav class="mobile-nav-bar" style="display: none;">
-        @php
-            $role = strtolower(trim(auth()->user()->role));
-
-            if ($role === 'poultry staff') {
-                $role = 'staff';
-            }
-
-            if ($role === 'farm manager') {
-                $role = 'manager';
-            }
-
-            if ($role === 'farm owner') {
-                $role = 'owner';
-            }
-
-            $mobileMenuItems = [
-                [
-                    'label' => 'Dashboard',
-                    'icon' => 'fas fa-chart-line',
-                    'route' => $role == 'owner' ? 'owner.dashboard' : ($role == 'manager' ? 'manager.dashboard' : 'staff.dashboard'),
-                    'roles' => ['owner', 'manager', 'staff'],
-                ],
-                [
-                    'label' => 'Production',
-                    'icon' => 'fas fa-egg',
-                    'route' => $role == 'owner' ? 'owner.production' : ($role == 'manager' ? 'manager.production' : 'staff.production'),
-                    'roles' => ['owner', 'manager', 'staff'],
-                ],
-                [
-                    'label' => 'Inventory',
-                    'icon' => 'fas fa-box',
-                    'route' => $role == 'owner' ? 'owner.inventory' : ($role == 'manager' ? 'manager.inventory' : 'staff.inventory'),
-                    'roles' => ['owner', 'manager', 'staff'],
-                ],
-                [
-                    'label' => 'Dispatch',
-                    'icon' => 'fas fa-truck',
-                    'route' => $role == 'owner' ? 'owner.dispatch' : 'manager.dispatch',
-                    'roles' => ['owner', 'manager'],
-                ],
-                [
-                    'label' => 'Menu',
-                    'icon' => 'fas fa-bars',
-                    'route' => '#',
-                    'roles' => ['owner', 'manager', 'staff'],
-                    'class' => 'mobile-menu-toggle'
-                ],
-            ];
-        @endphp
-
-        @foreach ($mobileMenuItems as $item)
-            @if (in_array($role, $item['roles']) && ($item['class'] === 'mobile-menu-toggle' || Route::has($item['route'])))
-                <a href="{{ $item['class'] === 'mobile-menu-toggle' ? '#' : route($item['route']) }}" 
-                   class="mobile-nav-item {{ request()->routeIs($item['route']) ? 'active' : '' }} {{ $item['class'] ?? '' }}"
-                   title="{{ $item['label'] }}"
-                   aria-label="{{ $item['label'] }}">
-                    <i class="{{ $item['icon'] }}"></i>
-                    <span>{{ $item['label'] }}</span>
-                </a>
-            @endif
-        @endforeach
-    </nav>
 
     <footer class="footer">
         <span>NB POULTRY FARM </span>
