@@ -137,6 +137,7 @@ Route::prefix('manager')
         Route::post('/dispatch/store', [DispatchController::class, 'store'])->name('dispatch.store');
         Route::patch('/dispatch/{dispatch}/status', [DispatchController::class, 'updateStatus'])->name('dispatch.updateStatus');
         Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])->name('dispatch.update');
+        Route::delete('/dispatch/bulk', [DispatchController::class, 'destroyBulk'])->name('dispatch.destroyBulk');
         Route::delete('/dispatch/{dispatch}', [DispatchController::class, 'destroy'])
             ->name('dispatch.destroy');
     });

@@ -60,6 +60,7 @@
         <div class="dsp-toolbar">
             <h2>Delivery records</h2>
 
+            <div class="dsp-toolbar-right">
             <form method="GET" action="{{ route($indexRoute) }}" class="dsp-filters">
                 <div class="dsp-search">
                     <i class="fas fa-search"></i>
@@ -88,12 +89,29 @@
                     <a href="{{ route($indexRoute) }}" class="dsp-clear">Clear</a>
                 @endif
             </form>
+
+            @if($canManage)
+                <button type="button" id="bulkDeleteBtn" class="dsp-bulk-delete" disabled>
+                    <i class="fas fa-trash"></i>
+                    Delete selected (<span id="bulkDeleteCount">0</span>)
+                </button>
+                <form id="bulkDeleteForm" method="POST" action="{{ route($rolePrefix . '.dispatch.destroyBulk') }}" hidden>
+                    @csrf
+                    @method('DELETE')
+                </form>
+            @endif
+            </div>
         </div>
 
         <div class="dsp-table-wrap">
             <table class="dsp-table">
                 <thead>
                     <tr>
+                        @if($canManage)
+                            <th class="dsp-check-col">
+                                <input type="checkbox" id="selectAllDispatches" title="Select all" aria-label="Select all">
+                            </th>
+                        @endif
                         <th>Date</th>
                         <th>Recipient</th>
                         <th>Address</th>
@@ -114,6 +132,15 @@
                             };
                         @endphp
                         <tr>
+                            @if($canManage)
+                                <td class="dsp-check-col">
+                                    <input
+                                        type="checkbox"
+                                        class="dsp-row-check"
+                                        value="{{ $dispatch->id }}"
+                                        aria-label="Select {{ $dispatch->recipient }}">
+                                </td>
+                            @endif
                             <td>
                                 <div class="dsp-date">
                                     <strong>{{ $date->format('M d') }}</strong>
@@ -179,7 +206,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">
+                            <td colspan="{{ $canManage ? 8 : 7 }}">
                                 <div class="dsp-empty">
                                     <i class="fas fa-truck"></i>
                                     <p>No dispatch records found</p>
@@ -447,6 +474,72 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    const selectAll = document.getElementById('selectAllDispatches');
+    const bulkBtn = document.getElementById('bulkDeleteBtn');
+    const bulkForm = document.getElementById('bulkDeleteForm');
+    const bulkCount = document.getElementById('bulkDeleteCount');
+    const rowChecks = function () {
+        return Array.from(document.querySelectorAll('.dsp-row-check'));
+    };
+
+    function syncBulkUi() {
+        const checks = rowChecks();
+        const selected = checks.filter(function (cb) { return cb.checked; });
+        checks.forEach(function (cb) {
+            cb.closest('tr').classList.toggle('dsp-row-selected', cb.checked);
+        });
+        if (bulkBtn && bulkCount) {
+            bulkBtn.disabled = selected.length === 0;
+            bulkCount.textContent = String(selected.length);
+        }
+        if (selectAll) {
+            selectAll.checked = checks.length > 0 && selected.length === checks.length;
+            selectAll.indeterminate = selected.length > 0 && selected.length < checks.length;
+        }
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            rowChecks().forEach(function (cb) {
+                cb.checked = selectAll.checked;
+            });
+            syncBulkUi();
+        });
+    }
+
+    document.querySelectorAll('.dsp-row-check').forEach(function (cb) {
+        cb.addEventListener('change', syncBulkUi);
+    });
+
+    if (bulkBtn && bulkForm) {
+        bulkBtn.addEventListener('click', function () {
+            if (bulkBtn.disabled) return;
+            const ids = rowChecks().filter(function (cb) { return cb.checked; }).map(function (cb) { return cb.value; });
+            if (!ids.length) return;
+
+            Swal.fire({
+                title: 'Delete ' + ids.length + ' dispatch' + (ids.length === 1 ? '' : 'es') + '?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, delete'
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+                bulkForm.querySelectorAll('input[name="ids[]"]').forEach(function (el) { el.remove(); });
+                ids.forEach(function (id) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = id;
+                    bulkForm.appendChild(input);
+                });
+                bulkForm.submit();
+            });
+        });
+    }
 
     @if(session('success'))
         Swal.fire({

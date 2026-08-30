@@ -101,6 +101,26 @@ class DispatchController extends Controller
 
         return back()->with('success', 'Dispatch deleted successfully.');
     }
+
+    public function destroyBulk(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:dispatches,id',
+        ]);
+
+        $ids = $request->input('ids');
+
+        DispatchItem::whereIn('dispatch_id', $ids)->delete();
+        Dispatch::whereIn('id', $ids)->delete();
+
+        $count = count($ids);
+
+        return back()->with('success', $count === 1
+            ? '1 dispatch deleted successfully.'
+            : $count.' dispatches deleted successfully.');
+    }
+
     public function store(Request $request)
     {
         $request->validate([
