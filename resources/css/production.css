@@ -1,294 +1,376 @@
-/* ======================================================
-   PRODUCTION PAGE
-   NB Poultry Farm Design System
-====================================================== */
+/* =====================================================
+   PRODUCTION — NB Poultry Farm
+===================================================== */
 
-/* ===========================
-   ICONS
-=========================== */
-
-.icon-circle{
-
-    width:58px;
-    height:58px;
-
-    border-radius:50%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:22px;
-
+.production-page {
+    padding: 8px 4px 32px;
 }
 
-/* ===========================
-   CARDS
-=========================== */
-
-.card{
-
-    border:none;
-
-    border-radius:16px;
-
-    background:#FFFFFF;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.05);
-
-    transition:.25s ease;
-
+.prd-alert {
+    background: #edf7ed;
+    color: #25671e;
+    border: 1px solid #cde8cd;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.card:hover{
+/* ----- Header ----- */
 
-    transform:translateY(-4px);
-
-    box-shadow:0 12px 28px rgba(37,103,30,.10);
-
+.prd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
 }
 
-/* ===========================
-   TABLE CONTAINER
-=========================== */
-
-.table-container{
-
-    background:#FFFFFF;
-
-    border:1px solid #E5E7EB;
-
-    border-radius:16px;
-
-    padding:26px;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.05);
-
-    margin-top:20px;
-
+.prd-header-copy h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #25671e;
+    letter-spacing: -0.3px;
 }
 
-/* ===========================
-   SECTION TITLE
-=========================== */
-
-.table-title{
-
-    margin-bottom:24px;
-
+.prd-header-copy p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #6b7280;
 }
 
-.table-title h2{
-
-    margin:0;
-
-    color:#25671E;
-
-    font-size:24px;
-
-    font-weight:700;
-
-    letter-spacing:-.3px;
-
+.prd-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
-/* ===========================
-   TABLE
-=========================== */
-
-.table{
-    margin-bottom:0;
+.prd-header-actions form {
+    margin: 0;
 }
 
-.table thead{
-    background:#2E7D32;
+.prd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: 0.2s ease;
 }
 
-.table thead th{
-
-    color:#FFFFFF !important;
-
-    border:none;
-
-    font-size:13px;
-
-    font-weight:700;
-
-    text-transform:uppercase;
-
-    letter-spacing:.5px;
-
-    padding:16px;
-
+.prd-btn-scan {
+    background: #fff;
+    color: #25671e;
+    border: 1px solid #cde8cd;
 }
 
-.table td{
-
-    padding:16px;
-
-    vertical-align:middle;
-
-
-    font-size:14px;
-
-    border-color:#EEF2F7;
-
+.prd-btn-scan:hover {
+    background: #f3faf3;
+    color: #1e5318;
 }
 
-.table tbody tr{
-
-    transition:.2s ease;
-
+.prd-btn-generate {
+    background: #25671e;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(37, 103, 30, 0.18);
 }
 
-.table tbody tr:hover{
-
-    background:#F8FAF8;
-
+.prd-btn-generate:hover {
+    background: #1e5318;
+    color: #fff;
+    transform: translateY(-1px);
 }
 
-.table-success{
+/* ----- Stat cards ----- */
 
-    background:#EDF7ED !important;
-
+.prd-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
 }
 
-.table-success th,
-.table-success td{
-
-    color:#25671E !important;
-
-    font-weight:700;
-
+.prd-stat {
+    background: #fff;
+    border: 1px solid #e6ece8;
+    border-radius: 16px;
+    padding: 22px 20px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-/* ===========================
-   FORMS
-=========================== */
-
-.form-control{
-
-    border:1px solid #D1D5DB;
-
-    border-radius:12px;
-
-    height:44px;
-
-    font-size:14px;
-
-    transition:.25s;
-
+.prd-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
 }
 
-.form-control:focus{
-
-    border-color:#2E7D32;
-
-    box-shadow:0 0 0 .18rem rgba(46,125,50,.15);
-
+.prd-stat-icon-eggs {
+    background: #e8f5e9;
+    color: #25671e;
 }
 
-/* ===========================
-   BUTTONS
-=========================== */
-
-.btn{
-
-    border-radius:12px;
-
-    font-weight:600;
-
-    padding:10px 18px;
-
-    transition:.25s;
-
+.prd-stat-icon-batches {
+    background: #e3f2fd;
+    color: #1565c0;
 }
 
-.btn-success{
-
-    background:#2E7D32;
-
-    border-color:#2E7D32;
-
+.prd-stat-icon-forecast {
+    background: #fff8e7;
+    color: #b7791f;
 }
 
-.btn-success:hover{
-
-    background:#25671E;
-
-    border-color:#25671E;
-
+.prd-stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    color: #8c9490;
 }
 
-.btn-outline-success{
-
-    color:#2E7D32;
-
-    border:1px solid #2E7D32;
-
-    background:#FFFFFF;
-
+.prd-stat-value {
+    margin: 4px 0 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #25671e;
+    line-height: 1.1;
 }
 
-.btn-outline-success:hover{
-
-    background:#2E7D32;
-
-    color:#FFFFFF;
-
+.prd-stat-hint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #9ca3af;
 }
 
-/* ===========================
-   BADGES
-=========================== */
+/* ----- Table card ----- */
 
-.badge{
-
-    border-radius:999px;
-
-    padding:7px 12px;
-
-    font-size:12px;
-
-    font-weight:600;
-
+.prd-card {
+    background: #fff;
+    border: 1px solid #e6ece8;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
-/* ===========================
-   RESPONSIVE
-=========================== */
+.prd-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #eef2ef;
+}
 
-@media (max-width:768px){
+.prd-toolbar-copy h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #25671e;
+}
 
-    .table-container{
+.prd-toolbar-copy span {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    color: #8c9490;
+}
 
-        padding:18px;
+.prd-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.prd-search {
+    position: relative;
+    width: 200px;
+}
+
+.prd-search i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.prd-search input,
+.prd-filters input[type="date"] {
+    height: 40px;
+    border: 1px solid #d5ddd8;
+    border-radius: 999px;
+    padding: 0 14px;
+    font-size: 13px;
+    color: #374151;
+    background: #fff;
+}
+
+.prd-search input {
+    width: 100%;
+    padding-left: 38px;
+}
+
+.prd-search input:focus,
+.prd-filters input[type="date"]:focus {
+    outline: none;
+    border-color: #25671e;
+    box-shadow: 0 0 0 3px rgba(37, 103, 30, 0.12);
+}
+
+.prd-filters input[type="date"] {
+    min-width: 160px;
+}
+
+.prd-empty {
+    padding: 48px 20px;
+    text-align: center;
+    color: #8c9490;
+}
+
+.prd-empty i {
+    font-size: 28px;
+    color: #cde8cd;
+    margin-bottom: 10px;
+}
+
+.prd-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.prd-table-wrap {
+    overflow-x: auto;
+}
+
+.prd-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.prd-table thead th {
+    background: #25671e;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 14px 16px;
+    text-align: left;
+    white-space: nowrap;
+    border: none;
+}
+
+.prd-table tbody td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #374151;
+    border-bottom: 1px solid #eef2ef;
+    vertical-align: middle;
+}
+
+.prd-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.prd-table tbody tr:not(.prd-foot):hover td {
+    background: #f8faf8;
+}
+
+.prd-batch {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.prd-total-cell {
+    font-weight: 700;
+    color: #25671e;
+}
+
+.prd-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 10px;
+    background: #e8f5e9;
+    color: #25671e;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.prd-view:hover {
+    background: #25671e;
+    color: #fff;
+}
+
+.prd-foot td {
+    background: #f3faf3;
+    color: #25671e;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* ----- Responsive ----- */
+
+@media (max-width: 1100px) {
+    .prd-toolbar {
+        flex-wrap: wrap;
+        align-items: stretch;
     }
 
-    .table-title h2{
-
-        font-size:20px;
-
+    .prd-filters {
+        width: 100%;
+        flex-wrap: wrap;
     }
 
-    .table{
-
-        font-size:13px;
-
+    .prd-search {
+        flex: 1 1 180px;
+        width: auto;
     }
-
-    .btn{
-
-        width:100%;
-
-        margin-bottom:8px;
-
-    }
-
 }
-.table thead th{
-    background:#2E7D32 !important;
-    color:#FFFFFF !important;
-    border-bottom:none !important;
+
+@media (max-width: 768px) {
+    .prd-stats {
+        grid-template-columns: 1fr;
+    }
+    .prd-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .prd-header-actions {
+        width: 100%;
+    }
+
+    .prd-header-actions form,
+    .prd-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .prd-filters input[type="date"] {
+        flex: 1;
+        min-width: 0;
+    }
 }

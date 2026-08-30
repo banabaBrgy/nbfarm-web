@@ -43,6 +43,10 @@ class ProductionController extends Controller
         }
 
         $productions = $query
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $term = trim((string) $request->search);
+                $q->where('batch_id', 'like', '%'.$term.'%');
+            })
             ->orderBy('batch_id')
             ->get();
 
