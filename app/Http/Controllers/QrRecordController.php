@@ -16,11 +16,16 @@ class QrRecordController extends Controller
         return view('qr.list', compact('records'));
     }
 
-    public function print()
+    public function print(Request $request)
     {
-        $records = QrRecord::printOrder()->get();
+        $printAll = $request->boolean('all');
+        $query = QrRecord::printOrder();
 
-        return view('qr.print', compact('records'));
+        $records = $printAll
+            ? $query->get()
+            : $query->paginate(12)->withQueryString();
+
+        return view('qr.print', compact('records', 'printAll'));
     }
 
     public function generate(Request $request)
