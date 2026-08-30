@@ -86,6 +86,7 @@ class ReportController extends Controller
         return response()->json([
             'title' => $title,
             'content' => $content,
+            'html' => \App\Support\ReportDocument::html($content),
         ]);
     }
 

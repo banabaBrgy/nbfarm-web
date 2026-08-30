@@ -194,7 +194,7 @@
 
         @foreach($reports as $report)
 
-            <div class="modal fade" id="viewReport{{ $report->id }}" tabindex="-1">
+            <div class="modal fade report-modal" id="viewReport{{ $report->id }}" tabindex="-1">
 
                 <div class="modal-dialog modal-xl">
 
@@ -214,47 +214,38 @@
 
                         <div class="modal-body">
 
-                            <div class="row mb-3">
+                            @php
+                                $viewStatusClass = match($report->status) {
+                                    'Sent' => 'rpt-badge-sent',
+                                    'Read' => 'rpt-badge-read',
+                                    default => 'rpt-badge-draft',
+                                };
+                            @endphp
 
-                                <div class="col-md-4">
-
-                                    <strong>Report No</strong>
-
-                                    <p>{{ $report->report_no }}</p>
-
+                            <div class="rpt-meta">
+                                <div class="rpt-meta-item">
+                                    <span>Report No</span>
+                                    <strong>{{ $report->report_no }}</strong>
                                 </div>
-
-                                <div class="col-md-4">
-
-                                    <strong>Report Type</strong>
-
-                                    <p>{{ ucfirst($report->report_type) }}</p>
-
+                                <div class="rpt-meta-item">
+                                    <span>Type</span>
+                                    <strong>{{ ucfirst($report->report_type) }}</strong>
                                 </div>
-
-                                <div class="col-md-4">
-
-                                    <strong>Date Submitted</strong>
-
-                                    <p>{{ $report->created_at->format('F d, Y h:i A') }}</p>
-
+                                <div class="rpt-meta-item">
+                                    <span>Created</span>
+                                    <strong>{{ $report->created_at->format('M d, Y - h:i A') }}</strong>
                                 </div>
-
+                                <div class="rpt-meta-item">
+                                    <span>Status</span>
+                                    <strong>
+                                        <span class="rpt-badge {{ $viewStatusClass }}">{{ strtoupper($report->status) }}</span>
+                                    </strong>
+                                </div>
                             </div>
 
-                            <hr>
+                            <x-report-document :content="$report->content" />
 
-                            <h6 class="fw-bold">
-
-                                Manager Report
-
-                            </h6>
-
-                            <div class="border rounded p-3 bg-light mb-4">
-
-                                {!! nl2br(e($report->content)) !!}
-
-                            </div>
+                            <div class="mt-4">
 
                             <h6 class="fw-bold">
 
