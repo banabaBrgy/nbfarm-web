@@ -66,10 +66,55 @@
   min-width: 0;
 }
 .chart-title { font-size: 14px; font-weight: 700; margin-bottom: 18px; }
-.chart-wrap {
+.content-grid .chart-wrap {
   flex: 1;
   display: flex;
-  min-height: 200px;
+  min-height: 0;
+  height: auto;
+}
+
+.trend-chart-card {
+  margin-top: 18px;
+  height: auto;
+}
+
+.trend-chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.trend-chart-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.trend-year-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trend-year-filter label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.trend-year-filter select {
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.trend-chart-wrap {
+  min-height: 260px;
 }
 
 /* ── INVENTORY PANEL ── */
@@ -78,7 +123,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 22px 24px;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -233,4 +278,104 @@
         padding:16px;
     }
 
+}
+
+/* Five dashboard cards stay in one row on large screens */
+.stats-grid.stats-grid--five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.stats-grid.stats-grid--five .stat-card {
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+}
+
+.stats-grid.stats-grid--five .stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+}
+
+.stats-grid.stats-grid--five .stat-icon i {
+  font-size: 18px;
+}
+
+.stats-grid.stats-grid--five .stat-info {
+  width: 100%;
+  min-width: 0;
+}
+
+.stats-grid.stats-grid--five .stat-title,
+.stats-grid.stats-grid--five .stat-info small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-grid.stats-grid--five .stat-title {
+  font-size: 12px;
+}
+
+.stats-grid.stats-grid--five .stat-info h2 {
+  font-size: 24px;
+  margin: 2px 0 4px;
+  white-space: nowrap;
+}
+
+.stats-grid.stats-grid--five .stat-info small {
+  font-size: 11px;
+}
+
+@media (max-width: 1100px) {
+  .stats-grid.stats-grid--five {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-grid.stats-grid--five .stat-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 18px 16px;
+  }
+
+  .stats-grid.stats-grid--five .stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+  }
+
+  .stats-grid.stats-grid--five .stat-icon i {
+    font-size: 22px;
+  }
+
+  .stats-grid.stats-grid--five .stat-info {
+    width: auto;
+    flex: 1;
+  }
+
+  .stats-grid.stats-grid--five .stat-title {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .stats-grid.stats-grid--five .stat-info h2 {
+    font-size: 26px;
+    margin: 2px 0;
+  }
+
+  .stats-grid.stats-grid--five .stat-info small {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .stats-grid.stats-grid--five {
+    grid-template-columns: 1fr;
+  }
 }

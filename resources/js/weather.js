@@ -1,4 +1,5 @@
 const REFRESH_MS = 5 * 60 * 1000;
+const ICON_MODIFIERS = ['sun', 'cloud', 'rain', 'storm', 'fog'];
 
 function relativeUpdated(iso) {
     if (!iso) {
@@ -39,54 +40,36 @@ function renderForecast(days) {
     `).join('');
 }
 
+function setTextAll(root, selector, value) {
+    root.querySelectorAll(selector).forEach((el) => {
+        el.textContent = value;
+    });
+}
+
 function applyWeather(root, data) {
     root.classList.remove('farm-weather--empty');
     root.dataset.updatedAt = data.updated_at || '';
+    const modifier = data.modifier || 'cloud';
 
-    const iconWrap = root.querySelector('.farm-weather__icon');
-    const icon = root.querySelector('[data-weather-icon]');
-    const temp = root.querySelector('[data-weather-temp]');
-    const condition = root.querySelector('[data-weather-condition]');
-    const location = root.querySelector('[data-weather-location]');
-    const humidity = root.querySelector('[data-weather-humidity]');
-    const date = root.querySelector('[data-weather-date]');
-    const forecast = root.querySelector('[data-weather-forecast]');
-    const updated = root.querySelector('[data-weather-updated]');
+    root.querySelectorAll('[data-weather-icon-wrap]').forEach((wrap) => {
+        ICON_MODIFIERS.forEach((name) => wrap.classList.remove(`farm-weather__icon--${name}`));
+        wrap.classList.add(`farm-weather__icon--${modifier}`);
+    });
 
-    if (iconWrap) {
-        iconWrap.className = `farm-weather__icon farm-weather__icon--${data.modifier || 'cloud'}`;
-    }
-
-    if (icon) {
+    root.querySelectorAll('[data-weather-icon]').forEach((icon) => {
         icon.className = `fas ${data.icon || 'fa-cloud-sun'}`;
-    }
+    });
 
-    if (temp) {
-        temp.textContent = data.temperature ?? '--';
-    }
+    setTextAll(root, '[data-weather-temp]', data.temperature ?? '--');
+    setTextAll(root, '[data-weather-condition]', data.condition || 'Weather unavailable');
+    setTextAll(root, '[data-weather-location]', data.location || '');
+    setTextAll(root, '[data-weather-humidity]', data.humidity ?? '--');
+    setTextAll(root, '[data-weather-date]', data.date_label || '');
+    setTextAll(root, '[data-weather-updated]', relativeUpdated(data.updated_at));
 
-    if (condition) {
-        condition.textContent = data.condition || 'Weather unavailable';
-    }
-
-    if (location) {
-        location.textContent = data.location || '';
-    }
-
-    if (humidity) {
-        humidity.textContent = data.humidity ?? '--';
-    }
-
-    if (date) {
-        date.textContent = data.date_label || '';
-    }
-
+    const forecast = root.querySelector('[data-weather-forecast]');
     if (forecast) {
         forecast.innerHTML = renderForecast(data.forecast);
-    }
-
-    if (updated) {
-        updated.textContent = relativeUpdated(data.updated_at);
     }
 }
 
@@ -106,11 +89,71 @@ async function refreshWeather(root) {
     }
 }
 
+function openWeather(root) {
+    root.classList.add('is-open');
+    document.body.classList.add('farm-weather-open');
+    const toggle = root.querySelector('[data-weather-toggle]');
+    const overlay = root.querySelector('.farm-weather__overlay');
+    const dialog = root.querySelector('#farm-weather-dialog');
+    if (toggle) {
+        toggle.setAttribute('aria-expanded', 'true');
+    }
+    overlay?.setAttribute('aria-hidden', 'false');
+    dialog?.focus();
+}
+
+function closeWeather(root) {
+    if (!root.classList.contains('is-open')) {
+        return;
+    }
+
+    root.classList.remove('is-open');
+    document.body.classList.remove('farm-weather-open');
+    const toggle = root.querySelector('[data-weather-toggle]');
+    const overlay = root.querySelector('.farm-weather__overlay');
+    overlay?.setAttribute('aria-hidden', 'true');
+    if (toggle) {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+    }
+}
+
+function bindWeatherDialog(root) {
+    const toggle = root.querySelector('[data-weather-toggle]');
+    const overlay = root.querySelector('.farm-weather__overlay');
+
+    toggle?.addEventListener('click', () => {
+        if (root.classList.contains('is-open')) {
+            closeWeather(root);
+            return;
+        }
+        openWeather(root);
+    });
+
+    overlay?.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            closeWeather(root);
+        }
+    });
+
+    root.querySelectorAll('[data-weather-close]').forEach((el) => {
+        el.addEventListener('click', () => closeWeather(root));
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeWeather(root);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const root = document.getElementById('farm-weather');
     if (!root) {
         return;
     }
+
+    bindWeatherDialog(root);
 
     const updated = root.querySelector('[data-weather-updated]');
     if (updated) {

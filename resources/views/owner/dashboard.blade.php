@@ -27,6 +27,7 @@
         $eggForecastLabels = $eggForecastLabels ?? [];
         $eggForecastData = $eggForecastData ?? [];
         $predictedEggs = $predictedEggs ?? 0;
+        $productionTrend = $productionTrend ?? ['months' => [], 'years' => [], 'selectedYear' => null, 'series' => []];
     @endphp
 
     <!-- Header -->
@@ -46,7 +47,7 @@
     @endif
 
     <!-- Stat cards -->
-    <div class="stats-grid">
+    <div class="stats-grid stats-grid--five">
 
         {{-- Eggs --}}
         <div class="stat-card">
@@ -60,8 +61,7 @@
                 <h2>{{ number_format($eggsToday) }}</h2>
 
                 <small>
-                    {{ $eggsChange >= 0 ? '+' : '-' }}
-                    {{ abs($eggsChange) }}% compared to yesterday
+                    {{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% vs yesterday
                 </small>
             </div>
         </div>
@@ -211,6 +211,11 @@
         </div>
     </div>
 
+    @include('dashboard.production-trend', [
+        'productionTrend' => $productionTrend,
+        'trendAction' => route('owner.dashboard'),
+    ])
+
 @endsection
 
 @push('scripts')
@@ -268,4 +273,5 @@
             }
         });
     </script>
+    @include('dashboard.production-trend-script')
 @endpush

@@ -8,12 +8,14 @@ use App\Models\Dispatch;
 use App\Models\Transaction;
 use App\Services\DailyInventory;
 use App\Services\Forecasting\GenerateEggForecast;
+use App\Services\ProductionYearTrend;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class OwnerDashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         app(DailyInventory::class)->applyForToday();
 
@@ -111,6 +113,9 @@ class OwnerDashboardController extends Controller
         $eggForecastData = $forecast['data'];
         $predictedEggs = $forecast['predicted_eggs'];
 
+        $productionTrend = app(ProductionYearTrend::class)
+            ->forYear($request->query('trend_year'));
+
         return view('owner.dashboard', compact(
             'eggsToday',
             'eggsChange',
@@ -128,7 +133,8 @@ class OwnerDashboardController extends Controller
             'eggChartData',
             'eggForecastLabels',
             'eggForecastData',
-            'predictedEggs'
+            'predictedEggs',
+            'productionTrend'
         ));
     }
 }

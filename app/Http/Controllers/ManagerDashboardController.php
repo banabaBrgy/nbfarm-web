@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Services\DailyInventory;
 use App\Services\Forecasting\GenerateEggForecast;
+use App\Services\ProductionYearTrend;
 
 class ManagerDashboardController extends Controller
 {
@@ -211,7 +212,8 @@ class ManagerDashboardController extends Controller
         $eggForecastData = $forecast['data'];
         $predictedEggs = $forecast['predicted_eggs'];
 
-
+        $productionTrend = app(ProductionYearTrend::class)
+            ->forYear($request->query('trend_year'));
 
         return view(
             'manager.dashboard',
@@ -242,7 +244,9 @@ class ManagerDashboardController extends Controller
                 'eggForecastLabels',
                 'eggForecastData',
 
-                'predictedEggs'
+                'predictedEggs',
+
+                'productionTrend'
 
             )
         );

@@ -1,5 +1,7 @@
 @php
     $weather = app(\App\Services\WeatherService::class)->current();
+    $modifier = $weather['modifier'] ?? 'cloud';
+    $icon = $weather['icon'] ?? 'fa-cloud-sun';
 @endphp
 
 <div
@@ -10,66 +12,106 @@
         data-updated-at="{{ $weather['updated_at'] }}"
     @endif
 >
-    <div class="farm-weather__inner">
-        <header class="farm-weather__header">
-            <div class="farm-weather__header-title">
-                <i class="fas fa-cloud-sun" aria-hidden="true"></i>
-                <span>Farm Weather</span>
-            </div>
-            <span class="farm-weather__location-pill" data-weather-location>
-                {{ $weather['location'] ?? config('services.weather.location') }}
+    <button
+        type="button"
+        class="farm-weather__trigger"
+        data-weather-toggle
+        aria-expanded="false"
+        aria-controls="farm-weather-dialog"
+        aria-haspopup="dialog"
+    >
+        <span class="farm-weather__trigger-icon farm-weather__icon--{{ $modifier }}" data-weather-icon-wrap aria-hidden="true">
+            <i class="fas {{ $icon }}" data-weather-icon></i>
+        </span>
+        <span class="farm-weather__trigger-copy">
+            <span class="farm-weather__trigger-kicker">Farm Weather</span>
+            <span class="farm-weather__trigger-now">
+                <strong><span data-weather-temp>{{ $weather['temperature'] ?? '--' }}</span>°C</strong>
+                <span data-weather-condition>{{ $weather['condition'] ?? 'Weather unavailable' }}</span>
             </span>
-        </header>
+        </span>
+        <span class="farm-weather__trigger-hint">
+            Forecast
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </span>
+    </button>
 
-        <div class="farm-weather__body">
-            <div class="farm-weather__now">
-                <div class="farm-weather__icon farm-weather__icon--{{ $weather['modifier'] ?? 'cloud' }}" aria-hidden="true">
-                    <i class="fas {{ $weather['icon'] ?? 'fa-cloud-sun' }}" data-weather-icon></i>
-                </div>
-                <div class="farm-weather__now-copy">
-                    <div class="farm-weather__temp-row">
-                        <span class="farm-weather__temp" data-weather-temp>{{ $weather['temperature'] ?? '--' }}</span>
-                        <span class="farm-weather__unit">°C</span>
+    <div class="farm-weather__overlay" aria-hidden="true">
+        <div
+            id="farm-weather-dialog"
+            class="farm-weather__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="farm-weather-title"
+            tabindex="-1"
+        >
+            <div class="farm-weather__inner">
+                <header class="farm-weather__header">
+                    <div class="farm-weather__header-title" id="farm-weather-title">
+                        <i class="fas fa-cloud-sun" aria-hidden="true"></i>
+                        <span>Farm Weather</span>
                     </div>
-                    <p class="farm-weather__condition" data-weather-condition>{{ $weather['condition'] ?? 'Weather unavailable' }}</p>
-                    <p class="farm-weather__date" data-weather-date>{{ $weather['date_label'] ?? '' }}</p>
-                    <div class="farm-weather__chips">
-                        <span class="farm-weather__chip">
-                            <i class="fas fa-droplet" aria-hidden="true"></i>
-                            <span data-weather-humidity>{{ $weather['humidity'] ?? '--' }}</span>% humidity
+                    <div class="farm-weather__header-actions">
+                        <span class="farm-weather__location-pill" data-weather-location>
+                            {{ $weather['location'] ?? config('services.weather.location') }}
                         </span>
+                        <button type="button" class="farm-weather__close" data-weather-close aria-label="Close weather forecast">
+                            <i class="fas fa-xmark" aria-hidden="true"></i>
+                        </button>
                     </div>
-                </div>
-            </div>
+                </header>
 
-            <div class="farm-weather__forecast-panel">
-                <p class="farm-weather__forecast-title">5-Day Forecast</p>
-                <div class="farm-weather__forecast" data-weather-forecast>
-                    @if(!empty($weather['forecast']))
-                        @foreach($weather['forecast'] as $day)
-                            <div class="farm-weather__day{{ $day['day'] === 'Today' ? ' is-today' : '' }}">
-                                <span class="farm-weather__day-name">{{ $day['day'] }}</span>
-                                <span class="farm-weather__day-num">{{ $day['day_num'] }}</span>
-                                <span class="farm-weather__day-icon" aria-hidden="true">
-                                    <i class="fas {{ $day['icon'] }}"></i>
-                                </span>
-                                <span class="farm-weather__day-temps">
-                                    <strong>{{ $day['max'] }}°</strong>
-                                    <span>{{ $day['min'] }}°</span>
+                <div class="farm-weather__body">
+                    <div class="farm-weather__now">
+                        <div class="farm-weather__icon farm-weather__icon--{{ $modifier }}" data-weather-icon-wrap aria-hidden="true">
+                            <i class="fas {{ $icon }}" data-weather-icon></i>
+                        </div>
+                        <div class="farm-weather__now-copy">
+                            <div class="farm-weather__temp-row">
+                                <span class="farm-weather__temp" data-weather-temp>{{ $weather['temperature'] ?? '--' }}</span>
+                                <span class="farm-weather__unit">°C</span>
+                            </div>
+                            <p class="farm-weather__condition" data-weather-condition>{{ $weather['condition'] ?? 'Weather unavailable' }}</p>
+                            <p class="farm-weather__date" data-weather-date>{{ $weather['date_label'] ?? '' }}</p>
+                            <div class="farm-weather__chips">
+                                <span class="farm-weather__chip">
+                                    <i class="fas fa-droplet" aria-hidden="true"></i>
+                                    <span data-weather-humidity>{{ $weather['humidity'] ?? '--' }}</span>% humidity
                                 </span>
                             </div>
-                        @endforeach
-                    @endif
+                        </div>
+                    </div>
+
+                    <div class="farm-weather__forecast-panel">
+                        <p class="farm-weather__forecast-title">5-Day Forecast</p>
+                        <div class="farm-weather__forecast" data-weather-forecast>
+                            @if(!empty($weather['forecast']))
+                                @foreach($weather['forecast'] as $day)
+                                    <div class="farm-weather__day{{ $day['day'] === 'Today' ? ' is-today' : '' }}">
+                                        <span class="farm-weather__day-name">{{ $day['day'] }}</span>
+                                        <span class="farm-weather__day-num">{{ $day['day_num'] }}</span>
+                                        <span class="farm-weather__day-icon" aria-hidden="true">
+                                            <i class="fas {{ $day['icon'] }}"></i>
+                                        </span>
+                                        <span class="farm-weather__day-temps">
+                                            <strong>{{ $day['max'] }}°</strong>
+                                            <span>{{ $day['min'] }}°</span>
+                                        </span>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
                 </div>
+
+                <footer class="farm-weather__credit">
+                    <span class="farm-weather__updated">
+                        <i class="fas fa-rotate" aria-hidden="true"></i>
+                        <span data-weather-updated>@if($weather) Updated just now @endif</span>
+                    </span>
+                    <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>
+                </footer>
             </div>
         </div>
-
-        <footer class="farm-weather__credit">
-            <span class="farm-weather__updated">
-                <i class="fas fa-rotate" aria-hidden="true"></i>
-                <span data-weather-updated>@if($weather) Updated just now @endif</span>
-            </span>
-            <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>
-        </footer>
     </div>
 </div>
