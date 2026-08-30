@@ -21,30 +21,15 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $latestDate = Production::max('production_date');
+        $latestDate = Production::query()->presentYear()->max('production_date');
 
+        $todayProduction = $latestDate
+            ? (int) Production::whereDate('production_date', $latestDate)->sum('eggs_produced')
+            : 0;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Dashboard Cards
-        |--------------------------------------------------------------------------
-        */
-
-        // Total Eggs Today
-        $todayProduction = Production::whereDate(
-                'production_date',
-                $latestDate
-            )
-            ->sum('eggs_produced');
-
-
-        // Active Batches
-        $activeBatches = Production::whereDate(
-                'production_date',
-                $latestDate
-            )
-            ->distinct('batch_id')
-            ->count('batch_id');
+        $activeBatches = $latestDate
+            ? (int) Production::whereDate('production_date', $latestDate)->distinct('batch_id')->count('batch_id')
+            : 0;
 
 
         // Feeds Available

@@ -68,10 +68,14 @@ class InventoryController extends Controller
             ->sum('eggs_produced');
 
         // ============================
-        // 2. EGG PRODUCTION SUMMARY (napiling buwan, default: kasalukuyang buwan)
+        // 2. EGG PRODUCTION SUMMARY — present year sample only
+        // Older years stay in the DB but are not selectable here.
         // ============================
-        $selectedMonth = $request->query('month', now()->month);
-        $selectedYear  = $request->query('year', now()->year);
+        $selectedYear = Production::visibleYear();
+        $selectedMonth = (int) $request->query('month', now()->month);
+        if ($selectedMonth < 1 || $selectedMonth > 12) {
+            $selectedMonth = (int) now()->month;
+        }
 
         $eggTotals = DB::table('production')
             ->whereMonth('production_date', $selectedMonth)
@@ -84,12 +88,19 @@ class InventoryController extends Controller
                 SUM(cracked_eggs) as cracked
             ')->first();
 
-        // Listahan ng mga buwan/taon na may laman sa production table (para sa dropdown)
         $availableMonths = DB::table('production')
+            ->whereYear('production_date', $selectedYear)
             ->selectRaw('DISTINCT YEAR(production_date) as year, MONTH(production_date) as month')
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->get();
+
+        if ($availableMonths->isEmpty()) {
+            $availableMonths = collect([(object) [
+                'year' => $selectedYear,
+                'month' => $selectedMonth,
+            ]]);
+        }
 
         $grandTotal = ($eggTotals->small ?? 0)
             + ($eggTotals->medium ?? 0)

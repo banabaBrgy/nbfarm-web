@@ -4,10 +4,18 @@
     $scanRoute = $rolePrefix . '.production.scan';
     $generateRoute = $rolePrefix . '.qr.generate';
     $detailsRoute = $rolePrefix . '.production.details';
-    $date = $selectedDate instanceof \Carbon\Carbon
-        ? $selectedDate
-        : \Carbon\Carbon::parse($selectedDate);
-    $isToday = $date->isToday();
+    $date = $selectedDate
+        ? ($selectedDate instanceof \Carbon\Carbon ? $selectedDate : \Carbon\Carbon::parse($selectedDate))
+        : null;
+    $isToday = $date?->isToday() ?? false;
+    $rangeStart = $productions->min('production_date');
+    $rangeEnd = $productions->max('production_date');
+    $rangeLabel = $date
+        ? $date->format('M j, Y')
+        : (($rangeStart && $rangeEnd)
+            ? \Carbon\Carbon::parse($rangeStart)->format('M j').' – '.\Carbon\Carbon::parse($rangeEnd)->format('M j, Y')
+            : 'All dates');
+    $activeBatches = $activeBatches ?? 3;
 @endphp
 
 <div class="production-page">
@@ -55,7 +63,7 @@
             </div>
             <div>
                 <div class="prd-stat-label">Active batches</div>
-                <div class="prd-stat-value">{{ $productions->count() }}</div>
+                <div class="prd-stat-value">{{ $activeBatches }}</div>
                 <div class="prd-stat-hint">{{ $isToday ? 'Harvesting today' : 'On this date' }}</div>
             </div>
         </div>
@@ -75,8 +83,8 @@
     <div class="prd-card">
         <div class="prd-toolbar">
             <div class="prd-toolbar-copy">
-                <h2>{{ $isToday ? "Today's egg production" : 'Egg production' }}</h2>
-                <span>{{ $date->format('M j, Y') }}</span>
+                <h2>{{ $date ? ($isToday ? "Today's egg production" : 'Egg production') : 'Egg production' }}</h2>
+                <span>{{ $rangeLabel }}</span>
             </div>
 
             <form method="GET" action="{{ route($indexRoute) }}" class="prd-filters">
@@ -85,28 +93,30 @@
                     <input
                         type="text"
                         name="search"
-                        placeholder="Search batch..."
+                        placeholder="Search date..."
                         value="{{ request('search') }}">
                 </div>
-                <input
-                    type="date"
-                    name="date"
-                    value="{{ $date->toDateString() }}"
-                    onchange="this.form.submit()">
+                    <input
+                        type="date"
+                        name="date"
+                        min="{{ now()->startOfYear()->toDateString() }}"
+                        max="{{ now()->endOfYear()->toDateString() }}"
+                        value="{{ $date?->toDateString() }}"
+                        onchange="this.form.submit()">
             </form>
         </div>
 
         @if($productions->isEmpty())
             <div class="prd-empty">
                 <i class="fas fa-egg"></i>
-                <p>No harvest records for this date.</p>
+                <p>No harvest records{{ $date ? ' for this date' : '' }}.</p>
             </div>
         @else
             <div class="prd-table-wrap">
                 <table class="prd-table">
                     <thead>
                         <tr>
-                            <th>Batch</th>
+                            <th>Date</th>
                             <th>Small</th>
                             <th>Medium</th>
                             <th>Large</th>
@@ -137,7 +147,7 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <span class="prd-batch">Batch {{ $production->batch_id }}</span>
+                                    <span class="prd-batch">{{ \Carbon\Carbon::parse($production->production_date)->format('M j, Y') }}</span>
                                 </td>
                                 <td><x-egg-count :value="$production->small_eggs" /></td>
                                 <td><x-egg-count :value="$production->medium_eggs" /></td>

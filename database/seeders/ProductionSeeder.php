@@ -8,6 +8,9 @@ class ProductionSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(WeeklyProductionSeeder::class);
+        $this->call([
+            HistoricalProductionSeeder::class,
+            WeeklyProductionSeeder::class,
+        ]);
     }
 }

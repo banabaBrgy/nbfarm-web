@@ -43,7 +43,7 @@ class OwnerDashboardController extends Controller
         $eggTrays = InventoryItem::where('item_name', 'Egg Trays')
             ->sum('current_stock');
 
-        $eggsTotal = Production::sum('eggs_produced');
+        $eggsTotal = Production::leftoverStock();
 
         $dispatchedTrays = DB::table('dispatch_items')
             ->sum('quantity');

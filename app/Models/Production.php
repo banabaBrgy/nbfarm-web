@@ -44,18 +44,41 @@ class Production extends Model
             + $this->cracked_eggs;
     }
 
-    /** Eggs on hand: harvest minus delivered. Pass a date for stock as of that day. */
+    /** Live screens and sample data use this calendar year only. Older years stay in the DB. */
+    public static function visibleYear(DateTimeInterface|string|null $asOf = null): int
+    {
+        return (int) ($asOf ? Carbon::parse($asOf)->year : now()->year);
+    }
+
+    public function scopePresentYear($query, DateTimeInterface|string|int|null $year = null)
+    {
+        $visibleYear = is_int($year)
+            ? $year
+            : static::visibleYear($year);
+
+        return $query->whereYear('production_date', $visibleYear);
+    }
+
+    /**
+     * Eggs on hand: present-year harvest minus present-year delivered trays.
+     * Older production is stored but does not inflate stock (no fake dispatch needed).
+     * Pass a date for stock as of that day within that date's year.
+     */
     public static function leftoverStock(DateTimeInterface|string|null $asOf = null): int
     {
-        $date = $asOf ? Carbon::parse($asOf)->toDateString() : null;
+        $asOfDate = $asOf ? Carbon::parse($asOf) : null;
+        $year = static::visibleYear($asOfDate);
+        $date = $asOfDate?->toDateString();
 
-        $harvestQuery = static::query()->selectRaw('
-            COALESCE(SUM(small_eggs), 0) as small,
-            COALESCE(SUM(medium_eggs), 0) as medium,
-            COALESCE(SUM(large_eggs), 0) as large,
-            COALESCE(SUM(extra_large_eggs), 0) as extra_large,
-            COALESCE(SUM(cracked_eggs), 0) as cracked
-        ');
+        $harvestQuery = static::query()
+            ->presentYear($year)
+            ->selectRaw('
+                COALESCE(SUM(small_eggs), 0) as small,
+                COALESCE(SUM(medium_eggs), 0) as medium,
+                COALESCE(SUM(large_eggs), 0) as large,
+                COALESCE(SUM(extra_large_eggs), 0) as extra_large,
+                COALESCE(SUM(cracked_eggs), 0) as cracked
+            ');
 
         if ($date) {
             $harvestQuery->whereDate('production_date', '<=', $date);
@@ -71,7 +94,8 @@ class Production extends Model
 
         $dispatchQuery = DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
-            ->where('dispatches.status', 'Delivered');
+            ->where('dispatches.status', 'Delivered')
+            ->whereYear('dispatches.dispatch_date', $year);
 
         if ($date) {
             $dispatchQuery->whereDate('dispatches.dispatch_date', '<=', $date);

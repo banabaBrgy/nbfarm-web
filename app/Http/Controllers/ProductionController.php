@@ -13,44 +13,38 @@ class ProductionController extends Controller
 {
     public function index(Request $request)
     {
-        $date = $request->date
+        $date = $request->filled('date')
             ? Carbon::parse($request->date)
-            : today();
+            : null;
+
+        if ($date && (int) $date->year !== Production::visibleYear()) {
+            $date = null;
+        }
 
         $view = $request->view ?? 'day';
 
-        $query = Production::query();
+        $query = Production::query()->presentYear();
 
-        if ($view == 'day') {
-
+        if ($date) {
             $query->whereDate('production_date', $date);
-
-        } elseif ($view == 'week') {
-
-            $query->whereBetween('production_date', [
-
-                $date->copy()->startOfWeek(),
-
-                $date->copy()->endOfWeek()
-
-            ]);
-
-        } else {
-
-            $query->whereMonth('production_date', $date->month)
-                  ->whereYear('production_date', $date->year);
-
         }
 
         $productions = $query
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = trim((string) $request->search);
-                $q->where('batch_id', 'like', '%'.$term.'%');
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('batch_id', 'like', '%'.$term.'%')
+                        ->orWhereDate('production_date', $term);
+                });
             })
+            ->orderBy('production_date')
             ->orderBy('batch_id')
             ->get();
 
-        $totalEggs = $productions->sum('eggs_produced');
+        $totalEggs = (int) Production::whereDate('production_date', today())
+            ->sum('eggs_produced');
+
+        $activeBatches = count(QrRecord::BATCH_IDS);
 
         $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
@@ -68,9 +62,10 @@ class ProductionController extends Controller
     $routeName = $request->route()->getName(); // e.g. 'staff.production'
     $role = explode('.', $routeName)[0]; // 'staff'
 
-    return view($role . '.production', compact(
+        return view($role . '.production', compact(
         'productions',
         'totalEggs',
+        'activeBatches',
         'predictedEggs',
         'qrTransactions',
         'selectedDate',

@@ -76,9 +76,7 @@ class ManagerDashboardController extends Controller
         // TOTAL PRODUCTION
         // ============================
 
-        $eggsTotal = Production::sum(
-            'eggs_produced'
-        );
+        $eggsTotal = Production::leftoverStock();
 
 
 

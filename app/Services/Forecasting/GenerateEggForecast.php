@@ -95,6 +95,7 @@ class GenerateEggForecast
         $window = max(2, (int) config('forecasting.window', 7));
 
         $rows = Production::query()
+            ->presentYear()
             ->select(
                 DB::raw('DATE(production_date) as date'),
                 DB::raw('SUM(eggs_produced) as total')
