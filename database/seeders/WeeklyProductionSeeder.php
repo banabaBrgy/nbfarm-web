@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Inventory;
+use App\Models\InventoryItem;
 use App\Models\Production;
 use App\Models\QrRecord;
 use App\Models\QrTransaction;
@@ -49,32 +51,51 @@ class WeeklyProductionSeeder extends Seeder
                 QrRecord::whereIn('id', $qrIds)->delete();
             }
             QrRecord::whereIn('production_id', $productionIds)->delete();
-            Production::whereIn('production_id', $productionIds)->delete();
+            Production::withoutEvents(function () use ($productionIds) {
+                Production::whereIn('production_id', $productionIds)->delete();
+            });
         }
 
         QrRecord::where('batch_id', 99)
             ->where('qr_code', 'like', '%-B99-DEMO-%')
             ->delete();
 
-        foreach (self::BATCH_IDS as $batchId) {
-            foreach ($this->eggsByBatch[$batchId] as $index => $total) {
-                $date = Carbon::today()->subDays(6 - $index);
-                $sizes = $this->splitBySize($total);
+        Production::withoutEvents(function () {
+            foreach (self::BATCH_IDS as $batchId) {
+                foreach ($this->eggsByBatch[$batchId] as $index => $total) {
+                    $date = Carbon::today()->subDays(6 - $index);
+                    $sizes = $this->splitBySize($total);
 
-                $production = Production::create([
-                    'production_date' => $date->toDateString(),
-                    'batch_id' => $batchId,
-                    'small_eggs' => $sizes['small'],
-                    'medium_eggs' => $sizes['medium'],
-                    'large_eggs' => $sizes['large'],
-                    'extra_large_eggs' => $sizes['extra_large'],
-                    'cracked_eggs' => $sizes['cracked'],
-                    'eggs_produced' => $sizes['produced'],
-                ]);
+                    $production = Production::create([
+                        'production_date' => $date->toDateString(),
+                        'batch_id' => $batchId,
+                        'small_eggs' => $sizes['small'],
+                        'medium_eggs' => $sizes['medium'],
+                        'large_eggs' => $sizes['large'],
+                        'extra_large_eggs' => $sizes['extra_large'],
+                        'cracked_eggs' => $sizes['cracked'],
+                        'eggs_produced' => $sizes['produced'],
+                    ]);
 
-                $this->seedQrRecordsForProduction($production, $date, $sizes);
+                    $this->seedQrRecordsForProduction($production, $date, $sizes);
+                }
             }
-        }
+        });
+
+        $todayEggs = Production::whereDate('production_date', Carbon::today())
+            ->sum('eggs_produced');
+        $traysUsedToday = intdiv((int) $todayEggs, 30);
+        $trayStock = max(0, 500 - $traysUsedToday);
+
+        InventoryItem::where('item_name', 'Egg Trays')->update([
+            'current_stock' => $trayStock,
+            'min_level' => 100,
+        ]);
+
+        Inventory::where('item_type', 'Egg Tray')->update([
+            'quantity' => $trayStock,
+            'minimum_stock' => 100,
+        ]);
 
         $this->command?->info('Seeded 3 batches × last 7 harvest days (client-style dummy data).');
         $this->command?->info("Date range: {$start} → {$end}");

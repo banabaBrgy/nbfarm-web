@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Inventory;
 use App\Models\Production;
 use App\Models\QrRecord;
 use App\Models\QrTransaction;
@@ -110,25 +109,8 @@ class QrScannerController extends Controller
         ]);
         /*
         ---------------------------------------
-        Deduct Empty Egg Trays
-        ---------------------------------------
-        */
-
-        $eggTray = Inventory::where('item_type', 'Egg Tray')->first();
-
-        if ($eggTray) {
-
-            $eggTray->quantity = max(
-                0,
-                $eggTray->quantity - $qr->tray_count
-            );
-
-            $eggTray->save();
-        }
-
-        /*
-        ---------------------------------------
         Recompute Production
+        (tray stock: eggs ÷ 30, via ProductionObserver)
         ---------------------------------------
         */
 

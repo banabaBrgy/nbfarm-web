@@ -69,7 +69,7 @@
     <div class="stat-card">
         <div class="stat-label">Egg Trays</div>
         <div class="stat-value">
-            {{ $eggTrays->current_stock ?? 0 }}
+            {{ number_format($eggTrays->current_stock ?? 0) }}
         </div>
         <div class="stat-sub">
             pcs — Min: {{ $eggTrays->min_level ?? 0 }} — {{ $eggTrays->status ?? 'OK' }}

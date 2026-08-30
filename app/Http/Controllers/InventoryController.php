@@ -40,6 +40,10 @@ class InventoryController extends Controller
             $feed->status = $this->computeStatus($feed->current_stock, $feed->min_level);
         }
 
+        if ($eggTrays) {
+            $eggTrays->status = $this->computeStatus($eggTrays->current_stock, $eggTrays->min_level);
+        }
+
         // ============================
         // 1. EGGS STOCK (all-time, para sa "Eggs Stock" stat card)
         //    Hindi ito monthly — running balance ito ng available eggs.
