@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
-
 </head>
 
 <body>
@@ -69,35 +68,90 @@
             <div class="title">Welcome back</div>
             <div class="subtitle">Sign in to continue</div>
 
-            @if($errors->any())
-                <div class="error-box">
-                    {{ $errors->first() }}
-                </div>
+            @if(session('success'))
+                <div class="success-box" role="status">{{ session('success') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('login.submit') }}">
+            @if(session('status'))
+                <div class="success-box" role="status">{{ session('status') }}</div>
+            @endif
+
+            @error('login')
+                <div class="error-box" role="alert">{{ $message }}</div>
+            @enderror
+
+            <form id="login-form" method="POST" action="{{ route('login.submit') }}" novalidate>
 
                 @csrf
 
-                <label class="field-label">Username</label>
-                <div class="input-icon-wrap">
-                    <span class="input-icon">👤</span>
-                    <input type="text" name="username" value="{{ old('username') }}" placeholder="Enter your username" required>
+                <div class="field {{ $errors->has('username') ? 'is-invalid' : '' }}" data-field="username">
+                    <label class="field-label" for="username">Username <span class="req" aria-hidden="true">*</span></label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon" aria-hidden="true">👤</span>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value="{{ old('username') }}"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            autocapitalize="none"
+                            autocorrect="off"
+                            spellcheck="false"
+                            maxlength="50"
+                            autofocus
+                            required
+                            aria-required="true"
+                            aria-invalid="{{ $errors->has('username') ? 'true' : 'false' }}"
+                            aria-describedby="username-error"
+                        >
+                    </div>
+                    <p class="field-error" id="username-error" role="alert">{{ $errors->first('username') }}</p>
                 </div>
 
-                <label class="field-label">Password</label>
-                <div class="password-container input-icon-wrap">
-                    <span class="input-icon">🔒</span>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                <div class="field {{ $errors->has('password') ? 'is-invalid' : '' }}" data-field="password">
+                    <label class="field-label" for="password">Password <span class="req" aria-hidden="true">*</span></label>
+                    <div class="password-container input-icon-wrap">
+                        <span class="input-icon" aria-hidden="true">🔒</span>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            maxlength="255"
+                            required
+                            aria-required="true"
+                            aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                            aria-describedby="password-error password-caps"
+                        >
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Show password" aria-pressed="false">
+                            Show
+                        </button>
+                    </div>
+                    <p class="caps-hint" id="password-caps" hidden>Caps Lock is on</p>
+                    <p class="field-error" id="password-error" role="alert">{{ $errors->first('password') }}</p>
                 </div>
 
-                <div class="terms">
-                    <input type="checkbox" name="terms" value="1" {{ old('terms') ? 'checked' : '' }}>
-                    <span>
-                        I have read and agree to the
-                        <a href="{{ route('terms') }}" target="_blank">Terms and Conditions</a>
-                    </span>
+                <div class="field terms-field {{ $errors->has('terms') ? 'is-invalid' : '' }}" data-field="terms">
+                    <label class="terms">
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            name="terms"
+                            value="1"
+                            {{ old('terms') ? 'checked' : '' }}
+                            required
+                            aria-required="true"
+                            aria-invalid="{{ $errors->has('terms') ? 'true' : 'false' }}"
+                            aria-describedby="terms-error"
+                        >
+                        <span>
+                            I have read and agree to the
+                            <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer">Terms and Conditions</a>
+                        </span>
+                    </label>
+                    <p class="field-error" id="terms-error" role="alert">{{ $errors->first('terms') }}</p>
                 </div>
 
                 <div class="remember-row">
@@ -108,17 +162,14 @@
                     <a href="{{ route('forgot.password') }}" class="forgot-password">Forgot Password?</a>
                 </div>
 
-                <div class="recaptcha-frame">
-                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                <div class="field recaptcha-field {{ $errors->has('g-recaptcha-response') ? 'is-invalid' : '' }}" data-field="recaptcha">
+                    <div class="recaptcha-frame">
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}" data-callback="onLoginCaptcha" data-expired-callback="onLoginCaptchaExpired"></div>
+                    </div>
+                    <p class="field-error" id="recaptcha-error" role="alert">{{ $errors->first('g-recaptcha-response') }}</p>
                 </div>
 
-                @error('g-recaptcha-response')
-                    <div style="margin-top:-14px; margin-bottom:18px; color:#A63D2F; font-size:13.5px; font-weight:500;">
-                        {{ $message }}
-                    </div>
-                @enderror
-
-                <button type="submit" class="login-btn">Log In</button>
+                <button type="submit" class="login-btn" id="login-submit">Log In</button>
 
             </form>
 
@@ -128,12 +179,7 @@
 
     </div>
 
-    <script>
-        function togglePassword() {
-            let password = document.getElementById('password');
-            password.type = password.type === 'password' ? 'text' : 'password';
-        }
-    </script>
+    <script src="{{ asset('js/login.js') }}"></script>
 </body>
 
 </html>

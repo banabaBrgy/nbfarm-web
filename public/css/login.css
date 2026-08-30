@@ -233,14 +233,70 @@ body {
     background: var(--straw);
 }
 
-.error-box {
-    background: #F7E2DD;
-    border: 1px solid #E3B4A8;
-    color: var(--error);
+.error-box,
+.success-box {
     padding: 12px 14px;
     border-radius: 4px;
     font-size: 14px;
     margin-bottom: 22px;
+}
+
+.error-box {
+    background: #F7E2DD;
+    border: 1px solid #E3B4A8;
+    color: var(--error);
+}
+
+.success-box {
+    background: #E6F4E4;
+    border: 1px solid #B5D8B0;
+    color: #2D6A27;
+}
+
+.field {
+    margin-bottom: 18px;
+}
+
+.field .req {
+    color: var(--error);
+    font-weight: 700;
+}
+
+.field-error {
+    display: none;
+    color: var(--error);
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+.field.is-invalid .field-error,
+.field-error:not(:empty) {
+    display: block;
+}
+
+.caps-hint {
+    display: none;
+    margin-top: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #8A6A1A;
+}
+
+.caps-hint.is-visible {
+    display: block;
+}
+
+@keyframes field-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.field.is-invalid .input-icon-wrap,
+.field.is-invalid .terms {
+    animation: field-shake .28s ease;
 }
 
 label.field-label {
@@ -283,6 +339,19 @@ input:focus-visible {
     outline-offset: 3px;
 }
 
+.field .input-icon-wrap input[type=text],
+.field .input-icon-wrap input[type=password] {
+    margin-bottom: 0;
+}
+
+.field.is-invalid .input-icon-wrap input {
+    border-bottom-color: var(--error);
+}
+
+.field.is-valid .input-icon-wrap input {
+    border-bottom-color: var(--moss);
+}
+
 /* Icon-accented inputs */
 .input-icon-wrap {
     position: relative;
@@ -307,25 +376,52 @@ input:focus-visible {
 }
 
 .password-container.input-icon-wrap input {
-    padding-right: 36px;
+    padding-right: 58px;
 }
 
 .toggle-password {
     position: absolute;
-    right: 4px;
-    top: 10px;
+    right: 0;
+    top: 8px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--moss);
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    font-family: 'Inter', sans-serif;
     user-select: none;
+}
+
+.toggle-password:hover {
+    text-decoration: underline;
+}
+
+.toggle-password:focus-visible {
+    outline: 2px solid var(--moss);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.terms-field {
+    margin-bottom: 14px;
 }
 
 .terms {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin: 6px 0 18px;
+    margin: 0;
     font-size: 13.5px;
     color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.terms-field.is-invalid .terms input {
+    border-color: var(--error);
 }
 
 .terms a {
@@ -406,12 +502,21 @@ input:focus-visible {
     text-decoration: underline;
 }
 
+.recaptcha-field {
+    margin-bottom: 18px;
+}
+
 .recaptcha-frame {
-    margin: 4px 0 22px;
+    margin: 4px 0 0;
     padding: 14px;
     border-radius: 6px;
     display: flex;
     justify-content: center;
+}
+
+.recaptcha-field.is-invalid .recaptcha-frame {
+    box-shadow: inset 0 0 0 1px #E3B4A8;
+    background: #FDF6F4;
 }
 
 .login-btn {
@@ -437,6 +542,19 @@ input:focus-visible {
 
 .login-btn:active {
     transform: scale(0.97);
+}
+
+.login-btn:disabled,
+.login-btn.is-loading {
+    opacity: 0.72;
+    cursor: wait;
+    transform: none;
+    box-shadow: none;
+}
+
+.login-btn:focus-visible {
+    outline: 2px solid var(--moss-dark);
+    outline-offset: 3px;
 }
 
 .footer {
@@ -467,6 +585,12 @@ input:focus-visible {
 
     .right-panel {
         padding: 40px 32px;
+    }
+
+    .remember-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
     }
 }
 
