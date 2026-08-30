@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InventoryItemHistory;
 use App\Models\Production;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +44,14 @@ class InventoryController extends Controller
 
         if ($eggTrays) {
             $eggTrays->status = $this->computeStatus($eggTrays->current_stock, $eggTrays->min_level);
+        }
+
+        if ($supplements) {
+            $supplements->status = $this->computeStatus($supplements->current_stock, $supplements->min_level);
+        }
+
+        if ($vitamins) {
+            $vitamins->status = $this->computeStatus($vitamins->current_stock, $vitamins->min_level);
         }
 
         $eggsStock = Production::leftoverStock();
@@ -122,7 +131,7 @@ class InventoryController extends Controller
             'min_level'     => ['required', 'numeric', 'min:0'],
         ]);
 
-        DB::table('inventory_items')->insert([
+        $id = DB::table('inventory_items')->insertGetId([
             'item_name'     => $validated['item_name'],
             'unit'          => $validated['unit'],
             'current_stock' => $validated['current_stock'],
@@ -130,6 +139,16 @@ class InventoryController extends Controller
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
+
+        InventoryItemHistory::record(
+            $id,
+            $validated['item_name'],
+            'Created',
+            (float) $validated['current_stock'],
+            0,
+            (float) $validated['current_stock'],
+            'New item added'
+        );
 
         return back()->with('success', 'New item added successfully!');
     }
@@ -141,21 +160,78 @@ class InventoryController extends Controller
             'quantity' => ['required', 'numeric', 'min:0.01'],
         ]);
 
+        $item = DB::table('inventory_items')->where('id', $validated['item_id'])->first();
+        $before = (float) $item->current_stock;
+        $qty = (float) $validated['quantity'];
+        $after = $before + $qty;
+
         DB::table('inventory_items')
             ->where('id', $validated['item_id'])
             ->update([
-                'current_stock' => DB::raw('current_stock + ' . (float) $validated['quantity']),
+                'current_stock' => $after,
                 'updated_at' => now(),
             ]);
+
+        InventoryItemHistory::record(
+            (int) $item->id,
+            $item->item_name,
+            'Restocked',
+            $qty,
+            $before,
+            $after,
+            'Stock added'
+        );
 
         return back()->with('success', 'Stock quantity updated successfully!');
     }
 
     public function deleteItem($id)
     {
+        $item = DB::table('inventory_items')->where('id', $id)->first();
+
+        if ($item) {
+            InventoryItemHistory::record(
+                (int) $item->id,
+                $item->item_name,
+                'Deleted',
+                -1 * (float) $item->current_stock,
+                (float) $item->current_stock,
+                0,
+                'Item removed'
+            );
+        }
+
         DB::table('inventory_items')->where('id', $id)->delete();
 
         return back()->with('success', 'Item deleted successfully!');
+    }
+
+    public function history($id)
+    {
+        $item = DB::table('inventory_items')->where('id', $id)->first();
+
+        if (! $item) {
+            abort(404);
+        }
+
+        $history = InventoryItemHistory::where('inventory_item_id', $id)
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get()
+            ->map(fn ($row) => [
+                'when' => $row->created_at->format('M d, Y g:i A'),
+                'action' => $row->action,
+                'change' => $row->quantity_change,
+                'before' => $row->stock_before,
+                'after' => $row->stock_after,
+                'note' => $row->note,
+            ]);
+
+        return response()->json([
+            'item' => $item->item_name,
+            'unit' => $item->unit,
+            'history' => $history,
+        ]);
     }
 
     private function computeStatus($currentStock, $minLevel)

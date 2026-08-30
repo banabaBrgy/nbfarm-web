@@ -2,8 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\Production;
 use App\Models\InventoryItem;
+use App\Models\InventoryItemHistory;
+use App\Models\Production;
 use Illuminate\Support\Facades\Log;
 
 class ProductionObserver
@@ -59,8 +60,19 @@ class ProductionObserver
             return;
         }
 
-        $next = (float) $trayItem->current_stock - $diff;
-        $trayItem->update(['current_stock' => max(0, $next)]);
+        $before = (float) $trayItem->current_stock;
+        $next = max(0, $before - $diff);
+        $trayItem->update(['current_stock' => $next]);
+
+        InventoryItemHistory::record(
+            $trayItem->id,
+            $trayItem->item_name,
+            $diff > 0 ? 'Deducted' : 'Returned',
+            -1.0 * $diff,
+            $before,
+            $next,
+            $diff > 0 ? 'Trays used for harvest' : 'Trays returned'
+        );
     }
 
     private function returnTrays(int $trays): void

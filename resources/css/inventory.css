@@ -81,7 +81,7 @@
 
     display: grid;
 
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
 
     gap: 22px;
 
@@ -463,6 +463,14 @@
     background: #D32F2F;
 
     color: #fff;
+
+}
+
+.icon-btn-history {
+
+    background: #E3F2FD;
+
+    color: #1565C0;
 
 }
 

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Production;
-use Illuminate\Support\Facades\DB;
 use App\Models\DailyInventoryLog;
-use App\Services\Forecasting\GenerateEggForecast;
 use App\Models\InventoryItem;
+use App\Models\InventoryItemHistory;
+use App\Models\Production;
+use App\Services\Forecasting\GenerateEggForecast;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -21,15 +22,9 @@ class DashboardController extends Controller
         */
 
         if (!DailyInventoryLog::where('log_date', $today)->exists()) {
-
-            // FEEDS
-            InventoryItem::where('item_name', 'Feeds')
-                ->decrement('current_stock');
-
-            // SUPPLEMENT
-            InventoryItem::where('item_name', 'Supplement')
-                ->decrement('current_stock');
-
+            $this->decrementDailySupply('Feeds', 'Daily feed use');
+            $this->decrementDailySupply('Supplement', 'Daily supplement use');
+            $this->decrementDailySupply('Supplements', 'Daily supplement use');
 
             DailyInventoryLog::create([
                 'log_date' => $today
@@ -133,5 +128,28 @@ class DashboardController extends Controller
             'weeklyProduction',
             'predictedEggs'
         ));
+    }
+
+    private function decrementDailySupply(string $itemName, string $note): void
+    {
+        $item = InventoryItem::where('item_name', $itemName)->first();
+
+        if (! $item) {
+            return;
+        }
+
+        $before = (float) $item->current_stock;
+        $after = max(0, $before - 1);
+        $item->update(['current_stock' => $after]);
+
+        InventoryItemHistory::record(
+            $item->id,
+            $item->item_name,
+            'Deducted',
+            -1,
+            $before,
+            $after,
+            $note
+        );
     }
 }

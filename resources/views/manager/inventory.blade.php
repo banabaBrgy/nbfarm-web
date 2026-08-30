@@ -57,13 +57,23 @@
         </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card {{ ($supplements->status ?? '') === 'LOW' ? 'stat-card-alert' : (($supplements->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
         <div class="stat-label">Supplements</div>
-        <div class="stat-value">
+        <div class="stat-value {{ ($supplements->status ?? '') === 'LOW' ? 'text-danger' : (($supplements->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
             {{ $supplements->current_stock ?? 0 }}
         </div>
         <div class="stat-sub">
             {{ $supplements->unit ?? 'pack' }} — Min: {{ $supplements->min_level ?? 0 }} — {{ $supplements->status ?? 'OK' }}
+        </div>
+    </div>
+
+    <div class="stat-card {{ ($vitamins->status ?? '') === 'LOW' ? 'stat-card-alert' : (($vitamins->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
+        <div class="stat-label">Vitamins</div>
+        <div class="stat-value {{ ($vitamins->status ?? '') === 'LOW' ? 'text-danger' : (($vitamins->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
+            {{ number_format($vitamins->current_stock ?? 0) }}
+        </div>
+        <div class="stat-sub">
+            {{ $vitamins->unit ?? 'bottles' }} — Min: {{ $vitamins->min_level ?? 0 }} — {{ $vitamins->status ?? 'OK' }}
         </div>
     </div>
 

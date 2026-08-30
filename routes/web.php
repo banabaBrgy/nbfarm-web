@@ -223,6 +223,7 @@ Route::middleware('auth')->prefix('staff')->name('staff.')->group(function () {
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
+    Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
     Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
     Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
     Route::delete('/inventory/delete/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
