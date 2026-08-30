@@ -58,7 +58,7 @@ class GenerateEggForecast
                 $payload = $this->engine->predict(
                     $history,
                     $predictDates,
-                    (int) config('forecasting.window', 14)
+                    (int) config('forecasting.window', 7)
                 );
             } catch (Throwable $e) {
                 Log::warning('Egg forecast generation failed', ['message' => $e->getMessage()]);
@@ -92,7 +92,7 @@ class GenerateEggForecast
      */
     private function dailyHistory(): array
     {
-        $window = max(2, (int) config('forecasting.window', 14));
+        $window = max(2, (int) config('forecasting.window', 7));
 
         $rows = Production::query()
             ->select(

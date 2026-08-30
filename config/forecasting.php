@@ -11,7 +11,7 @@ return [
 
     'api_key' => env('FORECAST_API_KEY', ''),
 
-    'window' => (int) env('FORECAST_WINDOW', 14),
+    'window' => (int) env('FORECAST_WINDOW', 7),
 
     'timeout' => (int) env('FORECAST_TIMEOUT', 10),
 
