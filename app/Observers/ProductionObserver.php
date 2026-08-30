@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\InventoryItem;
 use App\Models\InventoryItemHistory;
 use App\Models\Production;
+use App\Services\DailyInventory;
 use Illuminate\Support\Facades\Log;
 
 class ProductionObserver
@@ -14,6 +15,8 @@ class ProductionObserver
 
     public function created(Production $production): void
     {
+        app(DailyInventory::class)->applyForToday();
+
         $traysUsed = intdiv((int) $production->eggs_produced, self::EGGS_PER_TRAY);
 
         if ($traysUsed > 0) {
@@ -23,6 +26,8 @@ class ProductionObserver
 
     public function updated(Production $production): void
     {
+        app(DailyInventory::class)->applyForToday();
+
         if (! $production->isDirty('eggs_produced')) {
             return;
         }

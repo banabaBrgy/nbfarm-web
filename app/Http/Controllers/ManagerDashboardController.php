@@ -9,12 +9,15 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Services\DailyInventory;
 use App\Services\Forecasting\GenerateEggForecast;
 
 class ManagerDashboardController extends Controller
 {
     public function index(Request $request)
     {
+        app(DailyInventory::class)->applyForToday();
+
         // ============================
         // PRODUCTION TODAY
         // ============================

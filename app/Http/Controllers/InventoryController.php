@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\InventoryItemHistory;
 use App\Models\Production;
+use App\Services\DailyInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,6 +12,8 @@ class InventoryController extends Controller
 {
     public function index(Request $request)
     {
+        app(DailyInventory::class)->applyForToday();
+
         $search = $request->query('search');
         $statusFilter = $request->query('status');
 
@@ -136,6 +139,9 @@ class InventoryController extends Controller
             'unit'          => $validated['unit'],
             'current_stock' => $validated['current_stock'],
             'min_level'     => $validated['min_level'],
+            'daily_stock'   => $validated['item_name'] === 'Egg Trays'
+                ? $validated['current_stock']
+                : null,
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
@@ -165,12 +171,18 @@ class InventoryController extends Controller
         $qty = (float) $validated['quantity'];
         $after = $before + $qty;
 
+        $update = [
+            'current_stock' => $after,
+            'updated_at' => now(),
+        ];
+
+        if ($item->item_name === 'Egg Trays') {
+            $update['daily_stock'] = (float) ($item->daily_stock ?? DailyInventory::TRAY_DAILY_STOCK) + $qty;
+        }
+
         DB::table('inventory_items')
             ->where('id', $validated['item_id'])
-            ->update([
-                'current_stock' => $after,
-                'updated_at' => now(),
-            ]);
+            ->update($update);
 
         InventoryItemHistory::record(
             (int) $item->id,

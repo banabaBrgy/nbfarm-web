@@ -6,6 +6,7 @@ use App\Models\Production;
 use App\Models\InventoryItem;
 use App\Models\Dispatch;
 use App\Models\Transaction;
+use App\Services\DailyInventory;
 use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -14,6 +15,8 @@ class OwnerDashboardController extends Controller
 {
     public function index()
     {
+        app(DailyInventory::class)->applyForToday();
+
         $eggsToday = Production::whereDate('production_date', today())
             ->sum('eggs_produced');
 

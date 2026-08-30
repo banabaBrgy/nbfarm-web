@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class InventoryItem extends Model
 {
     protected $fillable = [
-        'item_name', 'unit', 'current_stock', 'min_level',
+        'item_name', 'unit', 'current_stock', 'min_level', 'daily_stock',
     ];
 
     protected $casts = [
         'current_stock' => 'float',
         'min_level' => 'float',
+        'daily_stock' => 'float',
     ];
 
     public function getStatusAttribute()

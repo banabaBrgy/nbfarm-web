@@ -6,6 +6,7 @@ use App\Models\Production;
 use App\Models\QrRecord;
 use App\Models\QrTransaction;
 use App\Models\User;
+use App\Services\DailyInventory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -23,6 +24,8 @@ class QrScannerController extends Controller
 
     public function store(Request $request)
     {
+        app(DailyInventory::class)->applyForToday();
+
         $request->validate([
             'qr_code' => 'required'
         ]);

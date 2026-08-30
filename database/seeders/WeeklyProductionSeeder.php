@@ -76,6 +76,7 @@ class WeeklyProductionSeeder extends Seeder
         InventoryItem::where('item_name', 'Egg Trays')->update([
             'current_stock' => $trayStock,
             'min_level' => 100,
+            'daily_stock' => 500,
         ]);
 
         Inventory::where('item_type', 'Egg Tray')->update([
