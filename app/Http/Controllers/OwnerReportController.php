@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Report;
-use App\Models\Production;
-use App\Models\InventoryItem;
-use App\Models\Dispatch;
-use App\Models\Forecast;
-use Illuminate\Support\Facades\DB;
-class OwnerReportController extends Controller
-{
+use Illuminate\Http\Request;
+
+class OwnerReportController extends Controller{
     /**
      * Show all reports sent by the manager.
      */
     public function index()
     {
-        $reports = Report::latest()->get();
+        $reports = Report::with('manager')
+            ->whereIn('status', ['Sent', 'Read'])
+            ->latest()
+            ->get();
 
         return view('owner.reports', compact('reports'));
     }
@@ -27,16 +25,18 @@ class OwnerReportController extends Controller
      */
     public function show(Report $report)
     {
-        if (!$report->is_read) {
-
-            $report->update([
-                'is_read' => 1,
-                'status' => 'Read'
-            ]);
-
+        if (! in_array($report->status, ['Sent', 'Read'], true)) {
+            abort(404);
         }
 
-        return view('owner.report-view', compact('report'));
+        if ($report->status === 'Sent') {
+            $report->update([
+                'is_read' => 1,
+                'status' => 'Read',
+            ]);
+        }
+
+        return redirect()->route('owner.reports');
     }
 
     /**

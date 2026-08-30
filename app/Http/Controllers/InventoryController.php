@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Production;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -44,31 +45,15 @@ class InventoryController extends Controller
             $eggTrays->status = $this->computeStatus($eggTrays->current_stock, $eggTrays->min_level);
         }
 
-        // ============================
-        // 1. EGGS STOCK (all-time, para sa "Eggs Stock" stat card)
-        //    Hindi ito monthly — running balance ito ng available eggs.
-        // ============================
-        $stockTotals = DB::table('production')->selectRaw('
-            SUM(small_eggs) as small,
-            SUM(medium_eggs) as medium,
-            SUM(large_eggs) as large,
-            SUM(extra_large_eggs) as extra_large
-        ')->first();
+        $eggsStock = Production::leftoverStock();
 
-        // Total na-dispatch (Delivered lang), i-convert trays -> eggs (1 tray = 30)
-        $totalDispatchedTrays = DB::table('dispatches')
-            ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
-            ->where('dispatches.status', 'Delivered')
-            ->sum('dispatch_items.quantity');
+        $eggsToday = (int) DB::table('production')
+            ->whereDate('production_date', today())
+            ->sum('eggs_produced');
 
-        $totalDispatchedEggs = $totalDispatchedTrays * 30;
-
-        // Available stock = Produced (excluding cracked) - Dispatched
-        $eggsStock = ($stockTotals->small ?? 0)
-            + ($stockTotals->medium ?? 0)
-            + ($stockTotals->large ?? 0)
-            + ($stockTotals->extra_large ?? 0)
-            - $totalDispatchedEggs;
+        $eggsYesterday = (int) DB::table('production')
+            ->whereDate('production_date', today()->subDay())
+            ->sum('eggs_produced');
 
         // ============================
         // 2. EGG PRODUCTION SUMMARY (napiling buwan, default: kasalukuyang buwan)
@@ -115,6 +100,8 @@ class InventoryController extends Controller
             'supplements',
             'vitamins',
             'eggsStock',
+            'eggsToday',
+            'eggsYesterday',
             'eggTotals',
             'grandTotal',
             'recentMovements',

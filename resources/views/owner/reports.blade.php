@@ -188,7 +188,6 @@
             </table>
 
         </div>
-        </tbody>
         {{-- ===========================================
         VIEW REPORT MODALS
         =========================================== --}}
@@ -267,8 +266,8 @@
 
                                 @csrf
 
-                                <textarea name="owner_remark" rows="5" class="form-control"
-                                    placeholder="Write your remarks here...">{{ old('owner_remark', $report->owner_remark) }}</textarea>
+                                <textarea name="owner_comment" rows="5" class="form-control"
+                                    placeholder="Write your remarks here...">{{ old('owner_comment', $report->owner_comment) }}</textarea>
 
                                 <div class="text-end mt-3">
 

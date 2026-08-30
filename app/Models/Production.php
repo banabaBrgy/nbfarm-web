@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Production extends Model
 {
@@ -39,5 +42,43 @@ class Production extends Model
             + $this->large_eggs
             + $this->extra_large_eggs
             + $this->cracked_eggs;
+    }
+
+    /** Eggs on hand: harvest minus delivered. Pass a date for stock as of that day. */
+    public static function leftoverStock(DateTimeInterface|string|null $asOf = null): int
+    {
+        $date = $asOf ? Carbon::parse($asOf)->toDateString() : null;
+
+        $harvestQuery = static::query()->selectRaw('
+            COALESCE(SUM(small_eggs), 0) as small,
+            COALESCE(SUM(medium_eggs), 0) as medium,
+            COALESCE(SUM(large_eggs), 0) as large,
+            COALESCE(SUM(extra_large_eggs), 0) as extra_large,
+            COALESCE(SUM(cracked_eggs), 0) as cracked
+        ');
+
+        if ($date) {
+            $harvestQuery->whereDate('production_date', '<=', $date);
+        }
+
+        $totals = $harvestQuery->first();
+
+        $harvested = (int) ($totals->small ?? 0)
+            + (int) ($totals->medium ?? 0)
+            + (int) ($totals->large ?? 0)
+            + (int) ($totals->extra_large ?? 0)
+            + (int) ($totals->cracked ?? 0);
+
+        $dispatchQuery = DB::table('dispatches')
+            ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
+            ->where('dispatches.status', 'Delivered');
+
+        if ($date) {
+            $dispatchQuery->whereDate('dispatches.dispatch_date', '<=', $date);
+        }
+
+        $trays = (int) $dispatchQuery->sum('dispatch_items.quantity');
+
+        return $harvested - ($trays * 30);
     }
 }

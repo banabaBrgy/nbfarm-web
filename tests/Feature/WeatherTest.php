@@ -42,7 +42,7 @@ class WeatherTest extends TestCase
         $this->assertIsArray($weather);
         $this->assertSame(31, $weather['temperature']);
         $this->assertSame('Partly cloudy', $weather['condition']);
-        $this->assertSame('San Jose, Batangas', $weather['location']);
+        $this->assertSame('Brgy Sabang, San Jose, Batangas', $weather['location']);
         $this->assertSame('Sat, Aug 29, 2026', $weather['date_label']);
         $this->assertSame('29', $weather['forecast'][0]['day_num']);
         $this->assertCount(3, $weather['forecast']);

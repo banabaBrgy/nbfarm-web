@@ -32,17 +32,30 @@ class DispatchController extends Controller
         }
 
         $dispatches = $query
-            ->latest()
+            ->orderByDesc('dispatch_date')
+            ->orderByDesc('id')
             ->paginate(10)
             ->withQueryString();
 
-        $role = auth()->user()->role ?? '';
+        $statusCounts = Dispatch::query()
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
 
-        if ($role === 'owner') {
-            return view('owner.dispatch', compact('dispatches'));
+        $dispatchStats = [
+            'total' => (int) $statusCounts->sum(),
+            'pending' => (int) ($statusCounts['Pending'] ?? 0),
+            'transit' => (int) ($statusCounts['On Transit'] ?? 0),
+            'delivered' => (int) ($statusCounts['Delivered'] ?? 0),
+        ];
+
+        $role = strtolower((string) (auth()->user()->role ?? ''));
+
+        if ($role === 'owner' || $role === 'farm owner') {
+            return view('owner.dispatch', compact('dispatches', 'dispatchStats'));
         }
 
-        return view('manager.dispatch', compact('dispatches'));
+        return view('manager.dispatch', compact('dispatches', 'dispatchStats'));
     }
 
     public function update(Request $request, Dispatch $dispatch)
@@ -64,7 +77,7 @@ class DispatchController extends Controller
 
         // Kapag unang beses naging Delivered
         if ($request->status === 'Delivered' && !$wasDelivered) {
-
+            $dispatch->loadMissing('items');
             $totalQty = $dispatch->items->sum('quantity');
 
             Transaction::create([
@@ -97,7 +110,7 @@ class DispatchController extends Controller
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:Pending,On Transit,Delivered',
             'size' => 'required|array|min:1',
-            'size.*' => 'required|in:Small,Medium,Large',
+            'size.*' => 'required|in:Small,Medium,Large,Extra Large,Cracked',
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required|integer|min:1',
         ]);
@@ -124,7 +137,41 @@ class DispatchController extends Controller
         });
 
         return redirect()
-            ->route('owner.dispatch')
+            ->route($this->dispatchIndexRoute())
             ->with('success', 'Dispatch created successfully.');
+    }
+
+    public function updateStatus(Request $request, Dispatch $dispatch)
+    {
+        $request->validate([
+            'status' => 'required|in:Pending,On Transit,Delivered',
+        ]);
+
+        $wasDelivered = $dispatch->status === 'Delivered';
+
+        $dispatch->update([
+            'status' => $request->status,
+        ]);
+
+        if ($request->status === 'Delivered' && ! $wasDelivered) {
+            $dispatch->loadMissing('items');
+
+            Transaction::create([
+                'customer' => $dispatch->recipient,
+                'transaction_date' => now(),
+                'quantity' => $dispatch->items->sum('quantity'),
+                'price' => $dispatch->price,
+                'status' => 'Paid',
+            ]);
+        }
+
+        return back()->with('success', 'Dispatch status updated successfully.');
+    }
+
+    private function dispatchIndexRoute(): string
+    {
+        $role = strtolower((string) (auth()->user()->role ?? 'manager'));
+
+        return $role === 'owner' ? 'owner.dispatch' : 'manager.dispatch';
     }
 }

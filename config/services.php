@@ -41,9 +41,9 @@ return [
     ],
 
     'weather' => [
-        'lat' => env('WEATHER_LAT', '13.8774'),
-        'lon' => env('WEATHER_LON', '121.1050'),
-        'location' => env('WEATHER_LOCATION', 'San Jose, Batangas'),
+        'lat' => env('WEATHER_LAT', '13.8785'),
+        'lon' => env('WEATHER_LON', '121.0632'),
+        'location' => env('WEATHER_LOCATION', 'Brgy Sabang, San Jose, Batangas'),
     ],
 
 ];

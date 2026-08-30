@@ -42,7 +42,8 @@
         <div class="stat-label">Eggs Stock</div>
         <div class="stat-value">{{ number_format($eggsStock) }}</div>
         <div class="stat-sub">
-            pcs — {{ $eggsStock > 0 ? 'OK' : 'No Data' }} 
+            pcs — Today: {{ number_format($eggsToday ?? 0) }}
+            · Yesterday: {{ number_format($eggsYesterday ?? 0) }}
         </div>
     </div>
 

@@ -63,9 +63,12 @@
 </style>
 
 <div class="container">
-    
 
-    <a href="{{ route(auth()->user()->role . '.production') }}" class="btn btn-secondary mb-3">
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    <a href="{{ route(\App\Models\User::routeRole() . '.production') }}" class="btn btn-secondary mb-3">
         <i class="fas fa-arrow-left"></i>
         Back
     </a>

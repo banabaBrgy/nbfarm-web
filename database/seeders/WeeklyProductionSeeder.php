@@ -9,7 +9,6 @@ use App\Models\QrRecord;
 use App\Models\QrTransaction;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
 class WeeklyProductionSeeder extends Seeder
 {
@@ -26,14 +25,6 @@ class WeeklyProductionSeeder extends Seeder
         3 => [1380, 1410, 1440, 1470, 1500, 1530, 1440],
     ];
 
-    private array $sizePrefixes = [
-        'Small' => 'QRS',
-        'Medium' => 'QRM',
-        'Large' => 'QRL',
-        'Extra Large' => 'QRXL',
-        'Cracked' => 'QRC',
-    ];
-
     public function run(): void
     {
         $start = Carbon::today()->subDays(6)->toDateString();
@@ -45,20 +36,15 @@ class WeeklyProductionSeeder extends Seeder
             ->pluck('production_id');
 
         if ($productionIds->isNotEmpty()) {
-            $qrIds = QrTransaction::whereIn('production_id', $productionIds)->pluck('qr_record_id');
             QrTransaction::whereIn('production_id', $productionIds)->delete();
-            if ($qrIds->isNotEmpty()) {
-                QrRecord::whereIn('id', $qrIds)->delete();
-            }
-            QrRecord::whereIn('production_id', $productionIds)->delete();
             Production::withoutEvents(function () use ($productionIds) {
                 Production::whereIn('production_id', $productionIds)->delete();
             });
         }
 
-        QrRecord::where('batch_id', 99)
-            ->where('qr_code', 'like', '%-B99-DEMO-%')
-            ->delete();
+        $this->deleteDatedAndDemoQrRecords();
+
+        QrRecord::ensurePrintedCodes();
 
         Production::withoutEvents(function () {
             foreach (self::BATCH_IDS as $batchId) {
@@ -77,7 +63,7 @@ class WeeklyProductionSeeder extends Seeder
                         'eggs_produced' => $sizes['produced'],
                     ]);
 
-                    $this->seedQrRecordsForProduction($production, $date, $sizes);
+                    $this->seedScansForProduction($production, $date, $sizes);
                 }
             }
         });
@@ -99,19 +85,35 @@ class WeeklyProductionSeeder extends Seeder
 
         $this->command?->info('Seeded 3 batches × last 7 harvest days (client-style dummy data).');
         $this->command?->info("Date range: {$start} → {$end}");
+        $this->command?->info('QR codes: QRS/QRM/QRL/QRXL/QRC-B{1-3}-001 to 010 (reused each day).');
         $this->command?->info('Farm daily totals: 4230, 4320, 4410, 4500, 4590, 4680, 4410.');
     }
 
-    private function seedQrRecordsForProduction(
+    private function deleteDatedAndDemoQrRecords(): void
+    {
+        QrRecord::query()
+            ->where(function ($query) {
+                $query->whereIn('batch_id', array_merge(self::BATCH_IDS, [99]))
+                    ->orWhere('qr_code', 'like', '%-DEMO-%');
+            })
+            ->get()
+            ->each(function (QrRecord $record) {
+                if (QrRecord::isClientCode($record->qr_code)) {
+                    return;
+                }
+                QrTransaction::where('qr_record_id', $record->id)->delete();
+                $record->delete();
+            });
+    }
+
+    private function seedScansForProduction(
         Production $production,
         Carbon $date,
         array $sizes
     ): void {
-        $sequence = 1;
         $scannedAt = $date->copy()->setTime(8, 30);
-        $hasQrDate = Schema::hasColumn('qr_records', 'qr_date');
 
-        foreach ($this->sizePrefixes as $eggSize => $prefix) {
+        foreach (QrRecord::SIZE_PREFIXES as $eggSize => $prefix) {
             $key = match ($eggSize) {
                 'Small' => 'small',
                 'Medium' => 'medium',
@@ -125,52 +127,33 @@ class WeeklyProductionSeeder extends Seeder
                 continue;
             }
 
-            $eggsPerTray = 30;
+            $chunks = [];
             $fullStacks = intdiv($eggCount, 300);
             $leftover = $eggCount % 300;
-
-            $chunks = array_fill(0, $fullStacks, 300);
+            for ($n = 0; $n < $fullStacks; $n++) {
+                $chunks[] = 300;
+            }
             if ($leftover > 0) {
                 $chunks[] = $leftover;
             }
-            if ($chunks === []) {
-                $chunks[] = $eggCount;
-            }
 
-            foreach ($chunks as $chunk) {
-                $trayCount = max(1, (int) ceil($chunk / $eggsPerTray));
-                $qrCode = sprintf(
-                    '%s-B%d-%s-%03d',
-                    $prefix,
-                    $production->batch_id,
-                    $date->format('Ymd'),
-                    $sequence
-                );
+            $chunks = array_slice($chunks, 0, 10);
 
-                $recordData = [
-                    'production_id' => $production->production_id,
-                    'batch_id' => $production->batch_id,
-                    'qr_code' => $qrCode,
-                    'egg_size' => $eggSize,
-                    'tray_count' => min(10, $trayCount),
-                    'eggs_per_tray' => $eggsPerTray,
-                ];
-
-                if ($hasQrDate) {
-                    $recordData['qr_date'] = $date->toDateString();
+            foreach ($chunks as $index => $chunk) {
+                $qrCode = QrRecord::clientCode($prefix, $production->batch_id, $index + 1);
+                $qrRecord = QrRecord::where('qr_code', $qrCode)->first();
+                if (!$qrRecord) {
+                    continue;
                 }
-
-                $qrRecord = QrRecord::create($recordData);
 
                 QrTransaction::create([
                     'production_id' => $production->production_id,
                     'qr_record_id' => $qrRecord->id,
                     'total_eggs' => $chunk,
-                    'status' => 'Scanned',
+                    'status' => $chunk === 300 ? 'Scanned' : 'Edited',
                     'scanned_at' => $scannedAt,
                 ]);
 
-                $sequence++;
                 $scannedAt = $scannedAt->copy()->addMinutes(10);
             }
         }

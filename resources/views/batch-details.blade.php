@@ -82,9 +82,10 @@
 
                     <form
                     method="POST"
-                    action="{{ route('generate.qr',$production->batch_id) }}">
+                    action="{{ route(\App\Models\User::routeRole() . '.qr.generate') }}">
 
                     @csrf
+                    <input type="hidden" name="batch_id" value="{{ $production->batch_id }}">
 
                     <button class="btn btn-success">
 

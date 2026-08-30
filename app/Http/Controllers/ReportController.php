@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Report;
-use App\Models\Production;
-use App\Models\Inventory;
 use App\Models\Dispatch;
-use App\Models\Transaction;
-use Carbon\Carbon;
 use App\Models\InventoryItem;
+use App\Models\Production;
+use App\Models\Report;
+use App\Models\Transaction;
 use App\Services\Forecasting\GenerateEggForecast;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
     public function index()
     {
-        $reports = Report::latest()->get();
+        $reports = Report::with('manager')->latest()->get();
 
         return view('manager.reports', compact('reports'));
     }
@@ -25,13 +23,13 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'report_type' => 'required',
-            'title' => 'required',
-            'content' => 'required',
+            'report_type' => 'required|in:overall,production,inventory,dispatch,sales',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
         ]);
 
         Report::create([
-            'report_no' => 'RPT-' . now()->format('YmdHis'),
+            'report_no' => 'RPT-'.now()->format('YmdHis'),
             'report_type' => $request->input('report_type'),
             'manager_id' => auth()->id(),
             'title' => $request->input('title'),
@@ -43,7 +41,7 @@ class ReportController extends Controller
 
         return redirect()
             ->route('manager.reports')
-            ->with('success', 'Report generated successfully.');
+            ->with('success', 'Report saved as draft.');
     }
 
     public function send($id)
@@ -51,9 +49,7 @@ class ReportController extends Controller
         $report = Report::findOrFail($id);
 
         $report->update([
-
-            'status' => 'Sent'
-
+            'status' => 'Sent',
         ]);
 
         return back()->with('success', 'Report sent to Owner.');
@@ -66,219 +62,249 @@ class ReportController extends Controller
         return back()->with('success', 'Report deleted successfully.');
     }
 
-    public function preview($type)
+    public function preview(Request $request, $type)
     {
-        $today = Carbon::today()->format('F d, Y');
-
-        switch ($type) {
-
-            case 'production':
-
-                $production = Production::selectRaw("
-                SUM(small_eggs) as small,
-                SUM(medium_eggs) as medium,
-                SUM(large_eggs) as large,
-                SUM(extra_large_eggs) as extra_large,
-                SUM(cracked_eggs) as cracked,
-                SUM(eggs_produced) as total
-            ")->first();
-
-                $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
-
-                $content =
-                    "========== PRODUCTION REPORT ==========\n\n"
-
-                    . "Date : {$today}\n\n"
-
-                    . "Small Eggs : {$production->small}\n"
-                    . "Medium Eggs : {$production->medium}\n"
-                    . "Large Eggs : {$production->large}\n"
-                    . "Extra Large Eggs : {$production->extra_large}\n"
-                    . "Cracked Eggs : {$production->cracked}\n\n"
-
-                    . "TOTAL EGGS : {$production->total}\n\n"
-
-                    . "Forecast Next Production : "
-                    . $predictedEggs
-                    . " eggs\n\n"
-
-                    . "Prepared by Farm Manager.";
-
-                break;
-
-
-            case 'inventory':
-
-                $items = InventoryItem::all();
-
-                $lowStock = InventoryItem::whereColumn('current_stock', '<=', 'min_level')->count();
-
-                $content = "========== INVENTORY REPORT ==========\n\n";
-                $content .= "Report Date : " . Carbon::now()->format('F d, Y') . "\n\n";
-                $content .= "Current Inventory Status\n";
-                $content .= "--------------------------------------\n\n";
-
-                foreach ($items as $item) {
-
-                    $content .= "Item : {$item->item_name}\n";
-                    $content .= "Stock : {$item->current_stock} {$item->unit}\n";
-                    $content .= "Minimum Level : {$item->min_level} {$item->unit}\n";
-
-                    if ($item->current_stock <= $item->min_level) {
-                        $content .= "Status : LOW STOCK\n";
-                    } else {
-                        $content .= "Status : AVAILABLE\n";
-                    }
-
-                    $content .= "\n";
-                }
-
-                $content .= "--------------------------------------\n";
-                $content .= "Total Inventory Items : " . $items->count() . "\n";
-                $content .= "Low Stock Items : " . $lowStock . "\n\n";
-                $content .= "Prepared by Farm Manager.";
-
-                break;
-
-
-            case 'dispatch':
-
-                $dispatch = Dispatch::count();
-
-                $pending = Dispatch::where('status', 'Pending')->count();
-
-                $transit = Dispatch::where('status', 'On Transit')->count();
-
-                $delivered = Dispatch::where('status', 'Delivered')->count();
-
-                $content =
-                    "========== DISPATCH REPORT ==========\n\n"
-
-                    . "Date : {$today}\n\n"
-
-                    . "Total Dispatch : {$dispatch}\n"
-
-                    . "Pending : {$pending}\n"
-
-                    . "On Transit : {$transit}\n"
-
-                    . "Delivered : {$delivered}\n\n"
-
-                    . "Prepared by Farm Manager.";
-
-                break;
-
-
-            case 'sales':
-
-                $sales = DB::table('transactions')->sum('price');
-
-                $transactions = DB::table('transactions')->count();
-
-                $content =
-                    "========== SALES REPORT ==========\n\n"
-
-                    . "Date : {$today}\n\n"
-
-                    . "Transactions : {$transactions}\n"
-
-                    . "Revenue : ₱" . number_format($sales, 2) . "\n\n"
-
-                    . "Prepared by Farm Manager.";
-
-                break;
-
-
-            default:
-
-                $production = Production::selectRaw("
-        SUM(small_eggs) as small,
-        SUM(medium_eggs) as medium,
-        SUM(large_eggs) as large,
-        SUM(extra_large_eggs) as extra_large,
-        SUM(cracked_eggs) as cracked,
-        SUM(eggs_produced) as total
-    ")->first();
-
-                $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
-
-                $dispatch = Dispatch::count();
-
-                $pending = Dispatch::where('status', 'Pending')->count();
-
-                $delivered = Dispatch::where('status', 'Delivered')->count();
-
-                $inventoryItems = InventoryItem::count();
-
-                $lowStocks = InventoryItem::whereColumn(
-                    'current_stock',
-                    '<=',
-                    'min_level'
-                )->count();
-
-                $sales = DB::table('transactions')->sum('price');
-
-                $transactions = DB::table('transactions')->count();
-
-                $content =
-
-                    "==============================\n"
-                    . "NB POULTRY FARM\n"
-                    . "OVERALL FARM REPORT\n"
-                    . "==============================\n\n"
-
-                    . "Report Date : {$today}\n\n"
-
-                    . "========= PRODUCTION =========\n"
-
-                    . "Small Eggs       : {$production->small}\n"
-
-                    . "Medium Eggs      : {$production->medium}\n"
-
-                    . "Large Eggs       : {$production->large}\n"
-
-                    . "Extra Large      : {$production->extra_large}\n"
-
-                    . "Cracked Eggs     : {$production->cracked}\n"
-
-                    . "TOTAL PRODUCTION : {$production->total}\n\n"
-
-                    . "========= INVENTORY =========\n"
-
-                    . "Inventory Items : {$inventoryItems}\n"
-
-                    . "Low Stock Items : {$lowStocks}\n\n"
-
-                    . "========= DISPATCH =========\n"
-
-                    . "Total Dispatch : {$dispatch}\n"
-
-                    . "Pending        : {$pending}\n"
-
-                    . "Delivered      : {$delivered}\n\n"
-
-                    . "========= SALES =========\n"
-
-                    . "Transactions : {$transactions}\n"
-
-                    . "Revenue : ₱" . number_format($sales, 2) . "\n\n"
-
-                    . "========= FORECAST =========\n"
-
-                    . "Predicted Egg Production\n"
-
-                    . $predictedEggs
-
-                    . " eggs\n\n"
-
-                    . "Farm Status : NORMAL\n\n"
-
-                    . "Prepared by Farm Manager.";
-                break;
-        }
+        $date = Carbon::parse($request->query('date', now()->toDateString()))->startOfDay();
+        $label = $date->format('F d, Y');
+        $titles = [
+            'production' => 'Production Report',
+            'inventory' => 'Inventory Report',
+            'dispatch' => 'Dispatch Report',
+            'sales' => 'Sales Report',
+            'overall' => 'Overall Farm Report',
+        ];
+        $title = ($titles[$type] ?? 'Farm Report').' — '.$label;
+
+        $content = match ($type) {
+            'production' => $this->productionReport($date, $label),
+            'inventory' => $this->inventoryReport($date, $label),
+            'dispatch' => $this->dispatchReport($date, $label),
+            'sales' => $this->salesReport($date, $label),
+            default => $this->overallReport($date, $label),
+        };
 
         return response()->json([
-            'content' => $content
+            'title' => $title,
+            'content' => $content,
         ]);
     }
+
+    private function productionReport(Carbon $date, string $label): string
+    {
+        return
+            $this->reportHeader('PRODUCTION REPORT', $label).
+            $this->productionSection($date).
+            "\n".
+            $this->forecastSection().
+            "\n".
+            $this->reportFooter();
+    }
+
+    private function inventoryReport(Carbon $date, string $label): string
+    {
+        return
+            $this->reportHeader('INVENTORY REPORT', $label).
+            $this->inventorySection($date).
+            "\n".
+            $this->reportFooter();
+    }
+
+    private function dispatchReport(Carbon $date, string $label): string
+    {
+        return
+            $this->reportHeader('DISPATCH REPORT', $label).
+            $this->dispatchSection($date).
+            "\n".
+            $this->reportFooter();
+    }
+
+    private function salesReport(Carbon $date, string $label): string
+    {
+        return
+            $this->reportHeader('SALES REPORT', $label).
+            $this->salesSection($date).
+            "\n".
+            $this->reportFooter();
+    }
+
+    private function overallReport(Carbon $date, string $label): string
+    {
+        return
+            "==============================\n".
+            "NB POULTRY FARM\n".
+            "OVERALL FARM REPORT\n".
+            "==============================\n\n".
+            $this->line('Report Date', $label).
+            "\n".
+            "========= PRODUCTION =========\n".
+            $this->productionSection($date).
+            "\n".
+            "========= INVENTORY =========\n".
+            $this->inventorySection($date).
+            "\n".
+            "========= DISPATCH =========\n".
+            $this->dispatchSection($date).
+            "\n".
+            "========= SALES =========\n".
+            $this->salesSection($date).
+            "\n".
+            "========= FORECAST =========\n".
+            $this->forecastSection().
+            "\n".
+            $this->reportFooter();
+    }
+
+    private function reportHeader(string $title, string $label): string
+    {
+        return
+            "========== {$title} ==========\n\n".
+            $this->line('Report Date', $label).
+            "\n";
+    }
+
+    private function reportFooter(): string
+    {
+        return 'Prepared by Farm Manager.';
+    }
+
+    private function productionSection(Carbon $date): string
+    {
+        $p = $this->productionTotals($date);
+
+        return
+            $this->line('Small Eggs', $this->qty($p['small'])).
+            $this->line('Medium Eggs', $this->qty($p['medium'])).
+            $this->line('Large Eggs', $this->qty($p['large'])).
+            $this->line('Extra Large Eggs', $this->qty($p['xl'])).
+            $this->line('Cracked Eggs', $this->qty($p['cracked'])).
+            $this->line('TOTAL HARVEST', $this->qty($p['total']));
+    }
+
+    private function inventorySection(Carbon $date): string
+    {
+        return
+            $this->line('Eggs Stock', $this->qty(Production::leftoverStock($date)).' pcs').
+            $this->supplyItemLines();
+    }
+
+    private function dispatchSection(Carbon $date): string
+    {
+        $rows = Dispatch::with('items')->whereDate('dispatch_date', $date)->orderBy('id')->get();
+        $trays = (int) $rows->sum(fn ($d) => $d->items->sum('quantity'));
+
+        $text =
+            $this->line('Total Dispatch', $this->qty($rows->count())).
+            $this->line('Pending', $this->qty($rows->where('status', 'Pending')->count())).
+            $this->line('On Transit', $this->qty($rows->where('status', 'On Transit')->count())).
+            $this->line('Delivered', $this->qty($rows->where('status', 'Delivered')->count())).
+            $this->line('Total Trays', $this->qty($trays)).
+            $this->line('Eggs (trays x 30)', $this->qty($trays * 30));
+
+        if ($rows->isEmpty()) {
+            return $text."No dispatch records on this date.\n";
+        }
+
+        $text .= "--------------------------------------\n";
+        foreach ($rows as $dispatch) {
+            $itemList = $dispatch->items
+                ->map(fn ($item) => $item->size.' '.$this->qty((int) $item->quantity).' trays')
+                ->implode(', ');
+            $text .= $dispatch->recipient.' | '.$dispatch->status.' | '.$this->peso((float) $dispatch->price)."\n";
+            if ($itemList !== '') {
+                $text .= $itemList."\n";
+            }
+        }
+
+        return $text;
+    }
+
+    private function salesSection(Carbon $date): string
+    {
+        $rows = Transaction::whereDate('transaction_date', $date)->orderBy('id')->get();
+        $revenue = (float) $rows->sum('price');
+
+        $text =
+            $this->line('Transactions', $this->qty($rows->count())).
+            $this->line('Revenue', $this->peso($revenue));
+
+        if ($rows->isEmpty()) {
+            return $text."No sales records on this date.\n";
+        }
+
+        $text .= "--------------------------------------\n";
+        foreach ($rows as $sale) {
+            $text .=
+                $sale->customer.' | '.$sale->status.' | '.
+                $this->qty((int) $sale->quantity).' | '.
+                $this->peso((float) $sale->price)."\n";
+        }
+
+        return $text;
+    }
+
+    private function forecastSection(): string
+    {
+        $predicted = app(GenerateEggForecast::class)->predictedEggs();
+
+        return $this->line('Forecast (next day)', $this->qty($predicted).' eggs');
+    }
+
+    /**
+     * @return array{small: int, medium: int, large: int, xl: int, cracked: int, total: int}
+     */
+    private function productionTotals(Carbon $date): array
+    {
+        $row = Production::query()
+            ->whereDate('production_date', $date)
+            ->selectRaw('
+                COALESCE(SUM(small_eggs), 0) as small,
+                COALESCE(SUM(medium_eggs), 0) as medium,
+                COALESCE(SUM(large_eggs), 0) as large,
+                COALESCE(SUM(extra_large_eggs), 0) as xl,
+                COALESCE(SUM(cracked_eggs), 0) as cracked,
+                COALESCE(SUM(eggs_produced), 0) as total
+            ')
+            ->first();
+
+        return [
+            'small' => (int) ($row->small ?? 0),
+            'medium' => (int) ($row->medium ?? 0),
+            'large' => (int) ($row->large ?? 0),
+            'xl' => (int) ($row->xl ?? 0),
+            'cracked' => (int) ($row->cracked ?? 0),
+            'total' => (int) ($row->total ?? 0),
+        ];
+    }
+
+    private function supplyItemLines(): string
+    {
+        $lines = '';
+
+        foreach (InventoryItem::orderBy('id')->get() as $item) {
+            $low = $item->current_stock <= $item->min_level;
+            $lines .=
+                $this->line(
+                    $item->item_name.' ('.$item->unit.')',
+                    $this->qty((float) $item->current_stock).($low ? ' LOW STOCK (min '.$this->qty((float) $item->min_level).')' : '')
+                );
+        }
+
+        return $lines;
+    }
+
+    private function line(string $label, string $value): string
+    {
+        return "{$label} : {$value}\n";
+    }
+
+    private function qty(int|float $n): string
+    {
+        return number_format($n);
+    }
+
+    private function peso(float $n): string
+    {
+        return '₱'.number_format($n, 2);
+    }
+
 }

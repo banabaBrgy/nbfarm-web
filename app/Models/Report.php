@@ -24,6 +24,6 @@ class Report extends Model
 
     public function manager()
     {
-        return $this->belongsTo(User::class, 'generated_by');
+        return $this->belongsTo(User::class, 'manager_id');
     }
 }

@@ -169,11 +169,11 @@
 
                         <td>
 
-                            @if($report->owner_remark)
+                            @if($report->owner_comment)
 
                                 <span class="text-success">
 
-                                    {{ Str::limit($report->owner_remark, 40) }}
+                                    {{ Str::limit($report->owner_comment, 40) }}
 
                                 </span>
 
@@ -274,7 +274,7 @@
 
                     <div class="modal-body">
 
-                        <div class="row">
+                        <div class="row g-3">
 
                             <div class="col-md-4">
 
@@ -326,7 +326,20 @@
 
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+
+                                    Report Date
+
+                                </label>
+
+                                <input type="date" id="reportDate" class="form-control"
+                                    value="{{ now()->toDateString() }}" required>
+
+                            </div>
+
+                            <div class="col-md-4">
 
                                 <label class="form-label">
 
@@ -334,8 +347,7 @@
 
                                 </label>
 
-                                <input type="text" name="title" class="form-control" value="{{ now()->format('F d, Y') }}"
-                                    required>
+                                <input type="text" id="reportTitle" name="title" class="form-control" required>
 
                             </div>
 
@@ -427,7 +439,7 @@
 
                         {!! nl2br(e($report->content)) !!}
 
-                        @if($report->owner_remark)
+                        @if($report->owner_comment)
 
                             <hr>
 
@@ -439,7 +451,7 @@
 
                             <div class="alert alert-success">
 
-                                {{ $report->owner_remark }}
+                                {{ $report->owner_comment }}
 
                             </div>
 
@@ -470,29 +482,39 @@
 
         <script>
 
-            document.getElementById('reportType').addEventListener('change', function () {
+            document.getElementById('reportType').addEventListener('change', loadReportPreview);
+            document.getElementById('reportDate').addEventListener('change', loadReportPreview);
 
-                let type = this.value;
+            function loadReportPreview() {
+                const type = document.getElementById('reportType').value;
+                const date = document.getElementById('reportDate').value;
+                const content = document.getElementById('generatedContent');
+                const title = document.getElementById('reportTitle');
 
-                if (type == "") {
-
-                    document.getElementById("generatedContent").value = "";
-
+                if (!type || !date) {
+                    content.value = '';
+                    title.value = '';
                     return;
-
                 }
 
-                fetch("/manager/reports/preview/" + type)
+                const url = @json(url('/manager/reports/preview')) + '/' + encodeURIComponent(type) + '?date=' + encodeURIComponent(date);
 
-                    .then(response => response.json())
-
-                    .then(data => {
-
-                        document.getElementById("generatedContent").value = data.content;
-
+                fetch(url)
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Preview failed');
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        content.value = data.content || '';
+                        title.value = data.title || '';
+                    })
+                    .catch(function () {
+                        content.value = '';
+                        title.value = '';
                     });
-
-            });
+            }
 
         </script>
 
