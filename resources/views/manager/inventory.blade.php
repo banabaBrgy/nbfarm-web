@@ -80,10 +80,10 @@
     <div class="stat-card">
         <div class="stat-label">Egg Trays</div>
         <div class="stat-value">
-            {{ number_format($eggTrays->current_stock ?? 0) }}
+            {{ number_format($eggTraysDisplay ?? 0) }}
         </div>
         <div class="stat-sub">
-            pcs — Min: {{ $eggTrays->min_level ?? 0 }} — {{ $eggTrays->status ?? 'OK' }}
+            pcs — 1,000 − (Eggs Stock ÷ 30)
         </div>
     </div>
 
@@ -144,6 +144,9 @@
         <i class="fas fa-trash"></i>
     </button>
 </form>
+    <button type="button" class="icon-btn icon-btn-history" onclick="openHistoryModal({{ $item->id }})" title="History">
+        <i class="fas fa-clock"></i>
+    </button>
 </td>
     </tr>
     @empty
@@ -304,6 +307,32 @@
         </form>
     </div>
 </div>
+
+<!-- ITEM HISTORY MODAL -->
+<div class="modal-overlay" id="historyModal">
+    <div class="modal-box history-modal-box">
+        <h3>Stock History</h3>
+        <p style="color:#777; font-size:13px; margin:-10px 0 16px;">Item: <strong id="historyItemName"></strong></p>
+        <div class="history-table-wrap">
+            <table class="inventory-table history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                        <th>Change</th>
+                        <th>Stock after</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:#999;">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeHistoryModal()">Close</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -328,6 +357,48 @@ function closeIncreaseModal() {
     document.getElementById('increaseModal').classList.remove('active');
 }
 
+const historyUrlTemplate = @json(route(\App\Models\User::routeRole() . '.inventory.history', ['id' => 999999]));
+
+function openHistoryModal(itemId) {
+    const modal = document.getElementById('historyModal');
+    const body = document.getElementById('historyTableBody');
+    document.getElementById('historyItemName').textContent = '…';
+    body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999;">Loading…</td></tr>';
+    modal.classList.add('active');
+
+    fetch(historyUrlTemplate.replace('999999', itemId), {
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error('Could not load history');
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('historyItemName').textContent = data.item + ' (' + data.unit + ')';
+            if (!data.history.length) {
+                body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">No history yet. Add stock to start a log.</td></tr>';
+                return;
+            }
+            body.innerHTML = data.history.map(row => {
+                const change = Number(row.change);
+                const sign = change > 0 ? '+' : '';
+                return '<tr>' +
+                    '<td>' + row.when + '</td>' +
+                    '<td>' + row.action + (row.note ? '<div class="history-note">' + row.note + '</div>' : '') + '</td>' +
+                    '<td>' + sign + Number(change).toLocaleString() + '</td>' +
+                    '<td>' + Number(row.after).toLocaleString() + '</td>' +
+                    '</tr>';
+            }).join('');
+        })
+        .catch(() => {
+            body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#c0392b;">Could not load history.</td></tr>';
+        });
+}
+
+function closeHistoryModal() {
+    document.getElementById('historyModal').classList.remove('active');
+}
+
 document.getElementById('stockModal').addEventListener('click', function(e) {
     if (e.target === this) closeStockModal();
 });
@@ -336,14 +407,8 @@ document.getElementById('increaseModal').addEventListener('click', function(e) {
     if (e.target === this) closeIncreaseModal();
 });
 
-@if(session('success'))
-Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: @json(session('success')),
-    confirmButtonColor: '#2E7D32',
-    timer: 2500,
-    timerProgressBar: true,
+document.getElementById('historyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeHistoryModal();
 });
 
 document.querySelectorAll('.delete-item-form').forEach(form => {
@@ -365,6 +430,16 @@ document.querySelectorAll('.delete-item-form').forEach(form => {
             }
         });
     });
+});
+
+@if(session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: @json(session('success')),
+    confirmButtonColor: '#2E7D32',
+    timer: 2500,
+    timerProgressBar: true,
 });
 @endif
 </script>

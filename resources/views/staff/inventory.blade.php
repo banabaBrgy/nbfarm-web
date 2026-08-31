@@ -80,10 +80,10 @@
     <div class="stat-card">
         <div class="stat-label">Egg Trays</div>
         <div class="stat-value">
-            {{ number_format($eggTrays->current_stock ?? 0) }}
+            {{ number_format($eggTraysDisplay ?? 0) }}
         </div>
         <div class="stat-sub">
-            pcs — Min: {{ $eggTrays->min_level ?? 0 }} — {{ $eggTrays->status ?? 'OK' }}
+            pcs — 1,000 − (Eggs Stock ÷ 30)
         </div>
     </div>
 
@@ -357,7 +357,7 @@ function closeIncreaseModal() {
     document.getElementById('increaseModal').classList.remove('active');
 }
 
-const historyUrlTemplate = @json(route('staff.inventory.history', ['id' => 999999]));
+const historyUrlTemplate = @json(route(\App\Models\User::routeRole() . '.inventory.history', ['id' => 999999]));
 
 function openHistoryModal(itemId) {
     const modal = document.getElementById('historyModal');

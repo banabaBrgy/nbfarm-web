@@ -25,7 +25,13 @@ class InventoryController extends Controller
 
         $items = $itemsQuery->paginate(6, ['*'], 'page')->withQueryString();
 
-        $items->getCollection()->transform(function ($item) {
+        $eggsStock = Production::leftoverStock();
+        $eggTraysDisplay = Production::leftoverTrays();
+
+        $items->getCollection()->transform(function ($item) use ($eggTraysDisplay) {
+            if ($item->item_name === 'Egg Trays') {
+                $item->current_stock = $eggTraysDisplay;
+            }
             $item->status = $this->computeStatus($item->current_stock, $item->min_level);
             return $item;
         });
@@ -46,6 +52,7 @@ class InventoryController extends Controller
         }
 
         if ($eggTrays) {
+            $eggTrays->current_stock = $eggTraysDisplay;
             $eggTrays->status = $this->computeStatus($eggTrays->current_stock, $eggTrays->min_level);
         }
 
@@ -56,8 +63,6 @@ class InventoryController extends Controller
         if ($vitamins) {
             $vitamins->status = $this->computeStatus($vitamins->current_stock, $vitamins->min_level);
         }
-
-        $eggsStock = Production::leftoverStock();
 
         $eggsToday = (int) DB::table('production')
             ->whereDate('production_date', today())
@@ -128,6 +133,7 @@ class InventoryController extends Controller
             'supplements',
             'vitamins',
             'eggsStock',
+            'eggTraysDisplay',
             'eggsToday',
             'eggsYesterday',
             'eggTotals',

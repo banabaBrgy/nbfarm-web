@@ -55,7 +55,11 @@ class QrScannerController extends Controller
 
         $today = Carbon::today();
 
-        $production = Production::whereDate('production_date', $today)->first();
+        $batchId = (int) ($qr->batch_id ?: 1);
+
+        $production = Production::whereDate('production_date', $today)
+            ->where('batch_id', $batchId)
+            ->first();
 
         /*
         ---------------------------------------
@@ -67,7 +71,7 @@ class QrScannerController extends Controller
 
             $production = Production::create([
                 'production_date' => $today,
-                'batch_id' => 1,
+                'batch_id' => $batchId,
                 'small_eggs' => 0,
                 'medium_eggs' => 0,
                 'large_eggs' => 0,

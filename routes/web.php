@@ -90,6 +90,7 @@ Route::prefix('manager')
 
         // Inventory
         Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
+        Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
         Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
         Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
         Route::delete('/inventory/delete/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
@@ -161,6 +162,7 @@ Route::middleware('auth')->prefix('owner')->name('owner.')->group(function () {
     Route::get('/qr/print', [QrRecordController::class, 'print'])->name('qr.print');
 
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
+    Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
     Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
     Route::delete('/inventory/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
     Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');

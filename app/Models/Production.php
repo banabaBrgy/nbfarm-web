@@ -18,6 +18,11 @@ class Production extends Model
     /** Rolling window for Eggs Stock / leftover totals. */
     public const STOCK_DAYS = 7;
 
+    public const EGGS_PER_TRAY = 30;
+
+    /** Tray pool used for the Inventory Overview Egg Trays card. */
+    public const TRAY_CAPACITY = 1000;
+
     protected $fillable = [
         'production_date',
         'batch_id',
@@ -88,6 +93,16 @@ class Production extends Model
             ->whereDate('dispatches.dispatch_date', '<=', $end)
             ->sum('dispatch_items.quantity');
 
-        return max(0, $harvested - ($trays * 30));
+        return max(0, $harvested - ($trays * self::EGGS_PER_TRAY));
+    }
+
+    /**
+     * Empty trays left from the 1,000 pool: 1000 − (Eggs Stock ÷ 30).
+     */
+    public static function leftoverTrays(DateTimeInterface|string|null $asOf = null): int
+    {
+        $eggs = static::leftoverStock($asOf);
+
+        return max(0, self::TRAY_CAPACITY - intdiv($eggs, self::EGGS_PER_TRAY));
     }
 }

@@ -67,13 +67,13 @@
         </div>
     </div>
 
-    <div class="stat-card {{ ($eggTrays->status ?? '') === 'LOW' ? 'stat-card-alert' : (($eggTrays->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
+    <div class="stat-card">
         <div class="stat-label">Egg Trays</div>
         <div class="stat-value">
-            {{ number_format($eggTrays->current_stock ?? 0) }}
+            {{ number_format($eggTraysDisplay ?? 0) }}
         </div>
         <div class="stat-sub">
-            pcs — Min: {{ number_format($eggTrays->min_level ?? 0) }} — {{ $eggTrays->status ?? 'OK' }}
+            pcs — 1,000 − (Eggs Stock ÷ 30)
         </div>
     </div>
 

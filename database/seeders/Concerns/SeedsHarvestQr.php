@@ -47,17 +47,20 @@ trait SeedsHarvestQr
                 $rows = [];
                 foreach ($dates as $dateStr) {
                     $date = Carbon::parse($dateStr);
-                    $sizes = $this->splitBySize((int) $totalForDate($date));
-                    $rows[] = [
-                        'production_date' => $dateStr,
-                        'batch_id' => 1,
-                        'small_eggs' => $sizes['small'],
-                        'medium_eggs' => $sizes['medium'],
-                        'large_eggs' => $sizes['large'],
-                        'extra_large_eggs' => $sizes['extra_large'],
-                        'cracked_eggs' => $sizes['cracked'],
-                        'eggs_produced' => $sizes['produced'],
-                    ];
+                    $farmTotal = (int) $totalForDate($date);
+                    foreach ($this->splitAcrossBatches($farmTotal, $date) as $batchId => $batchTotal) {
+                        $sizes = $this->splitBySize($batchTotal);
+                        $rows[] = [
+                            'production_date' => $dateStr,
+                            'batch_id' => $batchId,
+                            'small_eggs' => $sizes['small'],
+                            'medium_eggs' => $sizes['medium'],
+                            'large_eggs' => $sizes['large'],
+                            'extra_large_eggs' => $sizes['extra_large'],
+                            'cracked_eggs' => $sizes['cracked'],
+                            'eggs_produced' => $sizes['produced'],
+                        ];
+                    }
                 }
 
                 Production::insert($rows);
@@ -65,6 +68,7 @@ trait SeedsHarvestQr
                 $productions = Production::query()
                     ->whereIn('production_date', $dates)
                     ->orderBy('production_date')
+                    ->orderBy('batch_id')
                     ->get();
 
                 $scans = [];
@@ -86,6 +90,35 @@ trait SeedsHarvestQr
         });
 
         return $days;
+    }
+
+    /**
+     * Split one farm-day total across Batch 1–3. Parts stay multiples of 30 and sum to $farmTotal.
+     *
+     * @return array<int, int>
+     */
+    protected function splitAcrossBatches(int $farmTotal, Carbon $date): array
+    {
+        $batchIds = QrRecord::BATCH_IDS;
+        $count = count($batchIds);
+        $weights = [0.36, 0.33, 0.31];
+        $shift = $date->dayOfYear % $count;
+        $weights = array_merge(array_slice($weights, $shift), array_slice($weights, 0, $shift));
+
+        $totals = [];
+        $allocated = 0;
+        foreach ($batchIds as $index => $batchId) {
+            if ($index === $count - 1) {
+                $totals[$batchId] = max(0, $farmTotal - $allocated);
+                break;
+            }
+
+            $part = (int) (round($farmTotal * $weights[$index] / 30) * 30);
+            $totals[$batchId] = $part;
+            $allocated += $part;
+        }
+
+        return $totals;
     }
 
     /** Deterministic daily farm total, multiple of 30. */
@@ -115,6 +148,8 @@ trait SeedsHarvestQr
             'Cracked' => (int) $production->cracked_eggs,
         ];
 
+        $batchId = (int) $production->batch_id;
+
         foreach (QrRecord::SIZE_PREFIXES as $eggSize => $prefix) {
             $eggCount = $sizes[$eggSize] ?? 0;
             if ($eggCount <= 0) {
@@ -130,11 +165,10 @@ trait SeedsHarvestQr
             if ($leftover > 0) {
                 $chunks[] = $leftover;
             }
-            $chunks = array_slice($chunks, 0, 30);
+            $chunks = array_slice($chunks, 0, 10);
 
             foreach ($chunks as $index => $chunk) {
-                $batchId = QrRecord::BATCH_IDS[$index % count(QrRecord::BATCH_IDS)];
-                $sequence = intdiv($index, count(QrRecord::BATCH_IDS)) + 1;
+                $sequence = $index + 1;
                 $qrCode = QrRecord::clientCode($prefix, $batchId, $sequence);
                 $qrRecordId = $qrIds[$qrCode] ?? null;
                 if (! $qrRecordId) {
