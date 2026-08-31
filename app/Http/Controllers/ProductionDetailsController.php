@@ -8,8 +8,7 @@ class ProductionDetailsController extends Controller
 {
     public function index($id)
     {
-        $production = Production::presentYear()
-            ->with(['qrTransactions.qrRecord'])
+        $production = Production::with(['qrTransactions.qrRecord'])
             ->findOrFail($id);
 
         $transactions = $production->qrTransactions()

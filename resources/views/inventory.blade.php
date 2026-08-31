@@ -42,7 +42,7 @@
         <div class="stat-label">Eggs Stock</div>
         <div class="stat-value">{{ number_format($eggsStock) }}</div>
         <div class="stat-sub">
-            pcs — Today: {{ number_format($eggsToday ?? 0) }}
+            pcs — Last 7 days · Today: {{ number_format($eggsToday ?? 0) }}
             · Yesterday: {{ number_format($eggsYesterday ?? 0) }}
         </div>
     </div>
@@ -160,7 +160,7 @@
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
 
                     <select name="year" class="sort-select" onchange="this.form.submit()">
-                        @foreach($availableMonths->pluck('year')->unique()->sortDesc() as $year)
+                        @foreach(($availableYears ?? $availableMonths->pluck('year')->unique()->sortDesc()) as $year)
                             <option value="{{ $year }}" {{ (int) $year === (int) $selectedYear ? 'selected' : '' }}>
                                 {{ $year }}
                             </option>

@@ -14,6 +14,8 @@ class PresentYearProductionTest extends TestCase
 
         $this->assertSame(2026, Production::visibleYear());
         $this->assertSame(2023, Production::visibleYear('2023-05-01'));
+        $this->assertSame(7, Production::STOCK_DAYS);
+        $this->assertSame('2024-01-01', Production::sampleStartDate());
 
         Carbon::setTestNow();
     }

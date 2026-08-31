@@ -3,73 +3,46 @@
 namespace Database\Seeders;
 
 use App\Models\Production;
+use App\Models\QrTransaction;
 use Carbon\Carbon;
-use Database\Seeders\Concerns\SplitsEggSizes;
+use Database\Seeders\Concerns\SeedsHarvestQr;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
 
 class HistoricalProductionSeeder extends Seeder
 {
-    use SplitsEggSizes;
+    use SeedsHarvestQr;
 
     /**
-     * Store 3 prior years of harvest in the DB only.
-     * Live production table / egg stock stay on the present year.
+     * Year 1 = 2024, Year 2 = 2025. Dummy harvest + matching QR scans.
+     * Also removes leftover 2023 archive rows from the older seeder.
      */
     public function run(): void
     {
-        $start = now()->copy()->subYears(3)->startOfYear();
-        $end = now()->copy()->subYear()->endOfYear();
+        $year1Start = Carbon::parse('2024-01-01')->startOfDay();
+        $year2End = Carbon::parse('2025-12-31')->startOfDay();
 
-        Production::withoutEvents(function () use ($start, $end) {
-            Production::query()
-                ->whereDate('production_date', '>=', $start->toDateString())
-                ->whereDate('production_date', '<=', $end->toDateString())
-                ->delete();
+        Production::withoutEvents(function () {
+            $staleIds = Production::query()
+                ->whereYear('production_date', 2023)
+                ->pluck('production_id');
 
-            $rows = [];
-            $cursor = $start->copy();
-
-            while ($cursor->lte($end)) {
-                $sizes = $this->splitBySize($this->dailyTotal($cursor));
-
-                $rows[] = [
-                    'production_date' => $cursor->toDateString(),
-                    'batch_id' => 1,
-                    'small_eggs' => $sizes['small'],
-                    'medium_eggs' => $sizes['medium'],
-                    'large_eggs' => $sizes['large'],
-                    'extra_large_eggs' => $sizes['extra_large'],
-                    'cracked_eggs' => $sizes['cracked'],
-                    'eggs_produced' => $sizes['produced'],
-                ];
-
-                if (count($rows) >= 200) {
-                    Production::insert($rows);
-                    $rows = [];
-                }
-
-                $cursor->addDay();
-            }
-
-            if ($rows !== []) {
-                Production::insert($rows);
+            if ($staleIds->isNotEmpty()) {
+                QrTransaction::whereIn('production_id', $staleIds)->delete();
+                Production::whereIn('production_id', $staleIds)->delete();
             }
         });
 
-        $this->command?->info(
-            "Stored archive harvest {$start->toDateString()} → {$end->toDateString()} (hidden from present-year screens)."
+        $days = $this->seedHarvestRange(
+            $year1Start,
+            $year2End,
+            fn (Carbon $date) => $this->dailyWaveTotal($date)
         );
 
         Cache::flush();
-    }
 
-    /** Deterministic daily total, multiple of 30. */
-    private function dailyTotal(Carbon $date): int
-    {
-        $wave = (int) (round(sin($date->dayOfYear / 365 * M_PI * 2) * 240 / 30) * 30);
-        $weekdayBoost = [0, 60, 90, 120, 150, 180, 90][$date->dayOfWeek] ?? 0;
-
-        return 4200 + $wave + $weekdayBoost;
+        $this->command?->info(
+            "Year 1 (2024) + Year 2 (2025): {$days} harvest days with dummy QR scans."
+        );
     }
 }

@@ -10,7 +10,7 @@
 
 <div class="production-details-page">
 
-    <a href="{{ route(auth()->user()->role . '.production') }}" class="btn-back mb-3">
+    <a href="{{ route(\App\Models\User::routeRole() . '.production', ['date' => $production->production_date]) }}" class="btn-back mb-3">
         <i class="fas fa-arrow-left"></i>
         Back
     </a>

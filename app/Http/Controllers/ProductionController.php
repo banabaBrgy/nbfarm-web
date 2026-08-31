@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Production;
-use App\Models\QrRecord;
 use App\Models\QrTransaction;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -13,63 +12,51 @@ class ProductionController extends Controller
 {
     public function index(Request $request)
     {
+        $minDate = Carbon::parse(Production::sampleStartDate());
+        $maxDate = today();
+
         $date = $request->filled('date')
             ? Carbon::parse($request->date)
-            : null;
+            : today();
 
-        if ($date && (int) $date->year !== Production::visibleYear()) {
-            $date = null;
+        if ($date->lt($minDate) || $date->gt($maxDate)) {
+            $date = today();
         }
 
         $view = $request->view ?? 'day';
 
-        $query = Production::query()->presentYear();
-
-        if ($date) {
-            $query->whereDate('production_date', $date);
-        }
-
-        $productions = $query
+        $productions = Production::query()
+            ->whereDate('production_date', $date)
             ->when($request->filled('search'), function ($q) use ($request) {
                 $term = trim((string) $request->search);
-                $q->where(function ($inner) use ($term) {
-                    $inner->where('batch_id', 'like', '%'.$term.'%')
-                        ->orWhereDate('production_date', $term);
-                });
+                $q->where('batch_id', 'like', '%'.$term.'%');
             })
-            ->orderBy('production_date')
             ->orderBy('batch_id')
             ->get();
 
-        $totalEggs = (int) Production::whereDate('production_date', today())
-            ->sum('eggs_produced');
-
-        $activeBatches = count(QrRecord::BATCH_IDS);
+        $totalEggs = (int) $productions->sum('eggs_produced');
 
         $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
-        // Fetch QR transactions related to the selected productions
         $productionIds = $productions->pluck('production_id');
 
-       $qrTransactions = QrTransaction::with(['qrRecord','production'])
-    ->whereIn('production_id', $productionIds)
-    ->get();
+        $qrTransactions = QrTransaction::with(['qrRecord', 'production'])
+            ->whereIn('production_id', $productionIds)
+            ->get();
 
-            $selectedDate = $date;
-    $viewType = $view;
+        $selectedDate = $date;
+        $viewType = $view;
 
-    // Determine view based on route name prefix (staff. / owner. / manager.)
-    $routeName = $request->route()->getName(); // e.g. 'staff.production'
-    $role = explode('.', $routeName)[0]; // 'staff'
+        $routeName = $request->route()->getName();
+        $role = explode('.', $routeName)[0];
 
-        return view($role . '.production', compact(
-        'productions',
-        'totalEggs',
-        'activeBatches',
-        'predictedEggs',
-        'qrTransactions',
-        'selectedDate',
-        'viewType'
+        return view($role.'.production', compact(
+            'productions',
+            'totalEggs',
+            'predictedEggs',
+            'qrTransactions',
+            'selectedDate',
+            'viewType'
         ));
     }
 }

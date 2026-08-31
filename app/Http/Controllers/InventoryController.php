@@ -67,11 +67,16 @@ class InventoryController extends Controller
             ->whereDate('production_date', today()->subDay())
             ->sum('eggs_produced');
 
-        // ============================
-        // 2. EGG PRODUCTION SUMMARY — present year sample only
-        // Older years stay in the DB but are not selectable here.
-        // ============================
-        $selectedYear = Production::visibleYear();
+        $availableYears = DB::table('production')
+            ->selectRaw('DISTINCT YEAR(production_date) as year')
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        $selectedYear = (int) $request->query('year', now()->year);
+        if ($availableYears->isNotEmpty() && ! $availableYears->contains($selectedYear)) {
+            $selectedYear = (int) $availableYears->first();
+        }
+
         $selectedMonth = (int) $request->query('month', now()->month);
         if ($selectedMonth < 1 || $selectedMonth > 12) {
             $selectedMonth = (int) now()->month;
@@ -132,6 +137,7 @@ class InventoryController extends Controller
             'statusFilter',
             'selectedMonth',
             'selectedYear',
+            'availableYears',
             'availableMonths'
         ));
     }

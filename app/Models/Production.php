@@ -15,6 +15,9 @@ class Production extends Model
 
     public $timestamps = false;
 
+    /** Rolling window for Eggs Stock / leftover totals. */
+    public const STOCK_DAYS = 7;
+
     protected $fillable = [
         'production_date',
         'batch_id',
@@ -27,13 +30,13 @@ class Production extends Model
     ];
 
     public function qrTransactions()
-{
-    return $this->hasMany(
-        QrTransaction::class,
-        'production_id',
-        'production_id'
-    );
-}
+    {
+        return $this->hasMany(
+            QrTransaction::class,
+            'production_id',
+            'production_id'
+        );
+    }
 
     public function totalEggCount(): int
     {
@@ -44,7 +47,11 @@ class Production extends Model
             + $this->cracked_eggs;
     }
 
-    /** Live screens and sample data use this calendar year only. Older years stay in the DB. */
+    public static function sampleStartDate(): string
+    {
+        return '2024-01-01';
+    }
+
     public static function visibleYear(DateTimeInterface|string|null $asOf = null): int
     {
         return (int) ($asOf ? Carbon::parse($asOf)->year : now()->year);
@@ -60,49 +67,27 @@ class Production extends Model
     }
 
     /**
-     * Eggs on hand: present-year harvest minus present-year delivered trays.
-     * Older production is stored but does not inflate stock (no fake dispatch needed).
-     * Pass a date for stock as of that day within that date's year.
+     * Eggs on hand for the last 7 harvest days (not the 3-year archive).
+     * Delivered trays in the same window are subtracted.
      */
     public static function leftoverStock(DateTimeInterface|string|null $asOf = null): int
     {
-        $asOfDate = $asOf ? Carbon::parse($asOf) : null;
-        $year = static::visibleYear($asOfDate);
-        $date = $asOfDate?->toDateString();
+        $asOfDate = $asOf ? Carbon::parse($asOf) : now();
+        $end = $asOfDate->toDateString();
+        $start = $asOfDate->copy()->subDays(self::STOCK_DAYS - 1)->toDateString();
 
-        $harvestQuery = static::query()
-            ->presentYear($year)
-            ->selectRaw('
-                COALESCE(SUM(small_eggs), 0) as small,
-                COALESCE(SUM(medium_eggs), 0) as medium,
-                COALESCE(SUM(large_eggs), 0) as large,
-                COALESCE(SUM(extra_large_eggs), 0) as extra_large,
-                COALESCE(SUM(cracked_eggs), 0) as cracked
-            ');
+        $harvested = (int) static::query()
+            ->whereDate('production_date', '>=', $start)
+            ->whereDate('production_date', '<=', $end)
+            ->sum('eggs_produced');
 
-        if ($date) {
-            $harvestQuery->whereDate('production_date', '<=', $date);
-        }
-
-        $totals = $harvestQuery->first();
-
-        $harvested = (int) ($totals->small ?? 0)
-            + (int) ($totals->medium ?? 0)
-            + (int) ($totals->large ?? 0)
-            + (int) ($totals->extra_large ?? 0)
-            + (int) ($totals->cracked ?? 0);
-
-        $dispatchQuery = DB::table('dispatches')
+        $trays = (int) DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
             ->where('dispatches.status', 'Delivered')
-            ->whereYear('dispatches.dispatch_date', $year);
+            ->whereDate('dispatches.dispatch_date', '>=', $start)
+            ->whereDate('dispatches.dispatch_date', '<=', $end)
+            ->sum('dispatch_items.quantity');
 
-        if ($date) {
-            $dispatchQuery->whereDate('dispatches.dispatch_date', '<=', $date);
-        }
-
-        $trays = (int) $dispatchQuery->sum('dispatch_items.quantity');
-
-        return $harvested - ($trays * 30);
+        return max(0, $harvested - ($trays * 30));
     }
 }
