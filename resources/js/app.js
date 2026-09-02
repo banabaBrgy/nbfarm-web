@@ -2,6 +2,7 @@ import './bootstrap';
 import './sidebar';
 import './weather';
 import './alerts';
+import './count-up';
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
