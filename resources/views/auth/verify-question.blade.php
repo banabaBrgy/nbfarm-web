@@ -1,192 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
+@extends('layouts.auth-guest')
 
-<title>Verify Account</title>
+@section('title', 'Verify Account — NB Poultry Farm')
+@section('eyebrow', 'Account recovery · Step 2 of 3')
+@section('heading', 'Verify account')
+@section('sub', 'Answer your security question to confirm it is you.')
 
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-
-<style>
-
-    body {
-
-        background: #f4f7f6;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-    }
-
-
-    .verify-card {
-
-        width: 420px;
-        border-radius: 15px;
-
-    }
-
-
-    .card-header {
-
-        border-radius: 15px 15px 0 0 !important;
-
-    }
-
-
-    .question-box {
-
-        background: #f8f9fa;
-        border-left: 5px solid #198754;
-        padding: 15px;
-        border-radius: 8px;
-
-    }
-
-
-</style>
-
-
-</head>
-
-
-<body>
-
-
-<div class="card shadow-lg border-0 verify-card">
-
-
-    <div class="card-header bg-success text-white text-center p-3">
-
-        <h3 class="mb-0">
-
-            <i class="bi bi-shield-lock"></i>
-
-            Verify Account
-
-        </h3>
-
+@section('content')
+    <div class="field">
+        <label class="field-label" for="username">Username</label>
+        <div class="input-icon-wrap">
+            <span class="input-icon" aria-hidden="true">👤</span>
+            <input
+                type="text"
+                id="username"
+                value="{{ $user->username }}"
+                readonly
+                tabindex="-1"
+            >
+        </div>
     </div>
 
-
-
-
-    <div class="card-body p-4">
-
-
-
-        @if(session('error'))
-
-            <div class="alert alert-danger">
-
-                {{ session('error') }}
-
-            </div>
-
-        @endif
-
-
-
-
-        <div class="mb-3">
-
-            <label class="fw-bold">
-
-                Username
-
-            </label>
-
-
-            <input type="text"
-                   class="form-control"
-                   value="{{ $user->username }}"
-                   readonly>
-
-        </div>
-
-
-
-
-
-        <div class="mb-3">
-
-
-            <label class="fw-bold">
-
-                Security Question
-
-            </label>
-
-
-
-            <div class="question-box mt-2">
-
-
-                {{ $user->security_question }}
-
-
-            </div>
-
-
-        </div>
-
-
-
-
-
-
-
-        <form method="POST" action="{{ route('forgot.verify') }}">
-
-
-            @csrf
-
-
-
-
-
-            <div class="mb-3">
-
-
-                <label class="fw-bold">
-
-                    Answer
-
-                </label>
-
-
-
-
-                <input type="text"
-                       name="answer"
-                       class="form-control"
-                       placeholder="Enter your answer"
-                       required>
-
-
-
-            </div>
-
-
-            <button type="submit"
-                    class="btn btn-success w-100">
-
-
-                <i class="bi bi-check-circle"></i>
-
-                Verify
-
-            </button>
-
-        </form>
-
+    <div class="field">
+        <label class="field-label">Security question</label>
+        <div class="question-box">{{ $user->security_question }}</div>
     </div>
-</div>
 
-</body>
-</html>
+    <form method="POST" action="{{ route('forgot.verify') }}" data-loading-form novalidate>
+        @csrf
+
+        <div class="field {{ $errors->has('answer') ? 'is-invalid' : '' }}">
+            <label class="field-label" for="answer">Answer <span class="req" aria-hidden="true">*</span></label>
+            <div class="input-icon-wrap">
+                <span class="input-icon" aria-hidden="true">🔑</span>
+                <input
+                    type="text"
+                    id="answer"
+                    name="answer"
+                    value="{{ old('answer') }}"
+                    placeholder="Enter your answer"
+                    autocomplete="off"
+                    autofocus
+                    required
+                >
+            </div>
+            <p class="field-error">{{ $errors->first('answer') }}</p>
+        </div>
+
+        <button type="submit" class="login-btn" data-loading="Verifying…">Verify</button>
+    </form>
+
+    <div class="auth-back">
+        <a href="{{ route('forgot.password') }}" class="forgot-password">Use a different username</a>
+    </div>
+@endsection

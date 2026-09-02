@@ -1,160 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - NB Poultry Farm</title>
+@extends('layouts.auth-guest')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+@section('title', 'Reset Password — NB Poultry Farm')
+@section('eyebrow', 'Account recovery · Step 3 of 3')
+@section('heading', 'Reset password')
+@section('sub')
+    Create a new password for <strong>{{ $user->username }}</strong>.
+@endsection
 
-    <style>
-        body{
-            background:#f4f7f6;
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-family:Arial, Helvetica, sans-serif;
-        }
+@section('content')
+    <form method="POST" action="{{ route('forgot.reset') }}" data-loading-form novalidate>
+        @csrf
 
-        .reset-card{
-            width:100%;
-            max-width:420px;
-            border:none;
-            border-radius:15px;
-            overflow:hidden;
-        }
-
-        .card-header{
-            background:#2E7D32;
-            color:#fff;
-            text-align:center;
-            padding:20px;
-        }
-
-        .card-header i{
-            font-size:40px;
-            margin-bottom:10px;
-            display:block;
-        }
-
-        .form-control{
-            height:48px;
-            border-radius:10px;
-        }
-
-        .btn-success{
-            background:#2E7D32;
-            border:none;
-            border-radius:10px;
-            height:48px;
-            font-weight:600;
-        }
-
-        .btn-success:hover{
-            background:#256628;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="card shadow reset-card">
-
-    <div class="card-header">
-        <i class="bi bi-shield-lock-fill"></i>
-        <h4 class="mb-0">Reset Password</h4>
-    </div>
-
-    <div class="card-body p-4">
-
-        <p class="text-center text-muted mb-4">
-            Create a new password for your account.
-        </p>
-
-        @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-        @endif
-
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0 ps-3">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-        <form method="POST" action="{{ route('forgot.reset') }}">
-            @csrf
-
-            <div class="mb-3">
-                <label class="form-label">New Password</label>
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-lock-fill"></i>
-                    </span>
-                    <input type="password"
-                           name="password"
-                           id="password"
-                           class="form-control"
-                           placeholder="Enter new password"
-                           required>
-                    <span class="input-group-text" style="cursor:pointer;" onclick="togglePassword('password', this)">
-                        <i class="bi bi-eye-fill"></i>
-                    </span>
-                </div>
+        <div class="field {{ $errors->has('password') ? 'is-invalid' : '' }}">
+            <label class="field-label" for="password">New password <span class="req" aria-hidden="true">*</span></label>
+            <div class="password-container input-icon-wrap">
+                <span class="input-icon" aria-hidden="true">🔒</span>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter new password"
+                    autocomplete="new-password"
+                    maxlength="255"
+                    required
+                    aria-describedby="password-error"
+                >
+                <button type="button" class="toggle-password" data-toggle-password aria-label="Show password" aria-pressed="false">
+                    Show
+                </button>
             </div>
+            <p class="field-error" id="password-error">{{ $errors->first('password') }}</p>
+        </div>
 
-            <div class="mb-4">
-                <label class="form-label">Confirm Password</label>
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-shield-lock-fill"></i>
-                    </span>
-                    <input type="password"
-                           name="password_confirmation"
-                           id="password_confirmation"
-                           class="form-control"
-                           placeholder="Confirm password"
-                           required>
-                    <span class="input-group-text" style="cursor:pointer;" onclick="togglePassword('password_confirmation', this)">
-                        <i class="bi bi-eye-fill"></i>
-                    </span>
-                </div>
+        <div class="field {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}">
+            <label class="field-label" for="password_confirmation">Confirm password <span class="req" aria-hidden="true">*</span></label>
+            <div class="password-container input-icon-wrap">
+                <span class="input-icon" aria-hidden="true">🔒</span>
+                <input
+                    type="password"
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    placeholder="Confirm password"
+                    autocomplete="new-password"
+                    maxlength="255"
+                    required
+                >
+                <button type="button" class="toggle-password" data-toggle-password aria-label="Show password" aria-pressed="false">
+                    Show
+                </button>
             </div>
+            <p class="field-error">{{ $errors->first('password_confirmation') }}</p>
+        </div>
 
-            <button type="submit" class="btn btn-success w-100">
-                <i class="bi bi-check-circle me-2"></i>
-                Update Password
-            </button>
+        <button type="submit" class="login-btn" data-loading="Updating…">Update password</button>
+    </form>
 
-        </form>
-
+    <div class="auth-back">
+        <a href="{{ route('login') }}" class="forgot-password">Back to login</a>
     </div>
-
-</div>
-
-<script>
-    function togglePassword(inputId, iconSpan) {
-        const input = document.getElementById(inputId);
-        const icon = iconSpan.querySelector('i');
-
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('bi-eye-fill');
-            icon.classList.add('bi-eye-slash-fill');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('bi-eye-slash-fill');
-            icon.classList.add('bi-eye-fill');
-        }
-    }
-</script>
-
-</body>
-</html>
+@endsection

@@ -550,11 +550,44 @@ input:focus-visible {
     cursor: wait;
     transform: none;
     box-shadow: none;
+    pointer-events: none;
+}
+
+.login-btn:disabled:hover,
+.login-btn.is-loading:hover {
+    background: var(--moss);
+    box-shadow: none;
 }
 
 .login-btn:focus-visible {
     outline: 2px solid var(--moss-dark);
     outline-offset: 3px;
+}
+
+.question-box {
+    background: rgba(42, 33, 27, 0.045);
+    border-left: 3px solid var(--straw);
+    padding: 14px 16px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink);
+    border-radius: 0 4px 4px 0;
+}
+
+input[readonly] {
+    color: var(--ink-soft);
+    cursor: default;
+    opacity: 0.9;
+}
+
+.auth-back {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.subtitle strong {
+    font-weight: 600;
+    color: var(--ink);
 }
 
 .footer {
