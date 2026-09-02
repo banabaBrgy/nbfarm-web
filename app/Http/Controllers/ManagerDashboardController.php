@@ -60,16 +60,20 @@ class ManagerDashboardController extends Controller
         $feedLow = $feedStock <= $feedMin;
 
 
-        $supplements = InventoryItem::where(
+        $vitamins = InventoryItem::where(
             'item_name',
-            'Supplements'
+            'Vitamins'
         )->sum('current_stock');
 
-
-        $eggTrays = InventoryItem::where(
+        $vitaminMin = InventoryItem::where(
             'item_name',
-            'Egg Trays'
-        )->sum('current_stock');
+            'Vitamins'
+        )->sum('min_level');
+
+        $vitaminLow = $vitamins <= $vitaminMin;
+
+
+        $eggTrays = Production::leftoverTrays();
 
 
 
@@ -226,7 +230,9 @@ class ManagerDashboardController extends Controller
                 'feedMin',
                 'feedLow',
 
-                'supplements',
+                'vitamins',
+                'vitaminMin',
+                'vitaminLow',
                 'eggTrays',
 
                 'eggsTotal',

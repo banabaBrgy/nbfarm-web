@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
 use Illuminate\Support\Facades\DB;
-use App\Models\Transaction;
 
 class DispatchController extends Controller
 {
@@ -65,29 +64,12 @@ class DispatchController extends Controller
             'status' => 'required|in:Pending,On Transit,Delivered',
         ]);
 
-        // Dating status
-        $oldStatus = $dispatch->status;
-        $wasDelivered = $dispatch->status === 'Delivered';
-
-        // Update dispatch
         $dispatch->update([
             'dispatch_date' => $request->dispatch_date,
             'status' => $request->status,
         ]);
 
-        // Kapag unang beses naging Delivered
-        if ($request->status === 'Delivered' && !$wasDelivered) {
-            $dispatch->loadMissing('items');
-            $totalQty = $dispatch->items->sum('quantity');
-
-            Transaction::create([
-                'customer' => $dispatch->recipient,
-                'transaction_date' => now(),
-                'quantity' => $totalQty,
-                'price' => $dispatch->price,
-                'status' => 'Paid',
-            ]);
-        }
+        $dispatch->syncSale();
 
         return back()->with('success', 'Dispatch updated successfully.');
     }
@@ -154,6 +136,8 @@ class DispatchController extends Controller
 
             }
 
+            $dispatch->syncSale();
+
         });
 
         return redirect()
@@ -167,23 +151,11 @@ class DispatchController extends Controller
             'status' => 'required|in:Pending,On Transit,Delivered',
         ]);
 
-        $wasDelivered = $dispatch->status === 'Delivered';
-
         $dispatch->update([
             'status' => $request->status,
         ]);
 
-        if ($request->status === 'Delivered' && ! $wasDelivered) {
-            $dispatch->loadMissing('items');
-
-            Transaction::create([
-                'customer' => $dispatch->recipient,
-                'transaction_date' => now(),
-                'quantity' => $dispatch->items->sum('quantity'),
-                'price' => $dispatch->price,
-                'status' => 'Paid',
-            ]);
-        }
+        $dispatch->syncSale();
 
         return back()->with('success', 'Dispatch status updated successfully.');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dispatch;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -74,7 +75,9 @@ private function buildTopCustomers()
             'today'   => (float) Transaction::today()->sum('price'),
             'week'    => (float) Transaction::thisWeek()->sum('price'),
             'month'   => (float) Transaction::thisMonth()->sum('price'),
-            'pending' => (float) Transaction::pending()->sum('price'),
+            'pending' => (float) Dispatch::query()
+                ->whereIn('status', ['Pending', 'On Transit'])
+                ->sum('price'),
         ];
     }
 

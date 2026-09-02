@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Dispatch;
 use App\Models\Production;
 use App\Models\Transaction;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -77,13 +76,7 @@ class WeeklyDispatchSeeder extends Seeder
                     $dispatch->items()->create($item);
                 }
 
-                Transaction::create([
-                    'customer' => $dispatch->recipient,
-                    'transaction_date' => Carbon::parse($date),
-                    'quantity' => $need,
-                    'price' => $price,
-                    'status' => 'Paid',
-                ]);
+                $dispatch->syncSale();
 
                 $created++;
             });

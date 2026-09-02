@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql' || ! \Illuminate\Support\Facades\Schema::hasTable('dispatch_items')) {
+            return;
+        }
+
         DB::statement("
             ALTER TABLE dispatch_items
             MODIFY size ENUM('Small', 'Medium', 'Large', 'Extra Large', 'Cracked') NOT NULL

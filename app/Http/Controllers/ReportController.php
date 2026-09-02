@@ -8,6 +8,7 @@ use App\Models\Production;
 use App\Models\Report;
 use App\Models\Transaction;
 use App\Services\Forecasting\GenerateEggForecast;
+use App\Services\ReportNotifier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -28,16 +29,17 @@ class ReportController extends Controller
             'content' => 'required|string',
         ]);
 
-        Report::create([
+        Report::create(Report::existing([
             'report_no' => 'RPT-'.now()->format('YmdHis'),
             'report_type' => $request->input('report_type'),
             'manager_id' => auth()->id(),
             'title' => $request->input('title'),
             'content' => $request->input('content'),
+            'report_date' => now()->toDateString(),
             'status' => 'Draft',
             'owner_comment' => null,
             'is_read' => 0,
-        ]);
+        ]));
 
         return redirect()
             ->route('manager.reports')
@@ -48,15 +50,24 @@ class ReportController extends Controller
     {
         $report = Report::findOrFail($id);
 
-        $report->update([
+        if ($report->status !== 'Draft') {
+            return back()->with('success', 'Report sent to Owner.');
+        }
+
+        $report->update(Report::existing([
             'status' => 'Sent',
-        ]);
+            'sent_at' => now(),
+        ]));
+
+        app(ReportNotifier::class)->sent($report);
 
         return back()->with('success', 'Report sent to Owner.');
     }
 
     public function destroy($id)
     {
+        app(ReportNotifier::class)->forget((int) $id);
+
         Report::findOrFail($id)->delete();
 
         return back()->with('success', 'Report deleted successfully.');

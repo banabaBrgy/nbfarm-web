@@ -18,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->ensureOpensslConfig();
+
         Production::observe(ProductionObserver::class);
 
         Password::defaults(function () {
@@ -26,5 +28,30 @@ class AppServiceProvider extends ServiceProvider
                 ->numbers()    
                 ->symbols();    
         });
+    }
+
+    private function ensureOpensslConfig(): void
+    {
+        if (getenv('OPENSSL_CONF')) {
+            return;
+        }
+
+        $ini = php_ini_loaded_file();
+        $guesses = [];
+
+        if (is_string($ini) && $ini !== '') {
+            $dir = dirname($ini);
+            $guesses[] = $dir.DIRECTORY_SEPARATOR.'extras'.DIRECTORY_SEPARATOR.'ssl'.DIRECTORY_SEPARATOR.'openssl.cnf';
+            $guesses[] = $dir.DIRECTORY_SEPARATOR.'extras'.DIRECTORY_SEPARATOR.'openssl'.DIRECTORY_SEPARATOR.'openssl.cnf';
+        }
+
+        $guesses[] = 'C:\\xampp\\php\\extras\\ssl\\openssl.cnf';
+
+        foreach ($guesses as $cnf) {
+            if (is_file($cnf)) {
+                putenv('OPENSSL_CONF='.$cnf);
+                return;
+            }
+        }
     }
 }

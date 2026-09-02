@@ -4,6 +4,8 @@
     $scanRoute = $rolePrefix . '.production.scan';
     $generateRoute = $rolePrefix . '.qr.generate';
     $detailsRoute = $rolePrefix . '.production.details';
+    $canManageQr = $rolePrefix === 'staff';
+    $statCol = $canManageQr ? 'col-lg-3 col-md-6' : 'col-lg-4 col-md-6';
     $date = $selectedDate instanceof \Carbon\Carbon
         ? $selectedDate
         : \Carbon\Carbon::parse($selectedDate);
@@ -19,7 +21,7 @@
 
 <div class="row g-4 mb-4">
 
-    <div class="col-lg-3 col-md-6">
+    <div class="{{ $statCol }}">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
@@ -42,7 +44,7 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-md-6">
+    <div class="{{ $statCol }}">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
@@ -65,7 +67,7 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-md-6">
+    <div class="{{ $statCol }}">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
@@ -88,6 +90,7 @@
         </div>
     </div>
 
+    @if($canManageQr)
     <div class="col-lg-3 col-md-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
@@ -108,6 +111,7 @@
             </div>
         </div>
     </div>
+    @endif
 
 </div>
 

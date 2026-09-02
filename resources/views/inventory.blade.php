@@ -58,16 +58,6 @@
     </div>
 
     <div class="stat-card">
-        <div class="stat-label">Supplements</div>
-        <div class="stat-value">
-            {{ $supplements->current_stock ?? 0 }}
-        </div>
-        <div class="stat-sub">
-            {{ $supplements->unit ?? 'pack' }} — Min: {{ $supplements->min_level ?? 0 }} — {{ $supplements->status ?? 'OK' }}
-        </div>
-    </div>
-
-    <div class="stat-card">
         <div class="stat-label">Egg Trays</div>
         <div class="stat-value">
             {{ number_format($eggTraysDisplay ?? 0) }}

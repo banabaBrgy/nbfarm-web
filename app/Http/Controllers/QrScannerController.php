@@ -14,6 +14,8 @@ class QrScannerController extends Controller
 {
     public function index()
     {
+        abort_unless(User::routeRole() === 'staff', 403);
+
         $routeRole = User::routeRole();
 
         return view('scan-qr', [
@@ -24,6 +26,8 @@ class QrScannerController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(User::routeRole() === 'staff', 403);
+
         app(DailyInventory::class)->applyForToday();
 
         $request->validate([

@@ -26,6 +26,7 @@ class User extends Authenticatable
         // Added for User Management
         'status',
         'last_login_at',
+        'push_alerts_enabled',
     ];
 
     /**
@@ -47,7 +48,36 @@ class User extends Authenticatable
 
             // Added for User Management
             'last_login_at' => 'datetime',
+            'push_alerts_enabled' => 'boolean',
         ];
+    }
+
+    public function isFarmLead(): bool
+    {
+        return in_array(self::routeRole($this->role), ['owner', 'manager'], true);
+    }
+
+    public function isOwner(): bool
+    {
+        return self::routeRole($this->role) === 'owner';
+    }
+
+    /** @return \Illuminate\Support\Collection<int, self> */
+    public static function farmLeads()
+    {
+        return static::query()
+            ->get()
+            ->filter(fn (self $user) => $user->isFarmLead())
+            ->values();
+    }
+
+    /** @return \Illuminate\Support\Collection<int, self> */
+    public static function owners()
+    {
+        return static::query()
+            ->get()
+            ->filter(fn (self $user) => $user->isOwner())
+            ->values();
     }
 
     /**

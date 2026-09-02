@@ -15,21 +15,12 @@ class DashboardController extends Controller
         app(DailyInventory::class)->applyForToday();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Latest Production Date
-        |--------------------------------------------------------------------------
-        */
+        $todayProduction = (int) Production::whereDate('production_date', today())
+            ->sum('eggs_produced');
 
-        $latestDate = Production::query()->presentYear()->max('production_date');
-
-        $todayProduction = $latestDate
-            ? (int) Production::whereDate('production_date', $latestDate)->sum('eggs_produced')
-            : 0;
-
-        $activeBatches = $latestDate
-            ? (int) Production::whereDate('production_date', $latestDate)->distinct('batch_id')->count('batch_id')
-            : 0;
+        $activeBatches = (int) Production::whereDate('production_date', today())
+            ->distinct('batch_id')
+            ->count('batch_id');
 
 
         // Feeds Available
@@ -37,9 +28,8 @@ class DashboardController extends Controller
             ->sum('current_stock');
 
 
-        // Egg Trays Available
-        $eggTrays = InventoryItem::where('item_name', 'Egg Trays')
-            ->sum('current_stock');
+        // Egg Trays Available — same formula as Inventory: 1000 − (Eggs Stock ÷ 30)
+        $eggTrays = Production::leftoverTrays();
 
 
         /*

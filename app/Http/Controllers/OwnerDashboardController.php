@@ -39,11 +39,15 @@ class OwnerDashboardController extends Controller
 
         $feedLow = $feedStock <= $feedMin;
 
-        $supplements = InventoryItem::where('item_name', 'Supplements')
+        $vitamins = InventoryItem::where('item_name', 'Vitamins')
             ->sum('current_stock');
 
-        $eggTrays = InventoryItem::where('item_name', 'Egg Trays')
-            ->sum('current_stock');
+        $vitaminMin = InventoryItem::where('item_name', 'Vitamins')
+            ->sum('min_level');
+
+        $vitaminLow = $vitamins <= $vitaminMin;
+
+        $eggTrays = Production::leftoverTrays();
 
         $eggsTotal = Production::leftoverStock();
 
@@ -127,7 +131,9 @@ class OwnerDashboardController extends Controller
             'revenueToday',
             'eggsTotal',
             'eggTrays',
-            'supplements',
+            'vitamins',
+            'vitaminMin',
+            'vitaminLow',
             'lowStockAlert',
             'eggChartLabels',
             'eggChartData',

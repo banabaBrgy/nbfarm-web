@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InventoryItem;
 use App\Models\InventoryItemHistory;
 use App\Models\Production;
 use App\Services\DailyInventory;
+use App\Services\LowStockNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -44,7 +46,6 @@ class InventoryController extends Controller
         $allItems = DB::table('inventory_items')->get();
         $feed        = $allItems->firstWhere('item_name', 'Feeds');
         $eggTrays    = $allItems->firstWhere('item_name', 'Egg Trays');
-        $supplements = $allItems->firstWhere('item_name', 'Supplements');
         $vitamins    = $allItems->firstWhere('item_name', 'Vitamins');
 
         if ($feed) {
@@ -54,10 +55,6 @@ class InventoryController extends Controller
         if ($eggTrays) {
             $eggTrays->current_stock = $eggTraysDisplay;
             $eggTrays->status = $this->computeStatus($eggTrays->current_stock, $eggTrays->min_level);
-        }
-
-        if ($supplements) {
-            $supplements->status = $this->computeStatus($supplements->current_stock, $supplements->min_level);
         }
 
         if ($vitamins) {
@@ -130,7 +127,6 @@ class InventoryController extends Controller
             'items',
             'feed',
             'eggTrays',
-            'supplements',
             'vitamins',
             'eggsStock',
             'eggTraysDisplay',
@@ -179,6 +175,10 @@ class InventoryController extends Controller
             'New item added'
         );
 
+        if ($model = InventoryItem::find($id)) {
+            app(LowStockNotifier::class)->check($model);
+        }
+
         return back()->with('success', 'New item added successfully!');
     }
 
@@ -217,6 +217,10 @@ class InventoryController extends Controller
             'Stock added'
         );
 
+        if ($model = InventoryItem::find((int) $item->id)) {
+            app(LowStockNotifier::class)->check($model);
+        }
+
         return back()->with('success', 'Stock quantity updated successfully!');
     }
 
@@ -235,6 +239,8 @@ class InventoryController extends Controller
                 'Item removed'
             );
         }
+
+        app(LowStockNotifier::class)->forget((int) $id);
 
         DB::table('inventory_items')->where('id', $id)->delete();
 

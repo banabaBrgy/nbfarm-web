@@ -78,6 +78,7 @@
 
                 </h4>
 
+                @if(\App\Models\User::routeRole() === 'staff')
                 <div class="d-flex gap-2">
 
                     <form
@@ -97,15 +98,16 @@
 
                     </form>
 
-                    <button class="btn btn-primary">
+                    <a href="{{ route(\App\Models\User::routeRole() . '.production.scan') }}" class="btn btn-primary">
 
                     <i class="fas fa-camera"></i>
 
                     Scan QR
 
-                    </button>
+                    </a>
 
                 </div>
+                @endif
 
             </div>
 

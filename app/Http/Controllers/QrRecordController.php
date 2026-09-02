@@ -30,6 +30,8 @@ class QrRecordController extends Controller
 
     public function generate(Request $request)
     {
+        abort_unless(User::routeRole() === 'staff', 403);
+
         $batchId = $request->filled('batch_id') ? (int) $request->batch_id : null;
         $batches = $batchId ? [$batchId] : QrRecord::BATCH_IDS;
 

@@ -20,7 +20,9 @@
         $revenueToday = $revenueToday ?? 0;
         $eggsTotal = $eggsTotal ?? 0;
         $eggTrays = $eggTrays ?? 0;
-        $supplements = $supplements ?? 0;
+        $vitamins = $vitamins ?? 0;
+        $vitaminMin = $vitaminMin ?? 0;
+        $vitaminLow = $vitaminLow ?? false;
         $lowStockAlert = $lowStockAlert ?? null;
         $eggChartLabels = $eggChartLabels ?? [];
         $eggChartData = $eggChartData ?? [];
@@ -154,11 +156,11 @@
                 </div>
 
                 <div class="stat-info">
-                    <span class="stat-title">Supplements</span>
+                    <span class="stat-title">Vitamins</span>
 
-                    <h2>{{ number_format($supplements) }}</h2>
+                    <h2>{{ number_format($vitamins) }}</h2>
 
-                    <small>Available</small>
+                    <small>{{ $vitaminLow ? 'Low Stock' : 'Available' }}</small>
                 </div>
             </div>
 
@@ -203,9 +205,12 @@
             </div>
 
             <div class="inv-row">
-                <div class="inv-label"><span>Supplements</span><span>{{ number_format($supplements) }} pack</span></div>
+                <div class="inv-label"><span>Vitamins</span><span
+                        class="{{ $vitaminLow ? 'low-text' : '' }}">{{ number_format($vitamins) }} bottles{{ $vitaminLow ? ' — below min' : '' }}</span>
+                </div>
                 <div class="inv-bar">
-                    <div class="inv-fill" style="width: {{ min(100, $supplements) }}%"></div>
+                    <div class="inv-fill {{ $vitaminLow ? 'fill-low' : '' }}"
+                        style="width: {{ min(100, ($vitamins / max($vitaminMin, 1)) * 50) }}%"></div>
                 </div>
             </div>
         </div>

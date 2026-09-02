@@ -12,6 +12,7 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
+        'dispatch_id',
         'customer',
         'transaction_date',
         'quantity',
@@ -48,6 +49,11 @@ class Transaction extends Model
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'Pending');
+    }
+
+    public function dispatch()
+    {
+        return $this->belongsTo(Dispatch::class);
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder

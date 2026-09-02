@@ -30,4 +30,35 @@ class QrScannerTest extends TestCase
             )
         );
     }
+
+    public function test_owner_and_manager_cannot_open_scan_or_generate(): void
+    {
+        $owner = new User([
+            'username' => 'owner1',
+            'role' => 'farm owner',
+        ]);
+        $owner->id = 2;
+
+        $this->actingAs($owner)
+            ->get(route('owner.production.scan'))
+            ->assertForbidden();
+
+        $this->actingAs($owner)
+            ->post(route('owner.qr.generate'))
+            ->assertForbidden();
+
+        $manager = new User([
+            'username' => 'manager1',
+            'role' => 'farm manager',
+        ]);
+        $manager->id = 3;
+
+        $this->actingAs($manager)
+            ->get(route('manager.production.scan'))
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->post(route('manager.qr.generate'))
+            ->assertForbidden();
+    }
 }

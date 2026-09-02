@@ -39,7 +39,7 @@
                         <div class="module-icon">📦</div>
                         <div>
                             <strong>Inventory Management</strong>
-                            <small>Feeds, supplements, trays on hand</small>
+                            <small>Feeds, vitamins, trays on hand</small>
                         </div>
                     </div>
                     <div class="module-row">

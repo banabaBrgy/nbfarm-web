@@ -6,6 +6,7 @@ use App\Models\InventoryItem;
 use App\Models\InventoryItemHistory;
 use App\Models\Production;
 use App\Services\DailyInventory;
+use App\Services\LowStockNotifier;
 use Illuminate\Support\Facades\Log;
 
 class ProductionObserver
@@ -68,6 +69,7 @@ class ProductionObserver
         $before = (float) $trayItem->current_stock;
         $next = max(0, $before - $diff);
         $trayItem->update(['current_stock' => $next]);
+        $trayItem->current_stock = $next;
 
         InventoryItemHistory::record(
             $trayItem->id,
@@ -78,6 +80,8 @@ class ProductionObserver
             $next,
             $diff > 0 ? 'Trays used for harvest' : 'Trays returned'
         );
+
+        app(LowStockNotifier::class)->check($trayItem);
     }
 
     private function returnTrays(int $trays): void

@@ -7,6 +7,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>NB Poultry Farm - @yield('title')</title>
 
 
@@ -37,6 +38,13 @@
 </head>
 
 <body>
+    @php
+        $role = \App\Models\User::routeRole();
+        $isFarmLead = auth()->user()?->isFarmLead() ?? false;
+        $alertUnread = $isFarmLead
+            ? \App\Models\StockNotification::query()->where('user_id', auth()->id())->unread()->count()
+            : 0;
+    @endphp
     <!-- MOBILE HEADER (visible only on ≤768px) -->
     <header class="mobile-header">
         <button class="header-menu-btn" id="headerMenuBtn" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation">
@@ -51,13 +59,17 @@
                 <p class="header-subtitle">Poultry Management</p>
             </div>
         </div>
+        @if($isFarmLead)
+            <button type="button" class="alert-bell alert-bell-header" data-alert-bell aria-label="Notifications" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="alert-badge" data-alert-badge @if($alertUnread < 1) hidden @endif>{{ $alertUnread > 9 ? '9+' : $alertUnread }}</span>
+            </button>
+        @endif
     </header>
 
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     @php
-        $role = \App\Models\User::routeRole();
-
         $roleLabels = [
             'owner' => 'FARM OWNER',
             'manager' => 'FARM MANAGER',
@@ -197,6 +209,30 @@
         <span class="sep"> | </span>
         <span>Farm Management System</span>
     </footer>
+
+    @if($isFarmLead)
+    <div id="alertPanel" class="alert-panel" hidden
+         data-index="{{ route('alerts.index') }}"
+         data-read-base="{{ url('/alerts') }}"
+         data-push="{{ route('alerts.push') }}"
+         data-subscribe="{{ route('alerts.subscribe') }}"
+         data-unsubscribe="{{ route('alerts.unsubscribe') }}">
+        <div class="alert-panel-head">
+            <strong>Notifications</strong>
+            <span class="alert-panel-sub">Stock and reports</span>
+        </div>
+        <div class="alert-panel-list" data-alert-list>
+            <p class="alert-empty">No alerts.</p>
+        </div>
+        <div class="alert-panel-foot">
+            <div class="alert-push-copy">
+                <span>Browser notifications</span>
+                <strong data-push-status>Ask</strong>
+                <small data-push-hint></small>
+            </div>
+        </div>
+    </div>
+    @endif
 
     @stack('scripts')
 

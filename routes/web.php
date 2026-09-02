@@ -19,6 +19,7 @@ use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\OwnerReportController;
 use App\Http\Controllers\WeatherController;
+use App\Http\Controllers\AlertController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,14 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 Route::middleware('auth')->get('/weather', [WeatherController::class, 'current'])
     ->name('weather.current');
+
+Route::middleware('auth')->prefix('alerts')->name('alerts.')->group(function () {
+    Route::get('/', [AlertController::class, 'index'])->name('index');
+    Route::post('/push', [AlertController::class, 'togglePush'])->name('push');
+    Route::post('/subscribe', [AlertController::class, 'subscribe'])->name('subscribe');
+    Route::post('/unsubscribe', [AlertController::class, 'unsubscribe'])->name('unsubscribe');
+    Route::post('/{alert}/read', [AlertController::class, 'read'])->name('read');
+});
 
 /*
 |--------------------------------------------------------------------------

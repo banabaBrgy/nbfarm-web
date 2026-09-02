@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\StockNotification;
 use Illuminate\Http\Request;
 
 class OwnerReportController extends Controller{
@@ -30,11 +31,18 @@ class OwnerReportController extends Controller{
         }
 
         if ($report->status === 'Sent') {
-            $report->update([
+            $report->update(Report::existing([
                 'is_read' => 1,
                 'status' => 'Read',
-            ]);
+                'read_at' => now(),
+            ]));
         }
+
+        StockNotification::query()
+            ->where('user_id', auth()->id())
+            ->where('report_id', $report->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         return redirect()->route('owner.reports');
     }
@@ -48,11 +56,12 @@ class OwnerReportController extends Controller{
             'owner_comment' => 'required|string|max:5000',
         ]);
 
-        $report->update([
+        $report->update(Report::existing([
             'owner_comment' => $request->owner_comment,
             'status' => 'Read',
             'is_read' => 1,
-        ]);
+            'read_at' => now(),
+        ]));
 
         return redirect()
             ->route('owner.reports')

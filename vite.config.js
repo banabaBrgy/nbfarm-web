@@ -30,7 +30,11 @@ export default defineConfig({
 
                 'resources/css/inventory.css',
 
-                 'resources/js/revenue.js',
+                'resources/css/report.css',
+
+                'resources/css/owner.report.css',
+
+                'resources/js/revenue.js',
 
             ],
 

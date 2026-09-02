@@ -1,6 +1,7 @@
 import './bootstrap';
 import './sidebar';
 import './weather';
+import './alerts';
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';

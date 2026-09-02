@@ -28,7 +28,9 @@
         $eggsTotal = $eggsTotal ?? 0;
 
         $eggTrays = $eggTrays ?? 0;
-        $supplements = $supplements ?? 0;
+        $vitamins = $vitamins ?? 0;
+        $vitaminMin = $vitaminMin ?? 0;
+        $vitaminLow = $vitaminLow ?? false;
 
         $lowStockAlert = $lowStockAlert ?? null;
 
@@ -266,17 +268,17 @@
                 <div class="stat-info">
 
                     <span class="stat-title">
-                        Supplements
+                        Vitamins
                     </span>
 
 
                     <h2>
-                        {{ number_format($supplements) }}
+                        {{ number_format($vitamins) }}
                     </h2>
 
 
                     <small>
-                        Available
+                        {{ $vitaminLow ? 'Low Stock' : 'Available' }}
                     </small>
 
 
@@ -427,11 +429,14 @@
                 <div class="inv-label">
 
                     <span>
-                        Supplements
+                        Vitamins
                     </span>
 
-                    <span>
-                        {{ number_format($supplements) }} pack
+                    <span class="{{ $vitaminLow ? 'low-text' : '' }}">
+                        {{ number_format($vitamins) }} bottles
+                        @if($vitaminLow)
+                            — below min
+                        @endif
                     </span>
 
 
@@ -440,7 +445,8 @@
 
                 <div class="inv-bar">
 
-                    <div class="inv-fill" style="width: {{ min(100, $supplements) }}%">
+                    <div class="inv-fill {{ $vitaminLow ? 'fill-low' : '' }}"
+                        style="width: {{ min(100, ($vitamins / max($vitaminMin, 1)) * 50) }}%">
                     </div>
 
                 </div>
