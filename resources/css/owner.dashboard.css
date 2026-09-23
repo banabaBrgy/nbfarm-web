@@ -128,7 +128,7 @@ body{
 
     border-radius:16px;
 
-    background:#2E7D32;
+    background:#3B8F47;
 
     display:flex;
 
@@ -180,7 +180,7 @@ body{
 
     font-weight:700;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
 }
 
@@ -235,7 +235,7 @@ body{
 
     font-weight:600;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
     margin-bottom:20px;
 
@@ -274,7 +274,7 @@ body{
 
     font-weight:600;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
     margin-bottom:20px;
 
@@ -338,7 +338,7 @@ body{
 
     height:100%;
 
-    background:#2E7D32;
+    background:#3B8F47;
 
     border-radius:20px;
 
@@ -704,11 +704,15 @@ body{
 
 .trend-chart-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
     margin-bottom: 8px;
+}
+
+.chart-card .trend-chart-header .chart-title {
+    margin-bottom: 0;
 }
 
 .trend-chart-hint {

@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class ProductionYearTrend
 {
+    /** @var list<int> */
+    private const YEARS = [2024, 2025, 2026];
+
     /** @var list<string> */
     private const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -25,14 +28,7 @@ class ProductionYearTrend
      */
     public function forYear(string|int|null $yearFilter = null): array
     {
-        $years = Production::query()
-            ->selectRaw('YEAR(production_date) as year')
-            ->distinct()
-            ->orderBy('year')
-            ->pluck('year')
-            ->map(fn ($year) => (int) $year)
-            ->values()
-            ->all();
+        $years = self::YEARS;
 
         $selectedYear = is_numeric($yearFilter) ? (int) $yearFilter : null;
         if ($selectedYear !== null && ! in_array($selectedYear, $years, true)) {

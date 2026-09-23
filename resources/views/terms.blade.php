@@ -36,7 +36,7 @@ body{
 h1{
 
     text-align:center;
-    color:#2E7D32;
+    color:#3B8F47;
     margin-bottom:20px;
 
 }
@@ -44,7 +44,7 @@ h1{
 
 h3{
 
-    color:#2E7D32;
+    color:#3B8F47;
     margin-top:20px;
 
 }
@@ -69,7 +69,7 @@ p{
 
 .back a{
 
-    background:#2E7D32;
+    background:#3B8F47;
     color:white;
     padding:10px 20px;
     border-radius:6px;

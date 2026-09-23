@@ -20,7 +20,7 @@
     margin: 0;
     font-size: 30px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
     letter-spacing: -0.3px;
 }
 
@@ -34,7 +34,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #25671e;
+    background: #34853F;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -42,7 +42,7 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 6px 16px rgba(37, 103, 30, 0.18);
+    box-shadow: 0 6px 16px rgba(52, 133, 63, 0.18);
     transition: 0.2s ease;
     white-space: nowrap;
 }
@@ -93,7 +93,7 @@
 
 .rpt-stat-total .rpt-stat-icon {
     background: #e8f5e9;
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-stat-sent .rpt-stat-icon {
@@ -118,7 +118,7 @@
     margin: 4px 0 0;
     font-size: 26px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
     line-height: 1.1;
 }
 
@@ -148,7 +148,7 @@
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-count {
@@ -172,11 +172,11 @@
 }
 
 .rpt-table thead {
-    background: #25671e;
+    background: #34853F;
 }
 
 .rpt-table thead th {
-    background: #25671e;
+    background: #34853F;
     color: #fff;
     padding: 13px 16px;
     font-size: 12px;
@@ -257,7 +257,7 @@
     color: #374151;
 }
 
-.rpt-chip-overall { background: #e8f5e9; color: #25671e; }
+.rpt-chip-overall { background: #e8f5e9; color: #34853F; }
 .rpt-chip-production { background: #e3f2fd; color: #1565c0; }
 .rpt-chip-inventory { background: #fff3e0; color: #e65100; }
 .rpt-chip-dispatch { background: #f3e5f5; color: #7b1fa2; }
@@ -332,7 +332,7 @@
 
 .rpt-icon-send {
     background: #e8f5e9;
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-icon-delete {
@@ -375,7 +375,7 @@
 }
 
 .report-modal .modal-header {
-    background: #25671e;
+    background: #34853F;
     color: #fff;
     border: none;
     padding: 16px 22px;
@@ -425,8 +425,8 @@
 
 .report-modal .form-control:focus,
 .report-modal .form-select:focus {
-    border-color: #25671e;
-    box-shadow: 0 0 0 3px rgba(37, 103, 30, 0.12);
+    border-color: #34853F;
+    box-shadow: 0 0 0 3px rgba(52, 133, 63, 0.12);
 }
 
 .report-modal textarea.form-control {
@@ -457,12 +457,12 @@
 }
 
 .report-modal .btn-cancel:hover {
-    border-color: #25671e;
-    color: #25671e;
+    border-color: #34853F;
+    color: #34853F;
 }
 
 .report-modal .btn-save {
-    background: #25671e;
+    background: #34853F;
     border: none;
     color: #fff;
 }
@@ -552,7 +552,7 @@
 
 .rpt-source-toggle[open] summary {
     margin-bottom: 8px;
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-doc {
@@ -583,7 +583,7 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-doc-head h3 {
@@ -609,12 +609,12 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #25671e;
+    color: #34853F;
     background: #f3faf3;
     border-bottom: 1px solid #e6ece8;
 }
 
-.rpt-doc-section-production h4 { color: #25671e; background: #eef8ee; }
+.rpt-doc-section-production h4 { color: #34853F; background: #eef8ee; }
 .rpt-doc-section-inventory h4 { color: #c05621; background: #fff7ed; }
 .rpt-doc-section-dispatch h4 { color: #6b21a8; background: #f6f0fb; }
 .rpt-doc-section-sales h4 { color: #0f766e; background: #eefaf6; }
@@ -650,12 +650,12 @@
     padding: 12px;
     border: none;
     border-radius: 10px;
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-doc-row.is-total span,
 .rpt-doc-row.is-total strong {
-    color: #25671e;
+    color: #34853F;
 }
 
 .rpt-doc-row.is-alert strong {

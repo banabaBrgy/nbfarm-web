@@ -29,7 +29,7 @@
     margin:0;
     font-size:30px;
     font-weight:700;
-    color:#25671E;
+    color:#34853F;
     letter-spacing:-.3px;
 }
 
@@ -72,7 +72,7 @@
 
     transform:translateY(-4px);
 
-    box-shadow:0 10px 25px rgba(37,103,30,.12);
+    box-shadow:0 10px 25px rgba(52,133,63,.12);
 
 }
 
@@ -89,8 +89,8 @@
 
     background:linear-gradient(
         135deg,
-        #2E7D32,
-        #25671E
+        #3B8F47,
+        #34853F
     );
 
     display:flex;
@@ -136,7 +136,7 @@
 
     font-weight:700;
 
-    color:#25671E;
+    color:#34853F;
 
     line-height:1;
 
@@ -194,7 +194,7 @@
 
     font-weight:700;
 
-    color:#25671E;
+    color:#34853F;
 
 }
 
@@ -222,7 +222,7 @@
 
     background:#F6FBF6;
 
-    border-left:5px solid #2E7D32;
+    border-left:5px solid #3B8F47;
 
     border-radius:12px;
 
@@ -238,7 +238,7 @@
 
     font-weight:700;
 
-    color:#25671E;
+    color:#34853F;
 
 }
 
@@ -290,15 +290,15 @@
 
 .quick-card:hover{
 
-    background:#25671E;
+    background:#34853F;
 
-    border-color:#25671E;
+    border-color:#34853F;
 
     color:#FFFFFF;
 
     transform:translateY(-4px);
 
-    box-shadow:0 10px 25px rgba(37,103,30,.15);
+    box-shadow:0 10px 25px rgba(52,133,63,.15);
 
 }
 
@@ -306,7 +306,7 @@
 
     font-size:34px;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
     margin-bottom:14px;
 
@@ -341,13 +341,13 @@
     margin:0;
     font-size:30px;
     font-weight:700;
-    color:#25671E;
+    color:#34853F;
     letter-spacing:-.3px;
 }
 
 .btn-update{
 
-    background:#2E7D32;
+    background:#3B8F47;
     color:#fff;
 
     border:none;
@@ -362,13 +362,13 @@
 
     transition:.25s;
 
-    box-shadow:0 4px 12px rgba(46,125,50,.18);
+    box-shadow:0 4px 12px rgba(59,143,71,.18);
 
 }
 
 .btn-update:hover{
 
-    background:#25671E;
+    background:#34853F;
 
     transform:translateY(-2px);
 
@@ -424,7 +424,7 @@
 
     transform:translateY(-4px);
 
-    box-shadow:0 10px 24px rgba(37,103,30,.10);
+    box-shadow:0 10px 24px rgba(52,133,63,.10);
 
 }
 
@@ -456,7 +456,7 @@
 
     font-weight:700;
 
-    color:#25671E;
+    color:#34853F;
 
 }
 
@@ -470,7 +470,7 @@
 
 .text-success{
 
-    color:#25671E !important;
+    color:#34853F !important;
 
 }
 
@@ -492,7 +492,7 @@
 
     font-weight:700;
 
-    color:#25671E;
+    color:#34853F;
 
 }
 
@@ -562,7 +562,7 @@
 
 .inventory-table a{
 
-    color:#25671E;
+    color:#34853F;
 
     font-weight:600;
 
@@ -572,7 +572,7 @@
 
 .inventory-table a:hover{
 
-    color:#2E7D32;
+    color:#3B8F47;
 
 }
 
@@ -594,7 +594,7 @@
 
     transform:translateY(-4px);
 
-    box-shadow:0 12px 26px rgba(37,103,30,.10)!important;
+    box-shadow:0 12px 26px rgba(52,133,63,.10)!important;
 
 }
 

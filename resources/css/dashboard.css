@@ -39,7 +39,7 @@
 
     border-radius:50%;
 
-    background:#2E7D32;
+    background:#3B8F47;
 
     display:flex;
 
@@ -107,7 +107,7 @@
 .sidebar li.active a,
 .sidebar a:hover{
 
-    background:#2E7D32;
+    background:#3B8F47;
 
 }
 
@@ -229,7 +229,7 @@
 
     margin-top:10px;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
     font-size:30px;
 
@@ -268,7 +268,7 @@
 
     font-size:22px;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
 }
 
@@ -296,7 +296,7 @@
 
     background:#F8FAFC;
 
-    border-left:5px solid #2E7D32;
+    border-left:5px solid #3B8F47;
 
     padding:18px;
 
@@ -308,7 +308,7 @@
 
     margin-bottom:10px;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
 }
 
@@ -365,7 +365,7 @@
 
     font-size:36px;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
     margin-bottom:15px;
 
@@ -385,7 +385,7 @@
 
     transform:translateY(-4px);
 
-    background:#2E7D32;
+    background:#3B8F47;
 
     color:white;
 
@@ -486,7 +486,7 @@ height:auto;
 
     border-radius:14px;
 
-    background:#2E7D32;
+    background:#3B8F47;
 
     display:flex;
 
@@ -518,7 +518,7 @@ height:auto;
 
     margin:6px 0;
 
-    color:#2E7D32;
+    color:#3B8F47;
 
     font-size:32px;
 
@@ -573,12 +573,12 @@ height:auto;
 .page-header h1{
     font-size:28px;
     font-weight:700;
-    color:#2E7D32;
+    color:#3B8F47;
     margin:0;
 }
 
 .btn-update{
-    background:#2E7D32;
+    background:#3B8F47;
     color:#fff;
     border:none;
     padding:10px 18px;
@@ -589,7 +589,7 @@ height:auto;
 }
 
 .btn-update:hover{
-    background:#256628;
+    background:#327A3C;
 }
 
 .alert-low{
@@ -631,7 +631,7 @@ height:auto;
 .stat-value{
     font-size:32px;
     font-weight:700;
-    color:#2E7D32;
+    color:#3B8F47;
     margin:6px 0;
 }
 
@@ -645,14 +645,14 @@ height:auto;
 }
 
 .text-success{
-    color:#2E7D32!important;
+    color:#3B8F47!important;
 }
 
 .section-title{
     margin:30px 0 15px;
     font-size:22px;
     font-weight:700;
-    color:#2E7D32;
+    color:#3B8F47;
 }
 
 .inventory-table{
@@ -690,7 +690,7 @@ height:auto;
 }
 
 .inventory-table a{
-    color:#2E7D32;
+    color:#3B8F47;
     text-decoration:none;
     font-weight:600;
 }
@@ -709,7 +709,7 @@ height:auto;
     margin:0;
     font-size:28px;
     font-weight:700;
-    color:#2E7D32;
+    color:#3B8F47;
     line-height:1;
 }
 .icon-circle{
@@ -763,7 +763,7 @@ height:auto;
         }
 
         .btn-update {
-            background: #2e7d32;
+            background: #3B8F47;
             color: #fff;
             border: none;
             padding: 10px 16px;
@@ -832,7 +832,7 @@ height:auto;
         }
 
         .text-success {
-            color: #2e7d32;
+            color: #3B8F47;
         }
 
         .fw-bold {

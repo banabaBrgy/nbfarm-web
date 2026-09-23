@@ -1,10 +1,10 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --green-dark: #1a3d2b;
-  --green-mid:  #2e6b47;
-  --green-main: #3a7d52;
-  --green-btn:  #2e7d4f;
+  --green-dark: #2C6B35;
+  --green-mid:  #34853F;
+  --green-main: #3B8F47;
+  --green-btn:  #3B8F47;
   --green-light:#e8f4ec;
   --amber:      #e07b00;
   --text-main:  #1a1a1a;
@@ -84,7 +84,7 @@ body {
 .nav-item.active {
   background: rgba(255,255,255,.13);
   color: #fff;
-  border-left-color: #6dd98a;
+  border-left-color: #8FB89A;
   font-weight: 600;
 }
 .nav-item svg { flex-shrink: 0; opacity: .85; }

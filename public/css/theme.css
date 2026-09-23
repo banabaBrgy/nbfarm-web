@@ -11,16 +11,16 @@
        COLOR PALETTE
     ========================== */
 
-    --primary:#00B906;
-    --primary-dark:#009905;
-    --primary-light:#B9E937;
+    --primary:#3B8F47;
+    --primary-dark:#327A3C;
+    --primary-light:#D2E6D5;
 
-   --dark:#25671E;
+   --dark:#34853F;
 
     --background:#F5F5F5;
     --surface:#FFFFFF;
 
-  --text:#25671E;
+  --text:#34853F;
     --text-light:#6B7280;
 
     --border:#E5E7EB;
@@ -281,7 +281,7 @@ small{
 
 .table tbody tr:hover{
 
-    background:#F1FFE8;
+    background:#EEF3EE;
 
 }
 
@@ -305,7 +305,7 @@ small{
 
     border-color:var(--primary);
 
-    box-shadow:0 0 0 .2rem rgba(0,185,6,.15);
+    box-shadow:0 0 0 .2rem rgba(59,143,71,.15);
 
 }
 
@@ -361,7 +361,7 @@ small{
 
     justify-content:center;
 
-    background:rgba(0,185,6,.12);
+    background:rgba(59,143,71,.12);
 
     color:var(--primary);
 
@@ -461,7 +461,7 @@ small{
 
 .bg-primary-light{
 
-    background:rgba(0,185,6,.12);
+    background:rgba(59,143,71,.12);
 
 }
 

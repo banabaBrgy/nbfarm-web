@@ -20,7 +20,7 @@
     margin: 0;
     font-size: 30px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
     letter-spacing: -0.3px;
 }
 
@@ -34,7 +34,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #25671e;
+    background: #34853F;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -42,7 +42,7 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 6px 16px rgba(37, 103, 30, 0.18);
+    box-shadow: 0 6px 16px rgba(52, 133, 63, 0.18);
     transition: 0.2s ease;
 }
 
@@ -91,7 +91,7 @@
 
 .dsp-stat-total .dsp-stat-icon {
     background: #e8f5e9;
-    color: #25671e;
+    color: #34853F;
 }
 
 .dsp-stat-pending .dsp-stat-icon {
@@ -121,7 +121,7 @@
     margin: 4px 0 0;
     font-size: 28px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
     line-height: 1.1;
 }
 
@@ -153,7 +153,7 @@
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
     white-space: nowrap;
     flex: 0 0 auto;
 }
@@ -232,7 +232,7 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #25671e;
+    accent-color: #34853F;
 }
 
 .dsp-table tbody tr.dsp-row-selected {
@@ -272,8 +272,8 @@
 
 .dsp-search input:focus,
 .dsp-filters select:focus {
-    border-color: #25671e;
-    box-shadow: 0 0 0 3px rgba(37, 103, 30, 0.12);
+    border-color: #34853F;
+    box-shadow: 0 0 0 3px rgba(52, 133, 63, 0.12);
 }
 
 .dsp-clear {
@@ -291,8 +291,8 @@
 }
 
 .dsp-clear:hover {
-    border-color: #25671e;
-    color: #25671e;
+    border-color: #34853F;
+    color: #34853F;
 }
 
 /* ----- Table ----- */
@@ -308,7 +308,7 @@
 }
 
 .dsp-table thead {
-    background: #25671e;
+    background: #34853F;
 }
 
 .dsp-table thead th {
@@ -360,7 +360,7 @@
 
 .dsp-recipient {
     font-weight: 600;
-    color: #25671e;
+    color: #34853F;
 }
 
 .dsp-address {
@@ -396,7 +396,7 @@
     white-space: nowrap;
 }
 
-.dsp-chip-small { background: #e8f5e9; color: #2e7d32; }
+.dsp-chip-small { background: #e8f5e9; color: #3B8F47; }
 .dsp-chip-medium { background: #e3f2fd; color: #1565c0; }
 .dsp-chip-large { background: #fff3e0; color: #e65100; }
 .dsp-chip-extra-large { background: #f3e5f5; color: #7b1fa2; }
@@ -473,7 +473,7 @@
 
 .dsp-icon-edit {
     background: #e8f5e9;
-    color: #25671e;
+    color: #34853F;
 }
 
 .dsp-icon-view {
@@ -552,8 +552,8 @@
 }
 
 .dsp-page-btn:hover {
-    border-color: #25671e;
-    color: #25671e;
+    border-color: #34853F;
+    color: #34853F;
 }
 
 .dsp-page-btn.disabled {
@@ -576,7 +576,7 @@
 }
 
 .dispatch-modal .modal-header {
-    background: #25671e;
+    background: #34853F;
     color: #fff;
     border: none;
     padding: 16px 22px;
@@ -644,8 +644,8 @@
 
 .dispatch-modal .form-control:focus,
 .dispatch-modal .form-select:focus {
-    border-color: #25671e;
-    box-shadow: 0 0 0 3px rgba(37, 103, 30, 0.12);
+    border-color: #34853F;
+    box-shadow: 0 0 0 3px rgba(52, 133, 63, 0.12);
 }
 
 .dispatch-modal textarea.form-control {
@@ -665,13 +665,13 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #25671e;
+    color: #34853F;
 }
 
 .dsp-add-item {
     border: 1px dashed #b7cbb9;
     background: #f7faf7;
-    color: #25671e;
+    color: #34853F;
     border-radius: 10px;
     padding: 8px 14px;
     font-size: 13px;
@@ -758,12 +758,12 @@
 }
 
 .dispatch-modal .btn-cancel:hover {
-    border-color: #25671e;
-    color: #25671e;
+    border-color: #34853F;
+    color: #34853F;
 }
 
 .dispatch-modal .btn-save {
-    background: #25671e;
+    background: #34853F;
     border: none;
     color: #fff;
 }

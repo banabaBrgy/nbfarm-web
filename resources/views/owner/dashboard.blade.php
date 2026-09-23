@@ -171,7 +171,19 @@
     <!-- Chart + Inventory side by side -->
     <div class="content-grid">
         <div class="chart-card">
-            <div class="chart-title">Egg Production — Last 7 Days + Forecast</div>
+            <div class="trend-chart-header">
+                <div class="chart-title">
+                    @if(! empty($productionTrend['selectedYear']))
+                        Egg production — {{ $productionTrend['selectedYear'] }}
+                    @else
+                        Egg Production — Last 7 Days + Forecast
+                    @endif
+                </div>
+                @include('dashboard.production-trend', [
+                    'productionTrend' => $productionTrend,
+                    'trendAction' => route('owner.dashboard'),
+                ])
+            </div>
             <div class="chart-wrap">
                 <canvas id="eggChart" height="200"></canvas>
             </div>
@@ -216,67 +228,9 @@
         </div>
     </div>
 
-    @include('dashboard.production-trend', [
-        'productionTrend' => $productionTrend,
-        'trendAction' => route('owner.dashboard'),
-    ])
-
 @endsection
 
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <script>
-        const ctx = document.getElementById('eggChart').getContext('2d');
-
-        // Parehas na ngayon ng 7 days (Mon-Sun) ang labels, kaya
-        // hindi na kailangan i-concat pa yung actual at forecast labels
-        const labels = @json($eggChartLabels);
-
-        // Bars: actual data lang. Null yung mga araw na hindi pa
-        // nangyayari (walang bar na lalabas doon)
-        const barData = @json($eggChartData);
-
-        // Line: forecast/predicted values sa BUONG linggo — kasama
-        // yung mga araw na nakalipas na, para makumpara sa actual bars
-        const lineData = @json($eggForecastData);
-
-        new Chart(ctx, {
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        type: 'bar',
-                        label: 'Actual',
-                        data: barData,
-                        backgroundColor: "#2e7d32",
-                        borderRadius: 10,
-                        barThickness: 32
-                    },
-                    {
-                        type: 'line',
-                        label: 'Forecast',
-                        data: lineData,
-                        borderColor: '#e07a3f',
-                        borderDash: [6, 4],
-                        borderWidth: 2,
-                        pointBackgroundColor: '#e07a3f',
-                        fill: false,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
-                },
-                scales: {
-                    y: { display: false },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-    </script>
     @include('dashboard.production-trend-script')
 @endpush

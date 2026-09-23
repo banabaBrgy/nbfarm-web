@@ -23,7 +23,7 @@
 
 .production-page .card:hover{
     transform:translateY(-3px);
-    box-shadow:0 10px 24px rgba(37,103,30,.10);
+    box-shadow:0 10px 24px rgba(52,133,63,.10);
 }
 
 .production-page .table-container{
@@ -42,7 +42,7 @@
 
 .production-page .table-title h2{
     margin:0;
-    color:#25671E;
+    color:#34853F;
     font-size:22px;
     font-weight:700;
     letter-spacing:-.3px;
@@ -53,11 +53,11 @@
 }
 
 .production-page .table thead{
-    background:#2E7D32;
+    background:#3B8F47;
 }
 
 .production-page .table thead th{
-    background:#2E7D32 !important;
+    background:#3B8F47 !important;
     color:#FFFFFF !important;
     border:none;
     border-bottom:none !important;
@@ -89,7 +89,7 @@
 
 .production-page .table-success th,
 .production-page .table-success td{
-    color:#25671E !important;
+    color:#34853F !important;
     font-weight:700;
 }
 
@@ -102,8 +102,8 @@
 }
 
 .production-page .form-control:focus{
-    border-color:#2E7D32;
-    box-shadow:0 0 0 .18rem rgba(46,125,50,.15);
+    border-color:#3B8F47;
+    box-shadow:0 0 0 .18rem rgba(59,143,71,.15);
 }
 
 .production-page .btn{
@@ -114,13 +114,13 @@
 }
 
 .production-page .btn-success{
-    background:#2E7D32;
-    border-color:#2E7D32;
+    background:#3B8F47;
+    border-color:#3B8F47;
 }
 
 .production-page .btn-success:hover{
-    background:#25671E;
-    border-color:#25671E;
+    background:#34853F;
+    border-color:#34853F;
 }
 
 .production-page .btn-sm{

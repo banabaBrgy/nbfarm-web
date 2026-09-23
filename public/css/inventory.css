@@ -12,10 +12,10 @@
     margin-bottom: 16px;
 }
 
-.page-header h1 { font-size: 22px; margin: 4px 0 0; color: #2E7D32; }
+.page-header h1 { font-size: 22px; margin: 4px 0 0; color: #3B8F47; }
 
 .btn-update {
-    background: #2e7d32;
+    background: #3B8F47;
     color: #fff;
     border: none;
     padding: 10px 16px;
@@ -25,7 +25,7 @@
     transition: .2s;
 }
 
-.btn-update:hover { background: #256628; transform: translateY(-2px); }
+.btn-update:hover { background: #327A3C; transform: translateY(-2px); }
 
 .alert-low {
     background: #fdf3e2;
@@ -77,7 +77,7 @@
     width:100%;
     font-size:38px;
     font-weight:700;
-    color:#2E7D32;
+    color:#3B8F47;
     line-height:1;
     margin-bottom:8px;
 }
@@ -126,7 +126,7 @@
 }
 
 .filter-bar button {
-    background: #2E7D32;
+    background: #3B8F47;
     color: #fff;
     border: none;
     padding: 9px 18px;
@@ -135,7 +135,7 @@
     cursor: pointer;
 }
 
-.filter-bar button:hover { background: #256628; }
+.filter-bar button:hover { background: #327A3C; }
 
 .filter-clear {
     color: #888;
@@ -181,7 +181,7 @@
 
 .status-icon-ok {
     background: #e8f5e9;
-    color: #2e7d32;
+    color: #3B8F47;
 }
 
 .status-icon-watch {
@@ -202,7 +202,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #2E7D32;
+    background: #3B8F47;
     color: #fff;
     border: none;
     padding: 6px 14px;
@@ -214,7 +214,7 @@
 }
 
 .action-btn:hover {
-    background: #256628;
+    background: #327A3C;
     transform: translateY(-1px);
 }
 
@@ -239,7 +239,7 @@
     padding: 20px;
 }
 
-.chart-card h3 { font-size: 15px; color: #2E7D32; margin: 0 0 14px; }
+.chart-card h3 { font-size: 15px; color: #3B8F47; margin: 0 0 14px; }
 
 /* ===========================
    MODAL — Update Stock
@@ -265,7 +265,7 @@
     max-width: 90%;
 }
 
-.modal-box h3 { margin: 0 0 16px; color: #2E7D32; }
+.modal-box h3 { margin: 0 0 16px; color: #3B8F47; }
 
 .modal-box label {
     display: block;
@@ -302,8 +302,8 @@
 .btn-cancel { background: #f1f1f1; color: #444; }
 .btn-cancel:hover { background: #e5e5e5; }
 
-.btn-save { background: #2E7D32; color: #fff; }
-.btn-save:hover { background: #256628; }
+.btn-save { background: #3B8F47; color: #fff; }
+.btn-save:hover { background: #327A3C; }
 
 /* ===========================
    RESPONSIVE
@@ -360,7 +360,7 @@
 
 .mini-bar-fill {
     height: 100%;
-    background: #2E7D32;
+    background: #3B8F47;
     border-radius: 10px;
 }
 
@@ -389,7 +389,7 @@
     height: 40px;
     border-radius: 10px;
     background: #e8f5e9;
-    color: #2E7D32;
+    color: #3B8F47;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -456,7 +456,7 @@
 }
 
 .filter-bar button {
-    background: #2E7D32;
+    background: #3B8F47;
     color: #fff;
     border: none;
     padding: 9px 18px;
@@ -465,7 +465,7 @@
     cursor: pointer;
 }
 
-.filter-bar button:hover { background: #256628; }
+.filter-bar button:hover { background: #327A3C; }
 
 .filter-clear {
     color: #888;
@@ -500,11 +500,11 @@
 
 .icon-btn-edit {
     background: #e8f5e9;
-    color: #2e7d32;
+    color: #3B8F47;
 }
 
 .icon-btn-edit:hover {
-    background: #2e7d32;
+    background: #3B8F47;
     color: #fff;
 }
 
@@ -567,13 +567,13 @@
 }
 
 .sort-select:hover {
-    border-color: #2E7D32;
+    border-color: #3B8F47;
 }
 
 .sort-select:focus {
     outline: none;
-    border-color: #2E7D32;
-    box-shadow: 0 0 0 2px rgba(46,125,50,.15);
+    border-color: #3B8F47;
+    box-shadow: 0 0 0 2px rgba(59,143,71,.15);
 }
 
 @media (max-width: 600px) {

@@ -8,7 +8,7 @@
 
 .qr-alert {
     background: #edf7ed;
-    color: #25671e;
+    color: #34853F;
     border: 1px solid #cde8cd;
     border-radius: 12px;
     padding: 12px 16px;
@@ -33,7 +33,7 @@
 }
 
 .qr-back:hover {
-    color: #25671e;
+    color: #34853F;
 }
 
 .qr-print-header {
@@ -48,7 +48,7 @@
     margin: 0;
     font-size: 30px;
     font-weight: 700;
-    color: #25671e;
+    color: #34853F;
     letter-spacing: -0.3px;
 }
 
@@ -81,7 +81,7 @@
 
 .qr-btn-ghost {
     background: #fff;
-    color: #25671e;
+    color: #34853F;
     border: 1px solid #cde8cd;
 }
 
@@ -91,9 +91,9 @@
 }
 
 .qr-btn-print {
-    background: #25671e;
+    background: #34853F;
     color: #fff;
-    box-shadow: 0 6px 16px rgba(37, 103, 30, 0.18);
+    box-shadow: 0 6px 16px rgba(52, 133, 63, 0.18);
 }
 
 .qr-btn-print:hover {
@@ -125,7 +125,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #25671e;
+    background: #34853F;
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -203,11 +203,11 @@
     font-size: 11px;
     font-weight: 700;
     background: #edf7ed;
-    color: #25671e;
+    color: #34853F;
 }
 
 .qr-size-small { background: #eef6ee; color: #3d7a3a; }
-.qr-size-medium { background: #edf7ed; color: #25671e; }
+.qr-size-medium { background: #edf7ed; color: #34853F; }
 .qr-size-large { background: #e8f0e4; color: #1e5318; }
 .qr-size-extra-large { background: #dce8d8; color: #163f12; }
 .qr-size-cracked { background: #fef3c7; color: #92400e; }
@@ -290,8 +290,8 @@
 
 .qr-page-btn:hover,
 .qr-page-num:hover {
-    border-color: #25671e;
-    color: #25671e;
+    border-color: #34853F;
+    color: #34853F;
 }
 
 .qr-page-btn.disabled {
@@ -300,8 +300,8 @@
 }
 
 .qr-page-num.active {
-    background: #25671e;
-    border-color: #25671e;
+    background: #34853F;
+    border-color: #34853F;
     color: #fff;
 }
 
@@ -402,7 +402,7 @@
     }
 
     .qr-label-brand {
-        background: #25671e !important;
+        background: #34853F !important;
         color: #fff !important;
         padding: 8px 10px;
         font-size: 11px;

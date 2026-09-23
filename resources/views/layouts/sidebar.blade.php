@@ -205,8 +205,8 @@
     </div>
 
     <footer class="footer">
-        <span>NB POULTRY FARM </span>
-        <span class="sep"> | </span>
+        <span>NB POULTRY FARM</span>
+        <span class="sep" aria-hidden="true">|</span>
         <span>Farm Management System</span>
     </footer>
 
@@ -247,7 +247,7 @@ document.getElementById('logoutForm').addEventListener('submit', function(e) {
         text: "You will be logged out of your account.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#2E7D32',
+        confirmButtonColor: '#3B8F47',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, Log out',
         cancelButtonText: 'Cancel'

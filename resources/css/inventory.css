@@ -21,7 +21,7 @@
     margin: 0;
     font-size: 30px;
     font-weight: 700;
-    color: #25671E;
+    color: #34853F;
 }
 
 /* =========================================
@@ -29,7 +29,7 @@
 ========================================= */
 
 .btn-update {
-    background: #25671E;
+    background: #34853F;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -67,9 +67,9 @@
 
     background: #EEF8E8;
 
-    border-left: 5px solid #7CB342;
+    border-left: 5px solid #3B8F47;
 
-    color: #25671E;
+    color: #34853F;
 
 }
 
@@ -121,7 +121,7 @@
 
 .stat-card-watch {
 
-    border: 2px solid #7CB342;
+    border: 2px solid #3B8F47;
 
 }
 
@@ -147,7 +147,7 @@
 
     font-weight: 700;
 
-    color: #25671E;
+    color: #34853F;
 
 }
 
@@ -167,13 +167,13 @@
 
 .text-watch {
 
-    color: #7CB342 !important;
+    color: #3B8F47 !important;
 
 }
 
 .text-success {
 
-    color: #25671E !important;
+    color: #34853F !important;
 
 }
 
@@ -223,9 +223,9 @@
 
     outline: none;
 
-    border-color: #25671E;
+    border-color: #34853F;
 
-    box-shadow: 0 0 0 3px rgba(37, 103, 30, .12);
+    box-shadow: 0 0 0 3px rgba(52, 133, 63, .12);
 
 }
 
@@ -280,15 +280,15 @@
 }
 
 .sort-select:focus {
-    border-color: #2E7D32;
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, .12);
+    border-color: #3B8F47;
+    box-shadow: 0 0 0 3px rgba(59, 143, 71, .12);
 }
 
 .section-title {
     margin: 0;
     font-size: 18px;
     font-weight: 700;
-    color: #2E7D32;
+    color: #3B8F47;
 }
 
 .mini-bar {
@@ -304,7 +304,7 @@
 
 .mini-bar-fill {
     height: 100%;
-    background: #2E7D32;
+    background: #3B8F47;
     border-radius: 999px;
 }
 
@@ -332,7 +332,7 @@
 
 .inventory-table thead {
 
-    background: #25671E;
+    background: #34853F;
 
 }
 
@@ -402,7 +402,7 @@
 
     background: #EAF7EB;
 
-    color: #25671E;
+    color: #34853F;
 
 }
 
@@ -410,7 +410,7 @@
 
     background: #F2F8E8;
 
-    color: #7CB342;
+    color: #3B8F47;
 
 }
 
@@ -452,7 +452,7 @@
 
 .icon-btn-edit {
 
-    background: #25671E;
+    background: #34853F;
 
     color: #fff;
 
@@ -486,7 +486,7 @@
 
 .section-title {
 
-    color: #25671E;
+    color: #34853F;
 
     font-size: 24px;
 
@@ -562,7 +562,7 @@
 
     align-items: center;
 
-    color: #25671E;
+    color: #34853F;
 
 }
 
@@ -578,7 +578,7 @@
 
     display: block;
 
-    color: #25671E;
+    color: #34853F;
 
 }
 

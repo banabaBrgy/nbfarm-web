@@ -1,7 +1,7 @@
 /* ── SECTION HEADER ── */
 :root {
-  --green-main: #2E7D32;
-  --green-btn: #2E7D32;
+  --green-main: #3B8F47;
+  --green-btn: #3B8F47;
   --green-light: #e8f5e9;
   --amber: #b7791f;
   --text-main: #333;
@@ -454,7 +454,7 @@
 .customer-total {
     font-weight: 700;
     font-size: 0.9rem;
-    color: #2e7d32;
+    color: #3B8F47;
     white-space: nowrap;
 }
 
@@ -469,7 +469,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background: #2e7d32;
+    background: #3B8F47;
     color: #fff;
     border: none;
     padding: 7px 14px;
@@ -477,14 +477,14 @@
     font-weight: 600;
     font-size: 0.8rem;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.25);
+    box-shadow: 0 2px 6px rgba(59, 143, 71, 0.25);
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-primary-sm:hover {
-    background: #256628;
+    background: #327A3C;
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+    box-shadow: 0 4px 10px rgba(59, 143, 71, 0.3);
 }
 
 .btn-primary-sm svg {

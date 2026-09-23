@@ -301,8 +301,18 @@
 
         <div class="chart-card">
 
-            <div class="chart-title">
-                Egg Production — Last 7 Days + Forecast
+            <div class="trend-chart-header">
+                <div class="chart-title">
+                    @if(! empty($productionTrend['selectedYear']))
+                        Egg production — {{ $productionTrend['selectedYear'] }}
+                    @else
+                        Egg Production — Last 7 Days + Forecast
+                    @endif
+                </div>
+                @include('dashboard.production-trend', [
+                    'productionTrend' => $productionTrend,
+                    'trendAction' => route('manager.dashboard'),
+                ])
             </div>
 
 
@@ -461,111 +471,9 @@
 
     </div>
 
-    @include('dashboard.production-trend', [
-        'productionTrend' => $productionTrend,
-        'trendAction' => route('manager.dashboard'),
-    ])
-
 @endsection
 
-
-
 @push('scripts')
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-
-
-    <script>
-
-        const ctx = document
-            .getElementById('eggChart')
-            .getContext('2d');
-
-
-        const labels = @json($eggChartLabels);
-
-        const barData = @json($eggChartData);
-
-        const lineData = @json($eggForecastData);
-
-
-
-        new Chart(ctx, {
-
-            data: {
-
-                labels: labels,
-
-
-                datasets: [
-
-                    {
-                        type: 'bar',
-                        label: 'Actual',
-                        data: barData,
-                        backgroundColor: "#2e7d32",
-                        borderRadius: 10,
-                        barThickness: 32
-                    },
-
-
-                    {
-                        type: 'line',
-                        label: 'Forecast',
-                        data: lineData,
-                        borderColor: '#e07a3f',
-                        borderDash: [6, 4],
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3
-                    }
-
-                ]
-
-            },
-
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-
-                plugins: {
-
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
-
-                },
-
-
-                scales: {
-
-                    y: {
-                        display: false
-                    },
-
-                    x: {
-                        grid: {
-                            display: false
-                        }
-
-                    }
-
-                }
-
-
-            }
-
-
-        });
-
-
-    </script>
     @include('dashboard.production-trend-script')
-
-
 @endpush

@@ -12,7 +12,7 @@
 ================================ */
 
 .btn-back{
-    background:#25671E;
+    background:#34853F;
     color:#fff;
     border:none;
     border-radius:10px;
@@ -66,7 +66,7 @@
 .detail-card h1{
     margin:0;
     font-size:20px;
-    color:#25671E;
+    color:#34853F;
     font-weight:700;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .records-header{
-    background:#25671E;
+    background:#34853F;
     color:#FFFFFF;
     padding:16px 22px;
     font-size:18px;
@@ -139,7 +139,7 @@
 }
 
 .btn-edit:hover{
-    background:#25671E;
+    background:#34853F;
     color:#fff;
 }
 
@@ -152,12 +152,12 @@
 }
 
 .page-link{
-    color:#25671E;
+    color:#34853F;
 }
 
 .page-item.active .page-link{
-    background:#25671E;
-    border-color:#25671E;
+    background:#34853F;
+    border-color:#34853F;
 }
 
 /* ===============================

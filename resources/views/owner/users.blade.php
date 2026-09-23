@@ -228,7 +228,7 @@ Swal.fire({
     icon: 'success',
     title: 'Success!',
     text: @json(session('success')),
-    confirmButtonColor: '#2E7D32',
+    confirmButtonColor: '#3B8F47',
     timer: 2000,
     timerProgressBar: true,
 });

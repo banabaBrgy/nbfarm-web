@@ -23,7 +23,7 @@ body{
 /* LEFT PANEL */
 
 .left-panel{
-    background:linear-gradient(135deg,#2E7D32,#43A047);
+    background:linear-gradient(135deg,#3B8F47,#34853F);
     display:flex;
     justify-content:center;
     align-items:center;
@@ -65,7 +65,7 @@ body{
 
 .user-icon{
     font-size:70px;
-    color:#2E7D32;
+    color:#3B8F47;
 }
 
 .form-control{
@@ -74,12 +74,12 @@ body{
 }
 
 .form-control:focus{
-    border-color:#2E7D32;
-    box-shadow:0 0 0 .2rem rgba(46,125,50,.2);
+    border-color:#3B8F47;
+    box-shadow:0 0 0 .2rem rgba(59,143,71,.2);
 }
 
 .btn-success{
-    background:#2E7D32;
+    background:#3B8F47;
     border:none;
     height:50px;
     border-radius:12px;
@@ -87,7 +87,7 @@ body{
 }
 
 .btn-success:hover{
-    background:#1B5E20;
+    background:#327A3C;
 }
 
 @media(max-width:1200px) {
