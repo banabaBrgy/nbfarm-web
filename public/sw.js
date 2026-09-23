@@ -10,8 +10,8 @@ self.addEventListener('push', (event) => {
     const options = {
         body: data.body || 'Low stock alert',
         data: { url: data.url || '/' },
-        badge: '/favicon.ico',
-        icon: '/favicon.ico',
+        badge: '/favicon-32.png',
+        icon: '/favicon-32.png',
     };
 
     event.waitUntil(self.registration.showNotification(title, options));

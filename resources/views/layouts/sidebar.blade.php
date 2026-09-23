@@ -9,6 +9,8 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>NB Poultry Farm - @yield('title')</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

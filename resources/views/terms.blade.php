@@ -8,6 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Terms and Conditions - NB Poultry Farm</title>
+<link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+<link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
 
 
 <style>
