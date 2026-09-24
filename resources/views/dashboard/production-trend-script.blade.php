@@ -59,6 +59,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: !monthly,
                 plugins: {
                     legend: {
                         display: true,
