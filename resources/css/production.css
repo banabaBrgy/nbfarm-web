@@ -13,6 +13,20 @@
     font-size:20px;
 }
 
+.production-page button.icon-circle{
+    cursor:pointer;
+    padding:0;
+}
+
+.production-page button.icon-circle:hover{
+    filter:brightness(0.96);
+}
+
+.forecast-history-pages .pagination{
+    margin-bottom:0;
+    justify-content:flex-end;
+}
+
 .production-page .card{
     border:1px solid #E6ECE8;
     border-radius:16px;

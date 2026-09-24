@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Forecast;
 use App\Models\Production;
 use App\Models\QrTransaction;
 use Illuminate\Http\Request;
@@ -38,6 +39,11 @@ class ProductionController extends Controller
 
         $predictedEggs = app(GenerateEggForecast::class)->predictedEggs();
 
+        $forecastHistory = Forecast::query()
+            ->orderByDesc('forecast_date')
+            ->paginate(5, ['*'], 'forecast_page')
+            ->withQueryString();
+
         $productionIds = $productions->pluck('production_id');
 
         $qrTransactions = QrTransaction::with(['qrRecord', 'production'])
@@ -54,6 +60,7 @@ class ProductionController extends Controller
             'productions',
             'totalEggs',
             'predictedEggs',
+            'forecastHistory',
             'qrTransactions',
             'selectedDate',
             'viewType'

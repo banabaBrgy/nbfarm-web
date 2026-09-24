@@ -95,14 +95,72 @@ class GenerateEggForecast
     }
 
     /**
+     * Recompute every saved forecast with the current 7-day rule.
+     * Dates stay as they are. A day before the forecast with no eggs becomes 0.
+     *
+     * @return list<array{date: string, from: int, to: int}>
+     */
+    public function correctStoredHistory(): array
+    {
+        $changes = [];
+
+        Forecast::query()->orderBy('forecast_date')->each(function (Forecast $forecast) use (&$changes) {
+            $date = Carbon::parse($forecast->forecast_date)->startOfDay();
+            $from = (int) $forecast->predicted_eggs;
+            $to = $this->predictedFor($date);
+
+            if ($from !== $to) {
+                $forecast->predicted_eggs = $to;
+                $forecast->save();
+            }
+
+            $changes[] = [
+                'date' => $date->toDateString(),
+                'from' => $from,
+                'to' => $to,
+            ];
+        });
+
+        return $changes;
+    }
+
+    /**
+     * Forecast for one date from the 7 calendar days before it.
+     */
+    public function predictedFor(Carbon $forecastDate): int
+    {
+        $history = $this->historyEnding($forecastDate->copy()->subDay()->startOfDay());
+        $yesterdayEggs = (int) ($history[array_key_last($history)]['eggs'] ?? 0);
+        if ($yesterdayEggs <= 0) {
+            return 0;
+        }
+
+        $payload = $this->engine->predict(
+            $history,
+            [$forecastDate->toDateString()],
+            count($history)
+        );
+
+        return max(0, (int) ($payload['predicted_eggs'] ?? 0));
+    }
+
+    /**
      * Latest 7 calendar days ending yesterday. A day with no harvest is 0.
      *
      * @return list<array{date: string, eggs: int}>
      */
     private function dailyHistory(): array
     {
+        return $this->historyEnding(Carbon::yesterday()->startOfDay());
+    }
+
+    /**
+     * @return list<array{date: string, eggs: int}>
+     */
+    private function historyEnding(Carbon $end): array
+    {
         $window = max(2, (int) config('forecasting.window', 7));
-        $end = Carbon::yesterday()->startOfDay();
+        $end = $end->copy()->startOfDay();
         $start = $end->copy()->subDays($window - 1);
 
         $totals = Production::query()

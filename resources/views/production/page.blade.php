@@ -82,9 +82,15 @@
                             Forecast
                         </small>
                     </div>
-                    <div class="icon-circle bg-warning-subtle">
+                    <button
+                        type="button"
+                        class="icon-circle bg-warning-subtle border-0"
+                        style="cursor:pointer"
+                        data-bs-toggle="modal"
+                        data-bs-target="#forecastHistoryModal"
+                        aria-label="View forecast history">
                         <i class="fas fa-chart-line text-warning"></i>
-                    </div>
+                    </button>
                 </div>
             </div>
         </div>
@@ -215,5 +221,55 @@
     </table>
 
 </div>
+
+<div class="modal fade" id="forecastHistoryModal" tabindex="-1" aria-labelledby="forecastHistoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forecastHistoryLabel">Forecast History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3">Previous daily forecasts.</p>
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th class="text-end">Predicted Eggs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($forecastHistory as $forecast)
+                            <tr>
+                                <td>{{ $forecast->forecast_date->format('M j, Y') }}</td>
+                                <td class="text-end">{{ number_format($forecast->predicted_eggs) }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="2" class="text-center text-muted py-3">No forecast history yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                @if($forecastHistory->hasPages())
+                    <div class="forecast-history-pages mt-3">
+                        {{ $forecastHistory->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+@if($forecastHistory->currentPage() > 1)
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('forecastHistoryModal');
+        if (modal && window.bootstrap) {
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+        }
+    });
+</script>
+@endif
 
 </div>
