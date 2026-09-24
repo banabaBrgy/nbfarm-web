@@ -101,6 +101,6 @@ private function buildTopCustomers()
                 break;
         }
 
-        return $query->paginate(10)->withQueryString();
+        return $query->paginate(5)->withQueryString();
     }
 }

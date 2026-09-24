@@ -37,7 +37,7 @@ class UserController extends Controller
             $users->where('status', $status);
         }
 
-        $users = $users->latest()->paginate(10);
+        $users = $users->latest()->paginate(5);
 
         return view('owner.users', compact(
             'users',

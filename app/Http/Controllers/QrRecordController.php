@@ -23,7 +23,7 @@ class QrRecordController extends Controller
 
         $records = $printAll
             ? $query->get()
-            : $query->paginate(12)->withQueryString();
+            : $query->paginate(5)->withQueryString();
 
         return view('qr.print', compact('records', 'printAll'));
     }

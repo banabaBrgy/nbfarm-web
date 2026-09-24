@@ -25,7 +25,7 @@ class InventoryController extends Controller
             $itemsQuery->where('item_name', 'like', "%{$search}%");
         }
 
-        $items = $itemsQuery->paginate(6, ['*'], 'page')->withQueryString();
+        $items = $itemsQuery->paginate(5, ['*'], 'page')->withQueryString();
 
         $eggsStock = Production::leftoverStock();
         $eggTraysDisplay = Production::leftoverTrays();

@@ -39,10 +39,15 @@ class GenerateEggForecast
             'data' => [],
         ];
 
-        $cacheKey = 'egg-forecast:'.$weekStart->format('Y-m-d').':'.$weekEnd->format('Y-m-d');
+        $cacheKey = 'egg-forecast:v2:'.$weekStart->format('Y-m-d').':'.$weekEnd->format('Y-m-d');
 
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($weekStart, $weekEnd, $empty) {
             $history = $this->dailyHistory();
+            $yesterdayEggs = (int) ($history[array_key_last($history)]['eggs'] ?? 0);
+            if ($yesterdayEggs <= 0) {
+                $empty['predicted_eggs'] = 0;
+            }
+
             if (count($history) < 2) {
                 return $empty;
             }
@@ -66,7 +71,9 @@ class GenerateEggForecast
                 return $empty;
             }
 
-            $predicted = max(0, (int) ($payload['predicted_eggs'] ?? 0));
+            $predicted = $yesterdayEggs > 0
+                ? max(0, (int) ($payload['predicted_eggs'] ?? 0))
+                : 0;
             $forecastDate = $payload['forecast_date'] ?? Carbon::tomorrow()->toDateString();
 
             $attributes = ['predicted_eggs' => $predicted];
@@ -88,28 +95,44 @@ class GenerateEggForecast
     }
 
     /**
+     * Latest 7 calendar days ending yesterday. A day with no harvest is 0.
+     *
      * @return list<array{date: string, eggs: int}>
      */
     private function dailyHistory(): array
     {
         $window = max(2, (int) config('forecasting.window', 7));
+        $end = Carbon::yesterday()->startOfDay();
+        $start = $end->copy()->subDays($window - 1);
 
-        $rows = Production::query()
-            ->presentYear()
+        $totals = Production::query()
+            ->whereBetween('production_date', [
+                $start->toDateString(),
+                $end->toDateString(),
+            ])
             ->select(
                 DB::raw('DATE(production_date) as date'),
                 DB::raw('SUM(eggs_produced) as total')
             )
             ->groupBy(DB::raw('DATE(production_date)'))
-            ->orderByDesc(DB::raw('DATE(production_date)'))
-            ->limit($window)
-            ->get()
-            ->sortBy('date')
-            ->values();
+            ->get();
 
-        return $rows->map(fn ($row) => [
-            'date' => Carbon::parse($row->date)->format('Y-m-d'),
-            'eggs' => (int) $row->total,
-        ])->all();
+        $byDate = [];
+        foreach ($totals as $row) {
+            $byDate[Carbon::parse($row->date)->toDateString()] = (int) $row->total;
+        }
+
+        $history = [];
+        $cursor = $start->copy();
+        while ($cursor->lte($end)) {
+            $key = $cursor->toDateString();
+            $history[] = [
+                'date' => $key,
+                'eggs' => $byDate[$key] ?? 0,
+            ];
+            $cursor->addDay();
+        }
+
+        return $history;
     }
 }

@@ -33,7 +33,7 @@ class DispatchController extends Controller
         $dispatches = $query
             ->orderByDesc('dispatch_date')
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         $statusCounts = Dispatch::query()
