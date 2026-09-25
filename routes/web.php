@@ -72,6 +72,7 @@ Route::middleware('auth')->prefix('alerts')->name('alerts.')->group(function () 
     Route::post('/push', [AlertController::class, 'togglePush'])->name('push');
     Route::post('/subscribe', [AlertController::class, 'subscribe'])->name('subscribe');
     Route::post('/unsubscribe', [AlertController::class, 'unsubscribe'])->name('unsubscribe');
+    Route::post('/read-all', [AlertController::class, 'readAll'])->name('readAll');
     Route::post('/{alert}/read', [AlertController::class, 'read'])->name('read');
 });
 

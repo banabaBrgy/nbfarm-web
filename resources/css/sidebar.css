@@ -857,8 +857,8 @@ body {
 .alert-panel {
     position: fixed;
     z-index: 2000;
-    width: min(360px, calc(100vw - 24px));
-    max-height: min(420px, calc(100vh - 80px));
+    width: min(400px, calc(100vw - 24px));
+    max-height: min(480px, calc(100vh - 80px));
     display: flex;
     flex-direction: column;
     background: #fff;
@@ -883,11 +883,45 @@ body {
 
 .alert-panel-head {
     border-bottom: 1px solid #eef3ef;
+    flex-wrap: wrap;
+    row-gap: 4px;
 }
 
 .alert-panel-head strong {
     font-size: 16px;
     color: #2C6B35;
+}
+
+.alert-panel-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.alert-mark-all {
+    border: none;
+    background: transparent;
+    color: #34853F;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.alert-mark-all:hover:not(:disabled) {
+    background: #eef6ee;
+    text-decoration: underline;
+}
+
+.alert-mark-all:disabled,
+.alert-mark-all.is-disabled {
+    color: #a9b8ad;
+    cursor: default;
+    text-decoration: none;
 }
 
 .alert-panel-sub {
@@ -897,7 +931,7 @@ body {
 
 .alert-panel-list {
     overflow-y: auto;
-    max-height: 280px;
+    max-height: 340px;
 }
 
 .alert-empty,
@@ -910,29 +944,96 @@ body {
 }
 
 .alert-item {
+    position: relative;
     display: block;
     width: 100%;
     border: none;
     background: #fff;
     text-align: left;
     cursor: pointer;
-    border-bottom: 1px solid #f1f5f2;
+    border-bottom: 1px solid #eef3ef;
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: #33443a;
+    transition: background 0.15s ease;
 }
 
 .alert-item:hover {
     background: #f6faf6;
 }
 
+/* Unread: tinted surface + left accent bar + dot + "New" pill (see alerts.js) */
 .alert-item.is-unread {
-    background: #f3f9e8;
+    background: #edf5ee;
+    box-shadow: inset 3px 0 0 #34853f;
+}
+
+.alert-item.is-unread:hover {
+    background: #e6f1e7;
+}
+
+.alert-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.alert-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34853f;
+    box-shadow: 0 0 0 3px rgba(52, 133, 63, 0.18);
+}
+
+.alert-new {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #2c6b35;
+    background: #dcebdd;
+    border: 1px solid #c6ddc8;
+    border-radius: 999px;
+    padding: 3px 8px;
 }
 
 .alert-item-title {
     display: block;
-    font-weight: 700;
+    font-weight: 600;
     color: #2C6B35;
     font-size: 14px;
-    margin-bottom: 2px;
+    margin-bottom: 0;
+}
+
+/* Read items look settled; unread items pop */
+.alert-item:not(.is-unread) .alert-item-title {
+    color: #4a5a50;
+    font-weight: 600;
+}
+
+.alert-item.is-unread .alert-item-title {
+    color: #234f29;
+    font-weight: 700;
+}
+
+.alert-item-body {
+    color: #33443a;
+}
+
+.alert-item:not(.is-unread) .alert-item-body {
+    color: #5f7266;
+    font-weight: 400;
+}
+
+.alert-item.is-unread .alert-item-body {
+    color: #2f3f34;
+    font-weight: 500;
 }
 
 .alert-item-when {
@@ -968,4 +1069,26 @@ body {
     font-weight: 500;
     color: #7a8b7f;
     line-height: 1.35;
+}
+
+/* Small screens: panel goes nearly full-width and stays inside the viewport */
+@media (max-width: 480px) {
+    .alert-panel {
+        width: calc(100vw - 24px);
+        max-height: calc(100dvh - 96px);
+        border-radius: 10px;
+    }
+
+    .alert-panel-list {
+        max-height: calc(100dvh - 220px);
+    }
+
+    .alert-panel-head {
+        padding: 10px 12px;
+    }
+
+    .alert-item {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
 }

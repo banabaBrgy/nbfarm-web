@@ -220,18 +220,14 @@
          data-subscribe="{{ route('alerts.subscribe') }}"
          data-unsubscribe="{{ route('alerts.unsubscribe') }}">
         <div class="alert-panel-head">
-            <strong>Notifications</strong>
-            <span class="alert-panel-sub">Stock and reports</span>
+            <div class="alert-panel-title">
+                <strong>Notifications</strong>
+                <span class="alert-panel-sub">Stock and reports</span>
+            </div>
+            <button type="button" class="alert-mark-all" data-alert-read-all>Mark all as read</button>
         </div>
         <div class="alert-panel-list" data-alert-list>
             <p class="alert-empty">No alerts.</p>
-        </div>
-        <div class="alert-panel-foot">
-            <div class="alert-push-copy">
-                <span>Browser notifications</span>
-                <strong data-push-status>Ask</strong>
-                <small data-push-hint></small>
-            </div>
         </div>
     </div>
     @endif

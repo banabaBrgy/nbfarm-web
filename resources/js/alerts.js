@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = panel.querySelector('[data-alert-list]');
     const statusEl = panel.querySelector('[data-push-status]');
     const hint = panel.querySelector('[data-push-hint]');
+    const readAllBtn = panel.querySelector('[data-alert-read-all]');
+
+    const syncReadAllBtn = (count) => {
+        if (!readAllBtn) {
+            return;
+        }
+        readAllBtn.disabled = count < 1;
+        readAllBtn.classList.toggle('is-disabled', count < 1);
+    };
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const indexUrl = panel.dataset.index;
     const readBase = panel.dataset.readBase;
@@ -86,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setBadge(payload.unread || 0);
         vapidPublic = payload.vapid_public || vapidPublic;
         setPermissionUi();
+        syncReadAllBtn(payload.unread || 0);
 
         const alerts = payload.alerts || [];
         if (alerts.length === 0) {
@@ -95,9 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         list.innerHTML = alerts.map((row) => `
             <button type="button" class="alert-item ${row.read ? '' : 'is-unread'}" data-alert-id="${row.id}" data-alert-url="${escapeHtml(row.url || '')}">
-                <span class="alert-item-title">${escapeHtml(row.title || 'Notification')}</span>
-                <span>${escapeHtml(row.body || '')}</span>
-                <span class="alert-item-when">${escapeHtml(row.when || '')}</span>
+                <span class="alert-item-title-row">
+                        ${row.read ? '' : '<span class="alert-dot" aria-hidden="true"></span>'}
+                        <span class="alert-item-title">${escapeHtml(row.title || 'Notification')}</span>
+                        ${row.read ? '' : '<span class="alert-new">New</span>'}
+                    </span>
+                    <span class="alert-item-body">${escapeHtml(row.body || '')}</span>
+                    <span class="alert-item-when">${escapeHtml(row.when || '')}</span>
             </button>
         `).join('');
     };
@@ -120,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const positionPanel = (anchor) => {
         const rect = anchor.getBoundingClientRect();
-        const width = Math.min(360, window.innerWidth - 24);
+        const width = Math.min(400, window.innerWidth - 24);
         let left = rect.right - width;
         if (left < 12) {
             left = 12;
@@ -130,6 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let top = rect.bottom + 8;
+        if (top < 12) {
+            top = 12;
+        }
         panel.style.left = `${left}px`;
         panel.style.top = `${top}px`;
         panel.hidden = false;
@@ -199,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             url = data.url || fallback;
             setBadge(data.unread || 0);
+            syncReadAllBtn(data.unread || 0);
         }
 
         closePanel();
@@ -206,6 +224,31 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = url;
         }
     });
+
+    if (readAllBtn) {
+        readAllBtn.addEventListener('click', async () => {
+            if (readAllBtn.disabled) {
+                return;
+            }
+            readAllBtn.disabled = true;
+            try {
+                const res = await fetch(`${readBase}/read-all`, {
+                    method: 'POST',
+                    headers: headers(),
+                    credentials: 'same-origin',
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setBadge(data.unread || 0);
+                    await load();
+                } else {
+                    readAllBtn.disabled = false;
+                }
+            } catch (_e) {
+                readAllBtn.disabled = false;
+            }
+        });
+    }
 
     const urlBase64ToUint8Array = (base64String) => {
         const padding = '='.repeat((4 - (base64String.length % 4)) % 4);

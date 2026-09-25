@@ -49,8 +49,24 @@ class AlertController extends Controller
 
         return response()->json([
             'ok' => true,
+            'read' => true,
             'url' => $alert->url ?: route(User::routeRole($user->role).'.inventory'),
             'unread' => StockNotification::query()->where('user_id', $user->id)->unread()->count(),
+        ]);
+    }
+
+    public function readAll(Request $request): JsonResponse
+    {
+        $user = $this->farmLead($request);
+
+        StockNotification::query()
+            ->where('user_id', $user->id)
+            ->unread()
+            ->update(['read_at' => now()]);
+
+        return response()->json([
+            'ok' => true,
+            'unread' => 0,
         ]);
     }
 
