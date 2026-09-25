@@ -305,6 +305,21 @@
     width: 100%;
     border-collapse: collapse;
     min-width: 860px;
+    table-layout: fixed;
+}
+
+.dsp-col-check { width: 46px; }
+.dsp-col-date { width: 104px; }
+.dsp-col-recipient { width: 160px; }
+.dsp-col-address { width: 190px; }
+.dsp-col-items { width: 160px; }
+.dsp-col-price { width: 92px; }
+.dsp-col-status { width: 122px; }
+.dsp-col-action { width: 64px; }
+
+.dsp-table th,
+.dsp-table td {
+    overflow: hidden;
 }
 
 .dsp-table thead {
@@ -313,7 +328,7 @@
 
 .dsp-table thead th {
     color: #fff;
-    padding: 14px 18px;
+    padding: 14px 12px;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
@@ -323,7 +338,7 @@
 }
 
 .dsp-table tbody td {
-    padding: 16px 18px;
+    padding: 16px 12px;
     border-bottom: 1px solid #eef2ef;
     font-size: 14px;
     color: #374151;
@@ -346,6 +361,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    white-space: nowrap;
 }
 
 .dsp-date strong {
@@ -361,10 +377,12 @@
 .dsp-recipient {
     font-weight: 600;
     color: #34853F;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dsp-address {
-    max-width: 220px;
     color: #6b7280;
     display: -webkit-box;
     -webkit-line-clamp: 2;

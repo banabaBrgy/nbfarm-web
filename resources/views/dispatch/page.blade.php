@@ -105,6 +105,18 @@
 
         <div class="dsp-table-wrap">
             <table class="dsp-table">
+                <colgroup>
+                    @if($canManage)
+                        <col class="dsp-col-check">
+                    @endif
+                    <col class="dsp-col-date">
+                    <col class="dsp-col-recipient">
+                    <col class="dsp-col-address">
+                    <col class="dsp-col-items">
+                    <col class="dsp-col-price">
+                    <col class="dsp-col-status">
+                    <col class="dsp-col-action">
+                </colgroup>
                 <thead>
                     <tr>
                         @if($canManage)
@@ -143,8 +155,7 @@
                             @endif
                             <td>
                                 <div class="dsp-date">
-                                    <strong>{{ $date->format('M d') }}</strong>
-                                    <span>{{ $date->format('Y') }}</span>
+                                    <strong>{{ $date->format('M d, Y') }}</strong>
                                 </div>
                             </td>
                             <td class="dsp-recipient">{{ $dispatch->recipient }}</td>

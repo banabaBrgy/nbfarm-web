@@ -42,7 +42,8 @@ class ProductionController extends Controller
         $forecastHistory = Forecast::query()
             ->orderByDesc('forecast_date')
             ->paginate(5, ['*'], 'forecast_page')
-            ->withQueryString();
+            ->withQueryString()
+            ->appends(['forecast_open' => 1]);
 
         $productionIds = $productions->pluck('production_id');
 

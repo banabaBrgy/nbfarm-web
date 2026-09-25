@@ -261,7 +261,7 @@
     </div>
 </div>
 
-@if($forecastHistory->currentPage() > 1)
+@if(request()->boolean('forecast_open'))
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var modal = document.getElementById('forecastHistoryModal');
