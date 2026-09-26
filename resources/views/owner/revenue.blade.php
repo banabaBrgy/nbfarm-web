@@ -9,10 +9,13 @@
 @endpush
 
 @section('content')
+<div class="revenue-page">
 
- <!-- Header -->
-<div class="section-header">
-    <h2>Revenue Overview</h2>
+<div class="page-header">
+    <div>
+        <h2>Sales</h2>
+        <p>Track income, customers, and payment status.</p>
+    </div>
     @include('revenue.partials.form')
 </div>
 
@@ -91,6 +94,7 @@
     `;
 })();
 </script>
+</div>
 @endsection
 
 @push('scripts')

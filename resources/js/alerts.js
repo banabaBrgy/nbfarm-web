@@ -9,6 +9,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusEl = panel.querySelector('[data-push-status]');
     const hint = panel.querySelector('[data-push-hint]');
     const readAllBtn = panel.querySelector('[data-alert-read-all]');
+    const itemMenu = document.createElement('div');
+    itemMenu.className = 'alert-item-menu';
+    itemMenu.setAttribute('data-alert-item-menu', '');
+    itemMenu.hidden = true;
+    itemMenu.innerHTML = '<button type="button" class="alert-item-menu-btn" data-alert-toggle-read></button>';
+    panel.appendChild(itemMenu);
+
+    let menuAnchor = null;
+
+    const closeItemMenu = () => {
+        itemMenu.hidden = true;
+        delete itemMenu.dataset.alertId;
+        delete itemMenu.dataset.alertRead;
+        if (menuAnchor) {
+            menuAnchor.setAttribute('aria-expanded', 'false');
+            menuAnchor = null;
+        }
+    };
+
+    const positionItemMenu = (anchor) => {
+        const panelRect = panel.getBoundingClientRect();
+        const btnRect = anchor.getBoundingClientRect();
+        const menuWidth = 176;
+        const menuHeight = itemMenu.offsetHeight || 40;
+        let left = btnRect.right - panelRect.left - menuWidth;
+        let top = btnRect.bottom - panelRect.top + 4;
+
+        if (left < 8) {
+            left = 8;
+        }
+        if (top + menuHeight > panelRect.height - 8) {
+            top = btnRect.top - panelRect.top - menuHeight - 4;
+        }
+        if (top < 8) {
+            top = 8;
+        }
+
+        itemMenu.style.left = `${left}px`;
+        itemMenu.style.top = `${top}px`;
+    };
+
+    const openItemMenu = (anchor, item) => {
+        const isRead = item.getAttribute('data-alert-read') === '1';
+        const toggleBtn = itemMenu.querySelector('[data-alert-toggle-read]');
+        toggleBtn.textContent = isRead ? 'Mark as unread' : 'Mark as read';
+        itemMenu.dataset.alertId = item.getAttribute('data-alert-id') || '';
+        itemMenu.dataset.alertRead = isRead ? '1' : '0';
+        itemMenu.hidden = false;
+        if (menuAnchor && menuAnchor !== anchor) {
+            menuAnchor.setAttribute('aria-expanded', 'false');
+        }
+        menuAnchor = anchor;
+        menuAnchor.setAttribute('aria-expanded', 'true');
+        positionItemMenu(anchor);
+    };
 
     const syncReadAllBtn = (count) => {
         if (!readAllBtn) {
@@ -98,21 +153,27 @@ document.addEventListener('DOMContentLoaded', () => {
         syncReadAllBtn(payload.unread || 0);
 
         const alerts = payload.alerts || [];
+        closeItemMenu();
         if (alerts.length === 0) {
             list.innerHTML = '<p class="alert-empty">No alerts.</p>';
             return;
         }
 
         list.innerHTML = alerts.map((row) => `
-            <button type="button" class="alert-item ${row.read ? '' : 'is-unread'}" data-alert-id="${row.id}" data-alert-url="${escapeHtml(row.url || '')}">
-                <span class="alert-item-title-row">
+            <div class="alert-item ${row.read ? '' : 'is-unread'}" data-alert-id="${row.id}" data-alert-url="${escapeHtml(row.url || '')}" data-alert-read="${row.read ? '1' : '0'}">
+                <button type="button" class="alert-item-main" data-alert-open>
+                    <span class="alert-item-title-row">
                         ${row.read ? '' : '<span class="alert-dot" aria-hidden="true"></span>'}
                         <span class="alert-item-title">${escapeHtml(row.title || 'Notification')}</span>
                         ${row.read ? '' : '<span class="alert-new">New</span>'}
                     </span>
                     <span class="alert-item-body">${escapeHtml(row.body || '')}</span>
                     <span class="alert-item-when">${escapeHtml(row.when || '')}</span>
-            </button>
+                </button>
+                <button type="button" class="alert-item-more" data-alert-more aria-label="Notification actions" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
+                </button>
+            </div>
         `).join('');
     };
 
@@ -125,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const closePanel = () => {
+        closeItemMenu();
         panel.hidden = true;
         bells.forEach((btn) => {
             btn.classList.remove('is-open');
@@ -197,7 +259,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    list.addEventListener('scroll', () => {
+        closeItemMenu();
+    });
+
     list.addEventListener('click', async (event) => {
+        const more = event.target.closest('[data-alert-more]');
+        if (more) {
+            event.preventDefault();
+            event.stopPropagation();
+            const item = more.closest('[data-alert-id]');
+            if (!item) {
+                return;
+            }
+            if (menuAnchor === more && !itemMenu.hidden) {
+                closeItemMenu();
+                return;
+            }
+            openItemMenu(more, item);
+            return;
+        }
+
         const item = event.target.closest('[data-alert-id]');
         if (!item) {
             return;
@@ -223,6 +305,48 @@ document.addEventListener('DOMContentLoaded', () => {
         if (url) {
             window.location.href = url;
         }
+    });
+
+    itemMenu.addEventListener('click', async (event) => {
+        const toggleBtn = event.target.closest('[data-alert-toggle-read]');
+        if (!toggleBtn) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const id = itemMenu.dataset.alertId;
+        const isRead = itemMenu.dataset.alertRead === '1';
+        if (!id) {
+            closeItemMenu();
+            return;
+        }
+
+        toggleBtn.disabled = true;
+        try {
+            const res = await fetch(`${readBase}/${id}/${isRead ? 'unread' : 'read'}`, {
+                method: 'POST',
+                headers: headers(),
+                credentials: 'same-origin',
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setBadge(data.unread || 0);
+                syncReadAllBtn(data.unread || 0);
+                closeItemMenu();
+                await load();
+            }
+        } finally {
+            toggleBtn.disabled = false;
+        }
+    });
+
+    panel.addEventListener('click', (event) => {
+        if (event.target.closest('[data-alert-more], [data-alert-item-menu]')) {
+            return;
+        }
+        closeItemMenu();
     });
 
     if (readAllBtn) {

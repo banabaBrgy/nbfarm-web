@@ -34,6 +34,8 @@ export default defineConfig({
 
                 'resources/css/owner.report.css',
 
+                'resources/css/app-ui.css',
+
                 'resources/js/revenue.js',
 
             ],

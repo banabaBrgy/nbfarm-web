@@ -49,8 +49,8 @@
 /* ── CHART + INVENTORY SIDE-BY-SIDE ── */
 .content-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 18px;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
   align-items: stretch;
 }
 
@@ -289,18 +289,18 @@
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  padding: 16px;
+  gap: 9px;
+  padding: 15px;
 }
 
 .stats-grid.stats-grid--five .stat-icon {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
 }
 
 .stats-grid.stats-grid--five .stat-icon i {
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .stats-grid.stats-grid--five .stat-info {
@@ -350,7 +350,7 @@
   }
 
   .stats-grid.stats-grid--five .stat-icon i {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .stats-grid.stats-grid--five .stat-info {
@@ -379,3 +379,17 @@
     grid-template-columns: 1fr;
   }
 }
+
+.stat-trend-up { color: #3B8F47 !important; font-weight: 600; }
+.stat-trend-down { color: #dc2626 !important; font-weight: 600; }
+
+.stat-card--feed .stat-icon { background: linear-gradient(145deg, #fbbf24 0%, #ea580c 100%); }
+.stat-card--feed .stat-info h2 { color: #ea580c; }
+.stat-card--dispatch .stat-icon { background: linear-gradient(145deg, #60a5fa 0%, #2563eb 100%); }
+.stat-card--dispatch .stat-info h2 { color: #2563eb; }
+.stat-card--revenue .stat-icon { background: linear-gradient(145deg, #c084fc 0%, #7c3aed 100%); }
+.stat-card--revenue .stat-info h2 { color: #7c3aed; }
+.stat-card--eggs .stat-icon,
+.stat-card--predicted .stat-icon { background: linear-gradient(145deg, #4CAF50 0%, #2E7D32 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.22); }
+.stat-card--eggs .stat-info h2,
+.stat-card--predicted .stat-info h2 { color: #34853F; }

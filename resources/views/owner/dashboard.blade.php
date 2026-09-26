@@ -52,7 +52,7 @@
     <div class="stats-grid stats-grid--five">
 
         {{-- Eggs --}}
-        <div class="stat-card">
+        <div class="stat-card stat-card--eggs">
             <div class="stat-icon">
                 <i class="fas fa-egg"></i>
             </div>
@@ -62,14 +62,14 @@
 
                 <h2>{{ number_format($eggsToday) }}</h2>
 
-                <small>
+                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">
                     {{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% vs yesterday
                 </small>
             </div>
         </div>
 
         {{-- Predicted eggs (Python linear regression) --}}
-        <div class="stat-card">
+        <div class="stat-card stat-card--predicted">
             <div class="stat-icon">
                 <i class="fas fa-chart-line"></i>
             </div>
@@ -81,7 +81,7 @@
         </div>
 
         {{-- Feed --}}
-        <div class="stat-card">
+        <div class="stat-card stat-card--feed">
             <div class="stat-icon">
                 <i class="fas fa-wheat-awn"></i>
             </div>
@@ -104,7 +104,7 @@
         @if($role != 'staff')
 
             {{-- Dispatch --}}
-            <div class="stat-card">
+            <div class="stat-card stat-card--dispatch">
                 <div class="stat-icon">
                     <i class="fas fa-truck"></i>
                 </div>
@@ -119,7 +119,7 @@
             </div>
 
             {{-- Revenue --}}
-            <div class="stat-card">
+            <div class="stat-card stat-card--revenue">
                 <div class="stat-icon">
                     <i class="fas fa-peso-sign"></i>
                 </div>
@@ -170,62 +170,12 @@
 
     <!-- Chart + Inventory side by side -->
     <div class="content-grid">
-        <div class="chart-card">
-            <div class="trend-chart-header">
-                <div class="chart-title">
-                    @if(! empty($productionTrend['selectedYear']))
-                        Egg production — {{ $productionTrend['selectedYear'] }}
-                    @else
-                        Egg Production — Last 7 Days + Forecast
-                    @endif
-                </div>
-                @include('dashboard.production-trend', [
-                    'productionTrend' => $productionTrend,
-                    'trendAction' => route('owner.dashboard'),
-                ])
-            </div>
-            <div class="chart-wrap">
-                <canvas id="eggChart" height="200"></canvas>
-            </div>
-        </div>
+        @include('dashboard.egg-production-chart-card', [
+            'productionTrend' => $productionTrend,
+            'trendAction' => route('owner.dashboard'),
+        ])
 
-        <div class="panel-card">
-            <div class="panel-title">Inventory Levels</div>
-
-            <div class="inv-row">
-                <div class="inv-label"><span>Eggs</span><span>{{ number_format($eggsTotal) }} pcs</span></div>
-                <div class="inv-bar">
-                    <div class="inv-fill" style="width: {{ min(100, $eggsTotal / 150) }}%"></div>
-                </div>
-            </div>
-
-            <div class="inv-row">
-                <div class="inv-label"><span>Feed (sack)</span><span
-                        class="{{ $feedLow ? 'low-text' : '' }}">{{ $feedStock }} {{ $feedLow ? '— below min' : '' }}</span>
-                </div>
-                <div class="inv-bar">
-                    <div class="inv-fill {{ $feedLow ? 'fill-low' : '' }}"
-                        style="width: {{ min(100, ($feedStock / max($feedMin, 1)) * 50) }}%"></div>
-                </div>
-            </div>
-
-            <div class="inv-row">
-                <div class="inv-label"><span>Egg Trays</span><span>{{ number_format($eggTrays) }} pcs</span></div>
-                <div class="inv-bar">
-                    <div class="inv-fill" style="width: {{ min(100, $eggTrays / 5) }}%"></div>
-                </div>
-            </div>
-
-            <div class="inv-row">
-                <div class="inv-label"><span>Vitamins</span><span
-                        class="{{ $vitaminLow ? 'low-text' : '' }}">{{ number_format($vitamins) }} bottles{{ $vitaminLow ? ' — below min' : '' }}</span>
-                </div>
-                <div class="inv-bar">
-                    <div class="inv-fill {{ $vitaminLow ? 'fill-low' : '' }}"
-                        style="width: {{ min(100, ($vitamins / max($vitaminMin, 1)) * 50) }}%"></div>
-                </div>
-            </div>
-        </div>
+        @include('dashboard.inventory-levels-panel')
     </div>
 
 @endsection

@@ -17,6 +17,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
     
 
     @vite([
@@ -29,12 +32,14 @@
     'resources/css/users.css',
     'resources/css/report.css',
     'resources/css/owner.report.css',
+    'resources/css/app-ui.css',
     'resources/js/app.js'
 ])
 
 <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
 
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/app-ui.css') }}">
 
 
 </head>
@@ -53,7 +58,7 @@
             <i class="fas fa-bars"></i>
         </button>
         <div class="header-title-group">
-            <div class="header-logo">
+            <div class="header-logo" aria-hidden="true">
                 <i class="fas fa-leaf"></i>
             </div>
             <div class="header-title">
@@ -187,12 +192,11 @@
         </nav>
 
         <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="logout">
-    @csrf
-    <button type="submit" aria-label="Logout" title="Logout">
-        <i class="fas fa-sign-out-alt"></i>
-        Logout
-    </button>
-</form>
+            @csrf
+            <button type="submit" aria-label="Logout" title="Logout">
+                Logout
+            </button>
+        </form>
 
     </aside>
 

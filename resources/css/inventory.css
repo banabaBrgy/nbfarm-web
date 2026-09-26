@@ -3,7 +3,7 @@
 ========================================= */
 
 .inventory-page {
-    padding: 32px;
+    padding: 0;
 }
 
 /* =========================================
@@ -17,11 +17,12 @@
     margin-bottom: 28px;
 }
 
-.page-header h1 {
+.inventory-page .page-header h1,
+.inventory-page .page-header h2 {
     margin: 0;
     font-size: 30px;
     font-weight: 700;
-    color: #34853F;
+    color: #1b3d2f;
 }
 
 /* =========================================
@@ -47,30 +48,22 @@
    ALERTS
 ========================================= */
 
-.alert-low {
-
-    background: #FFF8E7;
-
-    border-left: 5px solid #F39C12;
-
-    color: #7A5B1A;
-
-    border-radius: 12px;
-
-    padding: 16px 18px;
-
+.inventory-page .alert-low {
+    display: block;
+    background: #fdf3e2;
+    border: 1px solid #f0c987;
+    color: #7a5b1a;
+    border-radius: 6px;
+    padding: 10px 16px;
     margin-bottom: 16px;
-
+    font-size: 14px;
+    line-height: 1.55;
 }
 
-.alert-watch {
-
-    background: #EEF8E8;
-
-    border-left: 5px solid #3B8F47;
-
-    color: #34853F;
-
+.inventory-page .alert-watch {
+    background: #fff9e6;
+    border: 1px solid #f5d77e;
+    color: #7a5b1a;
 }
 
 /* =========================================
@@ -89,40 +82,34 @@
 
 }
 
-.stat-card {
-
+.inventory-page .stat-card {
     background: #FFFFFF;
-
     border-radius: 16px;
-
-    padding: 24px;
-
+    padding: 22px;
     border: 1px solid #E6ECE8;
-
     box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
-
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 16px;
     transition: .25s;
-
 }
 
-.stat-card:hover {
-
+.inventory-page .stat-card:hover {
     transform: translateY(-3px);
-
     box-shadow: 0 12px 24px rgba(0, 0, 0, .08);
-
 }
 
-.stat-card-alert {
-
+.inventory-page .stat-card-alert,
+.inventory-page .stat-card.stat-card-alert {
     border: 2px solid #D32F2F;
-
 }
 
-.stat-card-watch {
-
-    border: 2px solid #3B8F47;
-
+.inventory-page .stat-card-watch,
+.inventory-page .stat-card.stat-card-watch {
+    border: 2px solid #F39C12;
 }
 
 .stat-label {

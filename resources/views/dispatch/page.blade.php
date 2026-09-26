@@ -10,7 +10,7 @@
 
     <div class="page-header">
         <div class="page-header-copy">
-            <h1>Dispatch</h1>
+            <h2>Dispatch</h2>
             <p>Track outgoing egg deliveries by recipient, size, and status.</p>
         </div>
 

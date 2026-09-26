@@ -5,188 +5,117 @@
 
 @section('content')
 
-    <div class="container-fluid py-4">
+    <div class="reports-page">
 
         <div class="page-header">
-
-            <h1 class="page-title">
-
-                Reports
-
-            </h1>
-
+            <div class="page-header-copy">
+                <h2>Reports</h2>
+                <p>Review farm reports sent by the manager.</p>
+            </div>
         </div>
 
-        <div class="report-summary">
-
-            <div class="summary-card">
-
-                <i class="fas fa-file-alt"></i>
-
+        <div class="rpt-stats">
+            <div class="rpt-stat rpt-stat-total">
+                <div class="rpt-stat-icon"><i class="fas fa-file-alt"></i></div>
                 <div>
-
-                    <span>Total Reports</span>
-
-                    <h3>{{ $reports->count() }}</h3>
-
+                    <div class="rpt-stat-label">Total Reports</div>
+                    <div class="rpt-stat-value">{{ $reports->count() }}</div>
                 </div>
-
             </div>
 
-            <div class="summary-card">
-
-                <i class="fas fa-paper-plane"></i>
-
+            <div class="rpt-stat rpt-stat-sent">
+                <div class="rpt-stat-icon"><i class="fas fa-paper-plane"></i></div>
                 <div>
-
-                    <span>Unread Reports</span>
-
-                    <h3>{{ $reports->where('status', 'Sent')->count() }}</h3>
-
+                    <div class="rpt-stat-label">Unread</div>
+                    <div class="rpt-stat-value">{{ $reports->where('status', 'Sent')->count() }}</div>
                 </div>
-
             </div>
 
-            <div class="summary-card">
-
-                <i class="fas fa-envelope-open"></i>
-
+            <div class="rpt-stat rpt-stat-read">
+                <div class="rpt-stat-icon"><i class="fas fa-envelope-open"></i></div>
                 <div>
-
-                    <span>Reviewed Reports</span>
-
-                    <h3>{{ $reports->where('status', 'Read')->count() }}</h3>
-
+                    <div class="rpt-stat-label">Reviewed</div>
+                    <div class="rpt-stat-value">{{ $reports->where('status', 'Read')->count() }}</div>
                 </div>
-
             </div>
-
         </div>
 
-        <div class="table-container">
+        <div class="rpt-card">
+            <div class="rpt-toolbar">
+                <h2>Received reports</h2>
+                <span class="rpt-count">{{ $reports->count() }} {{ Str::plural('record', $reports->count()) }}</span>
+            </div>
 
-            <table class="table align-middle">
-
-                <thead>
-
-                    <tr>
-
-                        <th>Date</th>
-
-                        <th>Report No</th>
-
-                        <th>Title</th>
-
-                        <th>Type</th>
-
-                        <th>Status</th>
-
-                        <th>Manager</th>
-
-                        <th width="120">Action</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-                    @forelse($reports as $report)
-
+            <div class="rpt-table-wrap">
+                <table class="rpt-table">
+                    <thead>
                         <tr>
-
-                            <td>
-
-                                {{ $report->created_at->format('M d, Y') }}
-
-                            </td>
-
-                            <td>
-
-                                <strong>{{ $report->report_no }}</strong>
-
-                            </td>
-
-                            <td>
-
-                                {{ $report->title }}
-
-                            </td>
-
-                            <td>
-
-                                {{ ucfirst($report->report_type) }}
-
-                            </td>
-
-                            <td>
-
-                                @if($report->status == 'Sent')
-
-                                    <span class="badge bg-warning">
-
-                                        Unread
-
-                                    </span>
-
-                                @elseif($report->status == 'Read')
-
-                                    <span class="badge bg-success">
-
-                                        Read
-
-                                    </span>
-
-                                @else
-
-                                    <span class="badge bg-secondary">
-
-                                        {{ $report->status }}
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                            <td>
-
-                                {{ optional($report->manager)->name ?? 'Manager' }}
-
-                            </td>
-
-                            <td>
-
-                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#viewReport{{ $report->id }}">
-
-                                    <i class="fas fa-eye"></i>
-
-                                    View
-
-                                </button>
-
-                            </td>
-
+                            <th>Date</th>
+                            <th>Report No</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Manager</th>
+                            <th>Action</th>
                         </tr>
-
-                    @empty
-
-                        <tr>
-
-                            <td colspan="7" class="text-center py-4">
-
-                                No reports available.
-
-                            </td>
-
-                        </tr>
-
-                    @endforelse
-
-                </tbody>
-
-            </table>
-
+                    </thead>
+                    <tbody>
+                        @forelse($reports as $report)
+                            @php
+                                $type = strtolower($report->report_type);
+                                $statusClass = match($report->status) {
+                                    'Sent' => 'rpt-badge-sent',
+                                    'Read' => 'rpt-badge-read',
+                                    default => 'rpt-badge-draft',
+                                };
+                            @endphp
+                            <tr>
+                                <td>
+                                    <span class="rpt-date">{{ $report->created_at->format('M d, Y') }}</span>
+                                </td>
+                                <td>
+                                    <span class="rpt-no">{{ $report->report_no }}</span>
+                                </td>
+                                <td>
+                                    <div class="rpt-title">{{ $report->title }}</div>
+                                </td>
+                                <td>
+                                    <span class="rpt-chip rpt-chip-{{ $type }}">{{ ucfirst($report->report_type) }}</span>
+                                </td>
+                                <td>
+                                    <span class="rpt-badge {{ $statusClass }}">
+                                        {{ $report->status == 'Sent' ? 'Unread' : $report->status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ optional($report->manager)->name ?? 'Manager' }}
+                                </td>
+                                <td>
+                                    <div class="rpt-actions">
+                                        <button type="button"
+                                            class="rpt-icon-btn rpt-icon-view"
+                                            title="View"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewReport{{ $report->id }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7">
+                                    <div class="rpt-empty">
+                                        <i class="fas fa-file-alt"></i>
+                                        <p>No reports available</p>
+                                        <span>Reports sent by the manager will appear here.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
         {{-- ===========================================
         VIEW REPORT MODALS

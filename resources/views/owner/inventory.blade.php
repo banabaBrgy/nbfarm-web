@@ -12,9 +12,13 @@
 
     <div class="page-header">
         <div>
-            <h1>Inventory Overview</h1>
+            <h2>Inventory</h2>
+            <p>Monitor stock levels, alerts, and recent updates.</p>
         </div>
-        <button class="btn-update" onclick="openStockModal()">+ Add Stock</button>
+        <button class="btn-update" type="button" onclick="openStockModal()">
+            <i class="fas fa-plus"></i>
+            Add Stock
+        </button>
     </div>
 
    @php
@@ -29,55 +33,53 @@
             @else
                 👁 <strong>{{ $alertItem->item_name }} stock approaching minimum level</strong>
             @endif
-            — Current: {{ $alertItem->current_stock }} {{ $alertItem->unit }} | Minimum: {{ $alertItem->min_level }} {{ $alertItem->unit }}.
+            — Current: {{ number_format($alertItem->current_stock, 2) }} {{ $alertItem->unit }} | Minimum: {{ number_format($alertItem->min_level, 2) }} {{ $alertItem->unit }}.
             {{ $alertItem->status === 'LOW' ? 'Immediate reorder suggested.' : 'Monitor closely.' }}
         </div>
     @endforeach
 @endif
 
-    <!-- STAT CARDS -->
-    <div class="stat-grid">
+    <div class="stats-grid">
+        <div class="stat-card stat-card--eggs">
+            <div class="stat-icon"><i class="fas fa-egg"></i></div>
+            <div class="stat-info">
+                <span class="stat-title">Eggs Stock</span>
+                <h2>{{ number_format($eggsStock) }}</h2>
+                <small>Today: {{ number_format($eggsToday ?? 0) }} · Yesterday: {{ number_format($eggsYesterday ?? 0) }}</small>
+            </div>
+        </div>
 
-    <div class="stat-card">
-        <div class="stat-label">Eggs Stock</div>
-        <div class="stat-value">{{ number_format($eggsStock) }}</div>
-        <div class="stat-sub">
-            pcs — Last 7 days · Today: {{ number_format($eggsToday ?? 0) }}
-            · Yesterday: {{ number_format($eggsYesterday ?? 0) }}
+        <div class="stat-card stat-card--feed {{ ($feed->status ?? '') === 'LOW' ? 'stat-card-alert' : (($feed->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
+            <div class="stat-icon"><i class="fas fa-wheat-awn"></i></div>
+            <div class="stat-info">
+                <span class="stat-title">Feed</span>
+                <h2 class="{{ ($feed->status ?? '') === 'LOW' ? 'text-danger' : (($feed->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
+                    {{ number_format($feed->current_stock ?? 0, 2) }}
+                </h2>
+                <small>{{ $feed->unit ?? 'sacks' }} — Min: {{ number_format($feed->min_level ?? 0, 2) }} — {{ $feed->status ?? 'OK' }}</small>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card--vitamins {{ ($vitamins->status ?? '') === 'LOW' ? 'stat-card-alert' : (($vitamins->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
+            <div class="stat-icon"><i class="fas fa-capsules"></i></div>
+            <div class="stat-info">
+                <span class="stat-title">Vitamins</span>
+                <h2 class="{{ ($vitamins->status ?? '') === 'LOW' ? 'text-danger' : (($vitamins->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
+                    {{ number_format($vitamins->current_stock ?? 0) }}
+                </h2>
+                <small>{{ $vitamins->unit ?? 'bottles' }} — Min: {{ number_format($vitamins->min_level ?? 0, 2) }} — {{ $vitamins->status ?? 'OK' }}</small>
+            </div>
+        </div>
+
+        <div class="stat-card stat-card--inventory">
+            <div class="stat-icon"><i class="fas fa-box"></i></div>
+            <div class="stat-info">
+                <span class="stat-title">Egg Trays</span>
+                <h2>{{ number_format($eggTraysDisplay ?? 0) }}</h2>
+                <small>Available trays</small>
+            </div>
         </div>
     </div>
-
-    <div class="stat-card {{ ($feed->status ?? '') === 'LOW' ? 'stat-card-alert' : (($feed->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
-        <div class="stat-label">Feed</div>
-        <div class="stat-value {{ ($feed->status ?? '') === 'LOW' ? 'text-danger' : (($feed->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
-            {{ $feed->current_stock ?? 0 }}
-        </div>
-        <div class="stat-sub">
-            {{ $feed->unit ?? '' }} — Min: {{ $feed->min_level ?? 0 }} — {{ $feed->status ?? 'OK' }}
-        </div>
-    </div>
-
-    <div class="stat-card {{ ($vitamins->status ?? '') === 'LOW' ? 'stat-card-alert' : (($vitamins->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
-        <div class="stat-label">Vitamins</div>
-        <div class="stat-value {{ ($vitamins->status ?? '') === 'LOW' ? 'text-danger' : (($vitamins->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
-            {{ number_format($vitamins->current_stock ?? 0) }}
-        </div>
-        <div class="stat-sub">
-            {{ $vitamins->unit ?? 'bottles' }} — Min: {{ $vitamins->min_level ?? 0 }} — {{ $vitamins->status ?? 'OK' }}
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-label">Egg Trays</div>
-        <div class="stat-value">
-            {{ number_format($eggTraysDisplay ?? 0) }}
-        </div>
-        <div class="stat-sub">
-            pcs — 1,000 − (Eggs Stock ÷ 30)
-        </div>
-    </div>
-
-</div>
 
 <!-- FILTER BAR (aligned right) -->
     <form method="GET" class="filter-bar">

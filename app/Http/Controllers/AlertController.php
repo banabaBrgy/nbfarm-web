@@ -55,6 +55,23 @@ class AlertController extends Controller
         ]);
     }
 
+    public function unread(Request $request, StockNotification $alert): JsonResponse
+    {
+        $user = $this->farmLead($request);
+
+        abort_unless($alert->user_id === $user->id, 403);
+
+        if ($alert->read_at !== null) {
+            $alert->update(['read_at' => null]);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'read' => false,
+            'unread' => StockNotification::query()->where('user_id', $user->id)->unread()->count(),
+        ]);
+    }
+
     public function readAll(Request $request): JsonResponse
     {
         $user = $this->farmLead($request);

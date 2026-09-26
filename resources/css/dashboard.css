@@ -116,41 +116,52 @@
 =================================== */
 
 .logout{
-
-    padding:20px;
-
+    padding:16px 18px 24px;
     border-top:1px solid rgba(255,255,255,.08);
-
 }
 
 .logout button{
-
     margin-top: 500px;
-
     width:100%;
-
-    border:none;
-
-    padding:14px;
-
-    border-radius:12px;
-
-    background:#d32f2f;
-
-    color:#fff;
-
-    font-weight:600;
-
+    min-height:46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(255, 255, 255, 0.22);
+    border-radius:14px;
+    padding:11px 16px;
+    background:rgba(255, 255, 255, 0.1);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    color:#ffffff;
+    font-family:'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:0.3px;
     cursor:pointer;
-
-    transition:.25s;
-
+    transition:background-color .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+    box-shadow:none;
+    text-decoration:none;
 }
 
 .logout button:hover{
+    background:rgba(255, 255, 255, 0.18);
+    border-color:rgba(255, 255, 255, 0.35);
+    color:#ffffff;
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-    background:#b71c1c;
+.logout button:active{
+    background:rgba(255, 255, 255, 0.08);
+    border-color:rgba(255, 255, 255, 0.18);
+    transform:translateY(0);
+    box-shadow:none;
+}
 
+.logout button:focus-visible{
+    outline:2px solid rgba(255, 255, 255, 0.6);
+    outline-offset:2px;
 }
 
 /* ===========================

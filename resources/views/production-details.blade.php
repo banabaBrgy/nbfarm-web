@@ -10,10 +10,16 @@
 
 <div class="production-details-page">
 
-    <a href="{{ route(\App\Models\User::routeRole() . '.production', ['date' => $production->production_date]) }}" class="btn-back mb-3">
-        <i class="fas fa-arrow-left"></i>
-        Back
-    </a>
+    <div class="page-header">
+        <div>
+            <h2>Batch {{ $production->batch_id }}</h2>
+            <p>Review and update this harvest record.</p>
+        </div>
+        <a href="{{ route(\App\Models\User::routeRole() . '.production', ['date' => $production->production_date]) }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Back
+        </a>
+    </div>
 
     <div class="detail-summary">
 

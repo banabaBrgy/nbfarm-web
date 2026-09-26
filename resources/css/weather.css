@@ -28,11 +28,19 @@
     text-align: left;
 }
 
+.dashboard-header:has(.farm-weather) p,
 .page-header:has(.farm-weather) p {
     margin: 6px 0 0;
-    color: #6b7280;
-    font-size: 14px;
+    color: #7c8e8c;
+    font-size: 15px;
     font-weight: 400;
+    line-height: 1.5;
+}
+
+.dashboard-header:has(.farm-weather) h2,
+.page-header:has(.farm-weather) h2 {
+    color: #1b3d2f;
+    font-weight: 700;
 }
 
 body.farm-weather-open {

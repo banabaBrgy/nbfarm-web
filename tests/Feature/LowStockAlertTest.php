@@ -89,6 +89,14 @@ class LowStockAlertTest extends TestCase
             ->assertOk()
             ->assertJsonPath('unread', 0);
 
+        $this->actingAs($owner)
+            ->postJson(route('alerts.unread', $alert))
+            ->assertOk()
+            ->assertJsonPath('unread', 1)
+            ->assertJsonPath('read', false);
+
+        $this->assertNull($alert->fresh()->read_at);
+
         $this->actingAs($staff)
             ->getJson(route('alerts.index'))
             ->assertForbidden();

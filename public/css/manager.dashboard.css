@@ -235,18 +235,18 @@ body{
     min-width: 0;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    padding: 16px;
+    gap: 9px;
+    padding: 15px;
 }
 
 .stats-grid.stats-grid--five .stat-icon {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     border-radius: 12px;
 }
 
 .stats-grid.stats-grid--five .stat-icon i {
-    font-size: 18px;
+    font-size: 19px;
 }
 
 .stats-grid.stats-grid--five .stat-info {
@@ -296,7 +296,7 @@ body{
     }
 
     .stats-grid.stats-grid--five .stat-icon i {
-        font-size: 22px;
+        font-size: 21px;
     }
 
     .stats-grid.stats-grid--five .stat-info {
@@ -322,6 +322,19 @@ body{
 
 @media (max-width: 420px) {
     .stats-grid.stats-grid--five {
+        grid-template-columns: 1fr;
+    }
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+    .content-grid {
         grid-template-columns: 1fr;
     }
 }

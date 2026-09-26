@@ -8,7 +8,7 @@
 
     <div class="page-header">
         <div class="page-header-copy">
-            <h1>Reports</h1>
+            <h2>Reports</h2>
             <p>Generate, send, and track farm reports for owner review.</p>
         </div>
 

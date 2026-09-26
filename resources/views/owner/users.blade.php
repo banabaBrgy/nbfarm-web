@@ -11,8 +11,14 @@
 <div class="users-page">
 
     <div class="page-header">
-        <h1>User Management</h1>
-        <button class="btn-primary" onclick="openAddModal()">+ Add User</button>
+        <div>
+            <h2>User Management</h2>
+            <p>Add farm staff and manage account access.</p>
+        </div>
+        <button class="btn-update" type="button" onclick="openAddModal()">
+            <i class="fas fa-plus"></i>
+            Add User
+        </button>
     </div>
 
     <!-- ROLE FILTER PILLS -->

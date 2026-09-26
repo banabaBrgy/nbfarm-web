@@ -3,7 +3,7 @@
     $trendAction = $trendAction ?? url()->current();
 @endphp
 
-<form method="GET" action="{{ $trendAction }}" class="trend-year-filter">
+<form method="GET" action="{{ $trendAction }}" class="trend-year-filter egg-production-chart__filter">
     @foreach(request()->except('trend_year') as $name => $value)
         @if(! is_array($value))
             <input type="hidden" name="{{ $name }}" value="{{ $value }}">

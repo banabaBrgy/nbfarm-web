@@ -74,6 +74,7 @@ Route::middleware('auth')->prefix('alerts')->name('alerts.')->group(function () 
     Route::post('/unsubscribe', [AlertController::class, 'unsubscribe'])->name('unsubscribe');
     Route::post('/read-all', [AlertController::class, 'readAll'])->name('readAll');
     Route::post('/{alert}/read', [AlertController::class, 'read'])->name('read');
+    Route::post('/{alert}/unread', [AlertController::class, 'unread'])->name('unread');
 });
 
 /*

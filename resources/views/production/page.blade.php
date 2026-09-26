@@ -5,7 +5,6 @@
     $generateRoute = $rolePrefix . '.qr.generate';
     $detailsRoute = $rolePrefix . '.production.details';
     $canManageQr = $rolePrefix === 'staff';
-    $statCol = $canManageQr ? 'col-lg-3 col-md-6' : 'col-lg-4 col-md-6';
     $date = $selectedDate instanceof \Carbon\Carbon
         ? $selectedDate
         : \Carbon\Carbon::parse($selectedDate);
@@ -13,111 +12,73 @@
 
 <div class="production-page">
 
+    <div class="page-header">
+        <div>
+            <h2>Production</h2>
+            <p>Track today's egg harvest, batches, and forecasts.</p>
+        </div>
+        @if($canManageQr)
+            <div class="page-header-actions">
+                <form action="{{ route($generateRoute) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-update">
+                        <i class="fas fa-qrcode"></i>
+                        Generate QR
+                    </button>
+                </form>
+                <a href="{{ route($scanRoute) }}" class="btn-update">
+                    <i class="fas fa-camera"></i>
+                    Scan QR
+                </a>
+            </div>
+        @endif
+    </div>
+
 @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
     </div>
 @endif
 
-<div class="row g-4 mb-4">
+<div class="stats-grid {{ $canManageQr ? '' : 'stats-grid--three' }}">
 
-    <div class="{{ $statCol }}">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <small class="text-muted text-uppercase fw-semibold">
-                            Today's Production
-                        </small>
-                        <h2 class="fw-bold mt-2 text-success">
-                            {{ number_format($totalEggs) }}
-                        </h2>
-                        <small class="text-muted">
-                            Eggs Produced
-                        </small>
-                    </div>
-                    <div class="icon-circle bg-success-subtle">
-                        <i class="fas fa-egg text-success"></i>
-                    </div>
-                </div>
-            </div>
+    <div class="stat-card stat-card--eggs">
+        <div class="stat-icon">
+            <i class="fas fa-egg"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-title">Today's Production</span>
+            <h2>{{ number_format($totalEggs) }}</h2>
+            <small>Eggs produced</small>
         </div>
     </div>
 
-    <div class="{{ $statCol }}">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <small class="text-muted text-uppercase fw-semibold">
-                            Active Batches
-                        </small>
-                        <h2 class="fw-bold mt-2 text-success">
-                            {{ $productions->count() }}
-                        </h2>
-                        <small class="text-muted">
-                            Available today
-                        </small>
-                    </div>
-                    <div class="icon-circle bg-primary-subtle">
-                        <i class="fas fa-layer-group text-primary"></i>
-                    </div>
-                </div>
-            </div>
+    <div class="stat-card stat-card--inventory">
+        <div class="stat-icon">
+            <i class="fas fa-layer-group"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-title">Active Batches</span>
+            <h2>{{ $productions->count() }}</h2>
+            <small>Available today</small>
         </div>
     </div>
 
-    <div class="{{ $statCol }}">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <small class="text-muted text-uppercase fw-semibold">
-                            Predicted Eggs
-                        </small>
-                        <h2 class="fw-bold mt-2 text-success">
-                            {{ number_format($predictedEggs) }}
-                        </h2>
-                        <small class="text-muted">
-                            Forecast
-                        </small>
-                    </div>
-                    <button
-                        type="button"
-                        class="icon-circle bg-warning-subtle border-0"
-                        style="cursor:pointer"
-                        data-bs-toggle="modal"
-                        data-bs-target="#forecastHistoryModal"
-                        aria-label="View forecast history">
-                        <i class="fas fa-chart-line text-warning"></i>
-                    </button>
-                </div>
-            </div>
+    <div class="stat-card stat-card--predicted">
+        <button
+            type="button"
+            class="stat-icon border-0"
+            data-bs-toggle="modal"
+            data-bs-target="#forecastHistoryModal"
+            aria-label="View forecast history">
+            <i class="fas fa-chart-line"></i>
+        </button>
+        <div class="stat-info">
+            <span class="stat-title">Predicted Eggs</span>
+            <h2>{{ number_format($predictedEggs) }}</h2>
+            <small>Next-day forecast</small>
         </div>
     </div>
-
-    @if($canManageQr)
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <small class="text-muted text-uppercase fw-semibold">
-                    QR Management
-                </small>
-                <form action="{{ route($generateRoute) }}" method="POST" class="mt-3">
-                    @csrf
-                    <button class="btn btn-primary w-100 mb-2">
-                        <i class="fas fa-qrcode"></i>
-                        Generate QR
-                    </button>
-                </form>
-                <a href="{{ route($scanRoute) }}" class="btn btn-success w-100">
-                    <i class="fas fa-camera"></i>
-                    Scan QR
-                </a>
-            </div>
-        </div>
-    </div>
-    @endif
 
 </div>
 
