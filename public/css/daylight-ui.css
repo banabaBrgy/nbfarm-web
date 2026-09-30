@@ -23,8 +23,18 @@ html {
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     background: var(--nb-day-bg);
     color: var(--nb-day-text);
+}
+
+/* Short pages (e.g. User Management) should keep the footer at the bottom
+   like Sales, without using position: fixed. */
+.wrapper {
+    flex: 1 0 auto;
+    min-height: 0;
 }
 
 body,
@@ -125,6 +135,11 @@ textarea,
     min-height: 48px;
     margin-left: 250px;
     padding: 14px 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
 }
 
 .profile {

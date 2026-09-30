@@ -5,36 +5,6 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/users.css') }}">
-<style>
-    /* Make footer not fixed in User Management */
-    .footer {
-        position: relative !important;
-        bottom: auto !important;
-        left: auto !important;
-        right: auto !important;
-        width: auto !important;
-        margin-left: 250px !important;
-        height: auto !important;
-        min-height: 48px;
-        padding: 14px 24px !important;
-        background: var(--nb-day-surface, #ffffff) !important;
-        border-top: 1px solid var(--nb-day-border, #E5E7EB) !important;
-        z-index: 10 !important;
-    }
-
-    @media (max-width: 992px) {
-        .footer {
-            margin-left: 220px !important;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .footer {
-            margin-left: 0 !important;
-            padding: 14px 16px !important;
-        }
-    }
-</style>
 @endpush
 
 @section('content')
@@ -143,7 +113,6 @@
         <div class="pagination-bar">
             {{ $users->links() }}
         </div>
-    </div>
     </div>
 
 </div>
