@@ -601,9 +601,7 @@ body {
 
     font-weight:700;
 
-    box-shadow:
-        inset 3px 0 0 #d4b36a,
-        0 7px 16px rgba(6, 34, 21, 0.16);
+    box-shadow: none;
 
 }
 

@@ -175,6 +175,7 @@ textarea,
 .sidebar li.active a {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    box-shadow: none;
 }
 
 .sidebar li:not(.active) a:hover {
