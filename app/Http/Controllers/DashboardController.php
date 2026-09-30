@@ -27,6 +27,12 @@ class DashboardController extends Controller
         $feeds = InventoryItem::where('item_name', 'Feeds')
             ->sum('current_stock');
 
+        $lowStockAlert = InventoryItem::whereColumn(
+            'current_stock',
+            '<=',
+            'min_level'
+        )->count();
+
 
         // Egg Trays Available — same formula as Inventory: 1000 − (Eggs Stock ÷ 30)
         $eggTrays = Production::leftoverTrays();
@@ -82,6 +88,7 @@ class DashboardController extends Controller
             'todayProduction',
             'activeBatches',
             'feeds',
+            'lowStockAlert',
             'eggTrays',
             'weeklyProduction',
             'predictedEggs'

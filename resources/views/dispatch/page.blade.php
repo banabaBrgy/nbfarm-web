@@ -71,14 +71,14 @@
                         value="{{ request('search') }}">
                 </div>
 
-                <select name="status" onchange="this.form.submit()">
+                <select name="status" data-auto-submit>
                     <option value="">All status</option>
                     <option value="Pending" @selected(request('status') === 'Pending')>Pending</option>
                     <option value="On Transit" @selected(request('status') === 'On Transit')>On Transit</option>
                     <option value="Delivered" @selected(request('status') === 'Delivered')>Delivered</option>
                 </select>
 
-                <select name="size" onchange="this.form.submit()">
+                <select name="size" data-auto-submit>
                     <option value="">All sizes</option>
                     @foreach($sizes as $size)
                         <option value="{{ $size }}" @selected(request('size') === $size)>{{ $size }}</option>

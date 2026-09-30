@@ -26,7 +26,8 @@ class ProductionDetailsController extends Controller
             ")
             ->orderBy('qr_records.qr_code')
             ->select('qr_transactions.*')
-            ->paginate(5);
+            ->paginate(5)
+            ->withQueryString();
 
         return view('production-details', [
             'production' => $production,

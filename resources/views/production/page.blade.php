@@ -100,7 +100,7 @@
                 min="{{ \App\Models\Production::sampleStartDate() }}"
                 max="{{ now()->toDateString() }}"
                 value="{{ $date->toDateString() }}"
-                onchange="this.form.submit()">
+                data-auto-submit>
         </form>
     </div>
 

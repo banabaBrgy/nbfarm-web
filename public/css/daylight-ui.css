@@ -1,0 +1,1590 @@
+/*
+ * NB Poultry Farm — daylight UI refinement
+ *
+ * This file is intentionally visual-only. It does not change layout
+ * dimensions, data, routes, or component behavior.
+ */
+
+:root {
+    --nb-day-bg: #f3f8f5;
+    --nb-day-surface: #ffffff;
+    --nb-day-surface-soft: #f8fbf9;
+    --nb-day-text: #21352c;
+    --nb-day-muted: #52665d;
+    --nb-day-green: #2f8158;
+    --nb-day-green-hover: #216e4b;
+    --nb-day-green-soft: #e8f3ec;
+    --nb-day-border: #d8e7dd;
+    --nb-day-shadow: 0 4px 18px rgba(26, 73, 48, 0.08);
+}
+
+html {
+    background: var(--nb-day-bg);
+}
+
+body {
+    background: var(--nb-day-bg);
+    color: var(--nb-day-text);
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.sidebar,
+.main-content,
+.footer,
+.mobile-header,
+.page-header,
+.dashboard-header,
+.section-header,
+.scan-page-header,
+.page-header h1,
+.page-header h2,
+.page-header-copy h1,
+.page-header-copy h2,
+.page-header p,
+.page-header-copy p,
+.dashboard-header h1,
+.dashboard-header h2,
+.dashboard-header p,
+.section-header h2,
+.scan-page-header h2,
+.page-label,
+.logout button {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.main-content {
+    background: var(--nb-day-bg);
+}
+
+/* The navigation stays distinct, but uses a softer forest green than a
+   near-black sidebar so the overall interface remains comfortable in daylight. */
+.sidebar {
+    background: linear-gradient(180deg, #2f8158 0%, #216e4b 56%, #19583b 100%);
+    border-right-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 5px 0 20px rgba(28, 76, 50, 0.14);
+}
+
+.mobile-header,
+.wrapper + .footer {
+    background: var(--nb-day-surface);
+    box-shadow: 0 4px 18px rgba(26, 73, 48, 0.12);
+}
+
+.mobile-header {
+    border-bottom: 1px solid var(--nb-day-border);
+}
+
+.wrapper + .footer {
+    border-top: 1px solid rgba(26, 73, 48, 0.08);
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 -4px 18px rgba(26, 73, 48, 0.12) !important;
+}
+
+.header-menu-btn,
+.header-logo,
+.mobile-header .alert-bell {
+    background: var(--nb-day-green-soft);
+    border-color: var(--nb-day-border);
+    color: var(--nb-day-green);
+}
+
+.header-menu-btn:hover,
+.mobile-header .alert-bell:hover,
+.mobile-header .alert-bell.is-open {
+    background: #d8ebdf;
+    border-color: #b8d5c2;
+    color: var(--nb-day-green-hover);
+}
+
+.header-title h1 {
+    color: var(--nb-day-text);
+}
+
+.header-subtitle {
+    color: var(--nb-day-muted);
+}
+
+.alert-badge {
+    box-shadow: none;
+}
+
+/* Keep the application footer in normal document flow instead of covering
+   the last rows of long tables or pages. */
+.wrapper + .footer {
+    position: relative;
+    z-index: 10;
+    left: auto;
+    right: auto;
+    width: auto;
+    height: auto;
+    min-height: 48px;
+    margin-left: 250px;
+    padding: 14px 24px;
+}
+
+.profile {
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.06) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.header-menu-btn,
+.header-logo,
+.mobile-header .alert-bell,
+.sidebar a i,
+.logout button {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.sidebar a i {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.sidebar li.active a {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.sidebar li:not(.active) a:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.sidebar li.active a {
+    color: #174f36;
+}
+
+.wrapper + .footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    color: var(--nb-day-muted);
+}
+
+.wrapper + .footer span {
+    color: var(--nb-day-muted);
+}
+
+.wrapper + .footer .sep {
+    color: #a4b7ab;
+}
+
+.page-header h1,
+.page-header h2,
+.page-header-copy h1,
+.page-header-copy h2,
+.page-title,
+.section-header h2,
+.dashboard-header h2,
+.scan-page-header h2,
+.dashboard-header h1 {
+    color: var(--nb-day-text);
+}
+
+.page-header p,
+.page-header-copy p,
+.dashboard-header p,
+.scan-page-header p {
+    color: var(--nb-day-muted);
+}
+
+.page-label {
+    color: var(--nb-day-green);
+}
+
+/* Shared controls */
+.btn-update,
+.btn-new,
+.rpt-btn-generate,
+.users-page .btn-primary,
+.btn-primary-sm,
+.btn-save,
+.modal-header,
+.report-modal .modal-header {
+    background: var(--nb-day-green);
+}
+
+.btn-update:hover,
+.btn-new:hover,
+.rpt-btn-generate:hover,
+.users-page .btn-primary:hover,
+.btn-primary-sm:hover,
+.btn-save:hover {
+    background: var(--nb-day-green-hover);
+}
+
+.dispatch-page .btn-new,
+.reports-page .rpt-btn-generate,
+.dispatch-modal .modal-header,
+.report-modal .modal-header,
+.dispatch-modal .btn-save,
+.report-modal .btn-save {
+    background: var(--nb-day-green);
+}
+
+.dispatch-page .btn-new:hover,
+.reports-page .rpt-btn-generate:hover,
+.dispatch-modal .btn-save:hover,
+.report-modal .btn-save:hover {
+    background: var(--nb-day-green-hover);
+}
+
+.scan-back-button,
+.btn-back {
+    color: var(--nb-day-green);
+    border-color: var(--nb-day-border);
+}
+
+.scan-back-button:hover,
+.btn-back:hover {
+    background: var(--nb-day-green-soft);
+    color: var(--nb-day-green-hover);
+    border-color: var(--nb-day-green);
+}
+
+/* Cards and panels */
+.stat-card,
+.dsp-stat,
+.rpt-stat,
+.report-summary .summary-card,
+.table-container,
+.inventory-table-wrapper,
+.user-table-wrapper,
+.dsp-card,
+.rpt-card,
+.chart-card,
+.panel-card,
+.transactions-card,
+.top-customers-card,
+.revenue-card,
+.records-card,
+.detail-card,
+.quick-card {
+    background: var(--nb-day-surface);
+    border-color: var(--nb-day-border);
+    box-shadow: var(--nb-day-shadow);
+}
+
+.stat-card:hover,
+.dsp-stat:hover,
+.rpt-stat:hover,
+.report-summary .summary-card:hover,
+.quick-card:hover {
+    box-shadow: 0 9px 24px rgba(26, 73, 48, 0.12);
+}
+
+.stat-icon,
+.dsp-stat-icon,
+.rpt-stat-icon,
+.report-summary .summary-card i {
+    background: linear-gradient(145deg, #3a8f65 0%, #216e4b 100%);
+}
+
+.stat-card--eggs .stat-icon,
+.stat-card--predicted .stat-icon,
+.stat-card--inventory .stat-icon,
+.dsp-stat-total .dsp-stat-icon,
+.rpt-stat-total .rpt-stat-icon {
+    background: linear-gradient(145deg, #3a8f65 0%, #216e4b 100%);
+}
+
+.stat-card--feed .stat-icon,
+.dsp-stat-pending .dsp-stat-icon,
+.rpt-stat-sent .rpt-stat-icon,
+.stat-card--pending .stat-icon {
+    background: linear-gradient(145deg, #c98224 0%, #a55c14 100%);
+}
+
+.stat-card--dispatch .stat-icon,
+.dsp-stat-transit .dsp-stat-icon,
+.rpt-stat-read .rpt-stat-icon {
+    background: linear-gradient(145deg, #4780a7 0%, #2e628c 100%);
+}
+
+.stat-card--revenue .stat-icon,
+.stat-card--week .stat-icon {
+    background: linear-gradient(145deg, #8662aa 0%, #67458e 100%);
+}
+
+.stat-card--vitamins .stat-icon,
+.dsp-stat-delivered .dsp-stat-icon {
+    background: linear-gradient(145deg, #2e9384 0%, #18766d 100%);
+}
+
+.stat-title,
+.stat-label,
+.dsp-stat-label,
+.rpt-stat-label,
+.report-summary .summary-card span {
+    color: var(--nb-day-muted);
+}
+
+.stat-info h2,
+.stat-value,
+.dsp-stat-value,
+.rpt-stat-value,
+.report-summary .summary-card h3,
+.detail-card h1,
+.detail-card h2 {
+    color: var(--nb-day-green);
+}
+
+.stat-info small,
+.stat-sub {
+    color: #61756b;
+}
+
+.stat-card--feed .stat-info h2,
+.dsp-stat-pending .dsp-stat-value,
+.rpt-stat-sent .rpt-stat-value,
+.stat-card--pending .stat-info h2,
+.stat-value.amber {
+    color: #a55c14;
+}
+
+.stat-card--dispatch .stat-info h2,
+.dsp-stat-transit .dsp-stat-value,
+.rpt-stat-read .rpt-stat-value {
+    color: #2e628c;
+}
+
+.stat-card--revenue .stat-info h2,
+.stat-card--week .stat-info h2 {
+    color: #67458e;
+}
+
+.stat-card--vitamins .stat-info h2,
+.dsp-stat-delivered .dsp-stat-value {
+    color: #18766d;
+}
+
+.table-title h2,
+.section-title,
+.chart-title,
+.panel-title,
+.transactions-title,
+.top-customers-header h3,
+.dsp-toolbar > h2,
+.rpt-toolbar h2,
+.inventory-levels-title,
+.egg-production-chart__title {
+    color: var(--nb-day-green);
+}
+
+/* Tables remain data-dense, but gain clearer boundaries under glare. */
+.table thead,
+.inventory-table thead,
+.user-table thead,
+.dsp-table thead,
+.rpt-table thead,
+.transactions-table thead,
+.production-page .table thead,
+.production-page .table thead th,
+.rpt-table thead th {
+    background: #2f8158;
+}
+
+.table tbody td,
+.inventory-table td,
+.user-table td,
+.dsp-table tbody td,
+.rpt-table tbody td,
+.transactions-table tbody td {
+    color: #2d4037;
+    border-bottom-color: #e3eee7;
+}
+
+.table tbody tr:hover,
+.inventory-table tbody tr:hover,
+.user-table tbody tr:hover,
+.dsp-table tbody tr:hover,
+.rpt-table tbody tr:hover,
+.transactions-table tbody tr:hover {
+    background: #f1f8f3;
+}
+
+/* Production has more specific legacy table rules, so mirror the daylight
+   treatment explicitly without touching its Blade data or table structure. */
+.production-page .table-container {
+    background: var(--nb-day-surface);
+    border-color: var(--nb-day-border);
+    box-shadow: var(--nb-day-shadow);
+}
+
+.production-page .table-title h2 {
+    color: var(--nb-day-green);
+}
+
+.production-page .table thead,
+.production-page .table thead th {
+    background: #2f8158 !important;
+}
+
+.production-page .table td {
+    color: #2d4037;
+    border-color: #e3eee7;
+}
+
+.production-page .table tbody tr:hover {
+    background: #f1f8f3;
+}
+
+.production-page .table-success {
+    background: var(--nb-day-green-soft) !important;
+}
+
+.production-page .table-success th,
+.production-page .table-success td {
+    color: var(--nb-day-green) !important;
+}
+
+.production-page .form-control {
+    border-color: var(--nb-day-border);
+}
+
+.production-page .form-control:focus {
+    border-color: var(--nb-day-green);
+    box-shadow: 0 0 0 3px rgba(33, 110, 75, 0.16);
+}
+
+.production-page .btn-success {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+}
+
+.production-page .btn-success:hover {
+    background: var(--nb-day-green-hover);
+    border-color: var(--nb-day-green-hover);
+}
+
+/* Keep the inventory sections visually connected without removing pagination. */
+.inventory-page .pagination-bar {
+    margin-top: 10px;
+}
+
+.inventory-page .bottom-grid {
+    gap: 16px;
+    margin-top: 16px;
+}
+
+/* Use one pagination language across inventory, users, dispatch, revenue,
+   forecast history, and record-detail screens. */
+.inventory-page .pagination-bar,
+.users-page .pagination-bar,
+.transactions-pagination,
+.dsp-pagination,
+.pagination-wrapper,
+.forecast-history-pages {
+    margin-top: 12px;
+}
+
+.inventory-page .pagination-bar,
+.users-page .pagination-bar {
+    gap: 6px;
+    padding: 10px 0;
+}
+
+.dsp-pagination {
+    padding: 10px 14px;
+    background: var(--nb-day-surface-soft);
+    border-top-color: var(--nb-day-border);
+}
+
+.pagination-wrapper,
+.forecast-history-pages {
+    padding-top: 2px;
+}
+
+.pagination-bar a,
+.pagination-bar span,
+.dsp-page-btn,
+.page-btn,
+.pagination .page-link {
+    border-radius: 8px;
+    border-color: var(--nb-day-border);
+    background: var(--nb-day-surface);
+    color: var(--nb-day-green);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pagination-bar a:hover,
+.dsp-page-btn:hover:not(.disabled),
+.page-btn:hover,
+.pagination .page-link:hover {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+    color: #fff;
+}
+
+.pagination-bar .active,
+.pagination .page-item.active .page-link,
+.page-btn:not(.disabled) {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+    color: #fff;
+}
+
+.pagination-bar .disabled,
+.dsp-page-btn.disabled,
+.page-btn.disabled {
+    background: #eef4f0;
+    border-color: var(--nb-day-border);
+    color: #7b8d84;
+}
+
+.pagination .page-link {
+    margin: 0 2px;
+}
+
+/* Forms use a visible border instead of relying on subtle shadows. */
+.filter-bar input,
+.filter-bar select,
+.search-bar input,
+.search-bar select,
+.sort-select,
+.production-page .form-control,
+.dsp-search input,
+.dsp-filters select,
+.modal-box input,
+.modal-box select,
+.modal-box textarea {
+    border-color: var(--nb-day-border);
+    background: var(--nb-day-surface);
+    color: var(--nb-day-text);
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus,
+.search-bar input:focus,
+.search-bar select:focus,
+.sort-select:focus,
+.production-page .form-control:focus,
+.dsp-search input:focus,
+.dsp-filters select:focus,
+.modal-box input:focus,
+.modal-box select:focus,
+.modal-box textarea:focus {
+    border-color: var(--nb-day-green);
+    box-shadow: 0 0 0 3px rgba(33, 110, 75, 0.16);
+}
+
+.role-pills .pill {
+    border-color: var(--nb-day-border);
+    color: var(--nb-day-muted);
+}
+
+.role-pills .pill.active {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+}
+
+.quick-card {
+    color: var(--nb-day-text);
+}
+
+.quick-card i {
+    color: var(--nb-day-green);
+}
+
+.quick-card:hover {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+}
+
+/* Keep keyboard navigation obvious in bright environments. */
+:where(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid #c98224;
+    outline-offset: 2px;
+}
+
+@media (max-width: 992px) {
+    .wrapper + .footer {
+        margin-left: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrapper + .footer {
+        margin-left: 0;
+        padding: 14px 16px;
+    }
+}
+
+/* =====================================================
+   COMPACT PROFESSIONAL LAYOUT
+   Visual density improvements only.
+===================================================== */
+
+.main-content {
+    padding: 24px 28px 32px;
+}
+
+.page-header,
+.dashboard-header,
+.section-header,
+.scan-page-header {
+    margin-bottom: 20px;
+}
+
+.stats-grid,
+.stat-grid,
+.dispatch-stats,
+.rpt-stats,
+.report-summary {
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.stat-card,
+.dsp-stat,
+.rpt-stat,
+.report-summary .summary-card {
+    padding: 18px;
+    border-radius: 12px;
+}
+
+.stat-icon,
+.dsp-stat-icon,
+.rpt-stat-icon,
+.report-summary .summary-card i {
+    border-radius: 12px;
+}
+
+.table-container,
+.inventory-table-wrapper,
+.user-table-wrapper,
+.dsp-card,
+.rpt-card,
+.chart-card,
+.panel-card,
+.transactions-card,
+.top-customers-card,
+.revenue-card,
+.records-card,
+.detail-card,
+.quick-card {
+    border-radius: 12px;
+    box-shadow: 0 3px 14px rgba(26, 73, 48, 0.07);
+}
+
+.table-container,
+.inventory-table-wrapper,
+.user-table-wrapper,
+.transactions-card,
+.revenue-card,
+.records-card,
+.top-customers-card {
+    padding: 18px 20px;
+}
+
+.table thead th,
+.inventory-table thead th,
+.user-table thead th,
+.dsp-table thead th,
+.rpt-table thead th,
+.transactions-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 11px 14px;
+}
+
+.table tbody td,
+.inventory-table td,
+.user-table td,
+.dsp-table tbody td,
+.rpt-table tbody td,
+.transactions-table tbody td {
+    padding: 11px 14px;
+}
+
+.production-page .table-container {
+    max-height: min(640px, calc(100vh - 220px));
+    overflow: auto;
+}
+
+.production-page .table-title {
+    margin-bottom: 12px;
+}
+
+.btn-update,
+.btn-new,
+.rpt-btn-generate,
+.users-page .btn-primary,
+.btn-primary-sm,
+.scan-back-button,
+.btn-back,
+.btn-save,
+.btn-cancel {
+    border-radius: 9px;
+}
+
+.filter-bar input,
+.filter-bar select,
+.search-bar input,
+.search-bar select,
+.sort-select,
+.production-page .form-control,
+.dsp-search input,
+.dsp-filters select,
+.modal-box input,
+.modal-box select,
+.modal-box textarea {
+    border-radius: 8px;
+}
+
+.alert-low,
+.production-page .alert,
+.inventory-page .alert,
+.alert-watch {
+    border-radius: 10px;
+}
+
+.alert.alert-persistent {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    background: #fff7df;
+    border: 1px solid #f0d38a;
+    border-left: 4px solid #c98224;
+    border-radius: 10px;
+    color: #6f5112;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.alert.alert-persistent strong {
+    color: #6f5112;
+}
+
+.quick-card {
+    padding: 18px;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 18px 16px 28px;
+    }
+
+    .table-container,
+    .inventory-table-wrapper,
+    .user-table-wrapper,
+    .transactions-card,
+    .revenue-card,
+    .records-card,
+    .top-customers-card {
+        padding: 14px;
+    }
+
+    .production-page .table-container {
+        max-height: calc(100vh - 250px);
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 14px 12px 24px;
+    }
+
+    .stat-card,
+    .dsp-stat,
+    .rpt-stat,
+    .report-summary .summary-card {
+        padding: 14px;
+    }
+}
+
+/* =====================================================
+   SOLID SIDEBAR REFRESH
+   Keep the navigation crisp and readable without glassmorphism.
+===================================================== */
+
+.sidebar {
+    background: #123d2a;
+    background-image: none;
+    border-right: 1px solid #245b40;
+    box-shadow: 6px 0 22px rgba(21, 61, 42, 0.18);
+}
+
+.sidebar *,
+.sidebar *::before,
+.sidebar *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.sidebar-close-btn {
+    background: #1e5b3e;
+    border: 1px solid #347956;
+}
+
+.sidebar-close-btn:hover {
+    background: #2a704d;
+}
+
+.profile {
+    background: #1c573b;
+    background-image: none;
+    border: 1px solid #347956;
+    box-shadow: 0 8px 18px rgba(7, 32, 21, 0.18);
+}
+
+.profile-image {
+    background: #f5fbf7;
+    color: #1d7049;
+}
+
+.role {
+    background: #2a704d;
+    border: 1px solid #3b8963;
+    color: #e4f4e9;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.sidebar nav::before {
+    color: #93c9a8;
+}
+
+.sidebar li {
+    margin-bottom: 6px;
+}
+
+.sidebar a {
+    background: #174b33;
+    background-image: none;
+    border-color: #245f42;
+    color: #f0f8f2;
+}
+
+.sidebar a i {
+    background: #2a7550;
+    background-image: none;
+    border-color: #3d8c65;
+    box-shadow: none;
+}
+
+.sidebar li:not(.active) a:hover {
+    background: #225f41;
+    border-color: #438b65;
+}
+
+.sidebar li:not(.active) a:hover i {
+    background: #34855b;
+    border-color: #57a178;
+}
+
+.sidebar li.active a {
+    background: #f5fbf7;
+    background-image: none;
+    border-color: #f5fbf7;
+    color: #164a31;
+    box-shadow: 0 7px 16px rgba(6, 34, 21, 0.18);
+}
+
+.sidebar li.active a i,
+.sidebar li.active a:hover i {
+    background: #2f8158;
+    background-image: none;
+    border-color: #3d9568;
+    box-shadow: 0 3px 8px rgba(10, 57, 34, 0.22);
+}
+
+.logout {
+    border-top-color: #245b40;
+}
+
+.logout button {
+    background: #1c573b;
+    background-image: none;
+    border-color: #347956;
+    box-shadow: none;
+}
+
+.logout button:hover {
+    background: #2a704d;
+    border-color: #4b966c;
+}
+
+.logout button:active {
+    background: #174b33;
+}
+
+/* =====================================================
+   CHAT-STYLE SIDEBAR
+   Flat navigation with a real desktop collapse control.
+===================================================== */
+
+@media (min-width: 769px) {
+    .sidebar-close-btn {
+        display: flex;
+        top: 16px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 9px;
+        background: #123d2a;
+        color: #b9ddc4;
+    }
+
+    .sidebar-close-btn:hover {
+        background: #205f42;
+        color: #ffffff;
+    }
+
+    .profile {
+        margin: 20px 12px 26px;
+        padding: 0;
+        background: #123d2a;
+        border: none;
+        box-shadow: none;
+        gap: 10px;
+    }
+
+    .profile-image {
+        width: 36px;
+        height: 36px;
+        background: #f5fbf7;
+    }
+
+    .profile-meta {
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 2px;
+    }
+
+    .profile-name {
+        font-size: 14px;
+        line-height: 1.15;
+    }
+
+    .role {
+        padding: 0;
+        background: #123d2a;
+        border: none;
+        color: #93c9a8;
+        font-size: 9px;
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+
+    .sidebar-close-btn {
+        position: static;
+        flex: 0 0 30px;
+        margin-left: auto;
+        width: 30px;
+        height: 36px;
+        padding: 0;
+    }
+
+    .sidebar nav {
+        padding: 0 12px 22px;
+    }
+
+    .sidebar nav::before {
+        margin: 0 10px 10px;
+    }
+
+    .sidebar li {
+        margin-bottom: 2px;
+    }
+
+    .sidebar a {
+        min-height: 44px;
+        padding: 6px 10px;
+        border: 1px solid #123d2a;
+        border-radius: 9px;
+        background: #123d2a;
+    }
+
+    .sidebar a i,
+    .sidebar li.active a i,
+    .sidebar li.active a:hover i {
+        width: 32px;
+        height: 32px;
+        background: #123d2a;
+        border: none;
+        box-shadow: none;
+        color: #b9ddc4;
+    }
+
+    .sidebar li:not(.active) a:hover {
+        background: #205f42;
+        border-color: #205f42;
+    }
+
+    .sidebar li:not(.active) a:hover i {
+        background: #205f42;
+        border: none;
+    }
+
+    .sidebar li.active a {
+        background: #205f42;
+        border-color: #205f42;
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+    .sidebar li.active a i,
+    .sidebar li.active a:hover i {
+        background: #205f42;
+        color: #e4f4e9;
+    }
+
+    .logout {
+        padding: 14px 12px 20px;
+        border-top: none;
+    }
+
+    .logout button {
+        justify-content: flex-start;
+        gap: 12px;
+        min-height: 44px;
+        padding: 6px 10px;
+        border: 1px solid #347956;
+        border-radius: 9px;
+        background: #123d2a;
+    }
+
+    .logout button::before {
+        content: '\f2f5';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: #b9ddc4;
+        font-size: 16px;
+    }
+
+    .logout button:hover {
+        background: #205f42;
+        border-color: #205f42;
+    }
+
+    body.sidebar-collapsed .sidebar {
+        transform: translateX(-100%);
+    }
+
+    body.sidebar-collapsed .mobile-header {
+        left: 0;
+    }
+
+    body.sidebar-collapsed .wrapper > .main-content {
+        margin-left: 0;
+    }
+
+    body.sidebar-collapsed .wrapper + .footer {
+        margin-left: 0;
+    }
+
+    body:not(.sidebar-collapsed) .header-menu-btn {
+        display: none;
+    }
+
+    body.sidebar-collapsed .header-menu-btn {
+        display: flex;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile {
+        margin: 20px 12px 18px;
+        padding: 0;
+        gap: 10px;
+        background: #123d2a;
+        border: none;
+        box-shadow: none;
+    }
+
+    .profile-image {
+        width: 36px;
+        height: 36px;
+        background: #f5fbf7;
+    }
+
+    .profile-meta {
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 2px;
+    }
+
+    .profile-name {
+        font-size: 14px;
+        line-height: 1.15;
+    }
+
+    .role {
+        padding: 0;
+        background: #123d2a;
+        border: none;
+        color: #93c9a8;
+        font-size: 9px;
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+
+    .sidebar-close-btn {
+        position: static;
+        display: flex;
+        flex: 0 0 30px;
+        margin-left: auto;
+        width: 30px;
+        height: 36px;
+        padding: 0;
+        border: none;
+        border-radius: 9px;
+        background: #123d2a;
+        color: #b9ddc4;
+    }
+
+    .sidebar-close-btn:hover {
+        background: #205f42;
+        color: #ffffff;
+    }
+
+    .sidebar nav {
+        padding: 0 12px 22px;
+    }
+
+    .sidebar nav::before {
+        margin: 0 10px 10px;
+    }
+
+    .sidebar li {
+        margin-bottom: 2px;
+    }
+
+    .sidebar a {
+        min-height: 44px;
+        padding: 6px 10px;
+        border: 1px solid #123d2a;
+        border-radius: 9px;
+        background: #123d2a;
+    }
+
+    .sidebar a i,
+    .sidebar li.active a i,
+    .sidebar li.active a:hover i {
+        width: 32px;
+        height: 32px;
+        background: #123d2a;
+        border: none;
+        box-shadow: none;
+        color: #b9ddc4;
+    }
+
+    .sidebar li:not(.active) a:hover {
+        background: #205f42;
+        border-color: #205f42;
+    }
+
+    .sidebar li:not(.active) a:hover i {
+        background: #205f42;
+        border: none;
+    }
+
+    .sidebar li.active a {
+        background: #205f42;
+        border-color: #205f42;
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+    .sidebar li.active a i,
+    .sidebar li.active a:hover i {
+        background: #205f42;
+        color: #e4f4e9;
+    }
+
+    .logout {
+        padding: 14px 12px 20px;
+        border-top: none;
+    }
+
+    .logout button {
+        justify-content: flex-start;
+        gap: 12px;
+        min-height: 44px;
+        padding: 6px 10px;
+        border: 1px solid #347956;
+        border-radius: 9px;
+        background: #123d2a;
+    }
+
+    .logout button::before {
+        content: '\f2f5';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: #b9ddc4;
+        font-size: 16px;
+    }
+
+    .logout button:hover {
+        background: #205f42;
+        border-color: #205f42;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile {
+        margin: 18px 10px 16px;
+    }
+
+    .profile-name {
+        font-size: 13px;
+    }
+
+    .role {
+        font-size: 8px;
+    }
+}
+
+/* =====================================================
+   LOGOUT BUTTON POLISH
+===================================================== */
+
+.logout button {
+    border: none;
+    background: #205f42;
+    color: #ffffff;
+    box-shadow: 0 5px 12px rgba(7, 32, 21, 0.18);
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.logout button:hover {
+    background: #2a704d;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 16px rgba(7, 32, 21, 0.24);
+}
+
+.logout button:active {
+    background: #174b33;
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(7, 32, 21, 0.16);
+}
+
+/* =====================================================
+   SIDEBAR SHOW / HIDE MOTION
+===================================================== */
+
+.wrapper > .sidebar {
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+
+.wrapper > .main-content,
+.mobile-header,
+.wrapper + .footer {
+    transition:
+        margin-left 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        left 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 768px) {
+    .sidebar-backdrop {
+        transition: opacity 0.28s ease, visibility 0.28s ease;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wrapper > .sidebar,
+    .wrapper > .main-content,
+    .mobile-header,
+    .wrapper + .footer,
+    .sidebar-backdrop {
+        transition: none;
+    }
+}
+
+.logout button:focus-visible {
+    outline: 2px solid #b9ddc4;
+    outline-offset: 2px;
+}
+
+/* Keep the application shell inside the same viewport boundary as body. */
+.wrapper,
+.wrapper > .main-content,
+.wrapper + .footer {
+    max-width: 100%;
+}
+
+/* Prevent dashboards from becoming uncomfortably wide on large viewports. */
+:root {
+    --app-content-max-width: 1440px;
+}
+
+@media (min-width: 769px) {
+    .wrapper > .main-content {
+        flex: 0 1 var(--app-content-max-width);
+        width: min(var(--app-content-max-width), calc(100vw - 250px));
+        max-width: var(--app-content-max-width);
+        margin-left: max(
+            250px,
+            calc(250px + (100vw - 250px - var(--app-content-max-width)) / 2)
+        );
+        margin-right: 0;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+    .wrapper > .main-content {
+        width: calc(100vw - 220px);
+        margin-left: 220px;
+    }
+}
+
+@media (min-width: 769px) {
+    body.sidebar-collapsed .wrapper > .main-content {
+        width: min(var(--app-content-max-width), 100vw);
+        margin-left: max(
+            0px,
+            calc((100vw - var(--app-content-max-width)) / 2)
+        );
+    }
+}
+
+/* Keep the space around the max-width dashboard the same color as its canvas. */
+html,
+body,
+.wrapper,
+.wrapper > .main-content {
+    background: var(--nb-day-bg);
+}
+
+/* =====================================================
+   USER MANAGEMENT POLISH
+===================================================== */
+
+.users-page {
+    width: 100%;
+    max-width: 100%;
+}
+
+.users-page .page-header {
+    margin-bottom: 18px;
+}
+
+.users-page .page-header h2 {
+    color: var(--nb-day-text);
+    font-size: clamp(24px, 3vw, 30px);
+}
+
+.users-page .page-header p {
+    color: var(--nb-day-muted);
+}
+
+.users-page .role-pills {
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.users-page .role-pills .pill {
+    padding: 8px 14px;
+    background: var(--nb-day-surface);
+    border-color: var(--nb-day-border);
+    color: var(--nb-day-muted);
+}
+
+.users-page .role-pills .pill:hover {
+    background: var(--nb-day-green-soft);
+    border-color: var(--nb-day-green);
+    color: var(--nb-day-green-hover);
+}
+
+.users-page .role-pills .pill.active {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+    color: #ffffff;
+}
+
+.users-page .search-bar {
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.users-page .search-bar input,
+.users-page .search-bar select {
+    height: 40px;
+    border: 1px solid var(--nb-day-border);
+    border-radius: 9px;
+    background: var(--nb-day-surface);
+    color: var(--nb-day-text);
+}
+
+.users-page .search-bar input {
+    width: min(280px, 100%);
+}
+
+.users-page .search-bar input:focus,
+.users-page .search-bar select:focus {
+    outline: none;
+    border-color: var(--nb-day-green);
+    box-shadow: 0 0 0 3px rgba(33, 110, 75, 0.14);
+}
+
+.users-page .user-count {
+    margin-bottom: 10px;
+    color: var(--nb-day-muted);
+}
+
+.users-page .user-table-wrapper {
+    border: 1px solid var(--nb-day-border);
+    border-radius: 12px;
+    box-shadow: var(--nb-day-shadow);
+    overflow-x: auto;
+}
+
+.users-page .user-table {
+    min-width: 760px;
+}
+
+.users-page .user-table th {
+    padding: 12px 16px;
+    background: #2f8158;
+    border-bottom: none;
+}
+
+.users-page .user-table td {
+    padding: 12px 16px;
+    color: var(--nb-day-text);
+    border-bottom-color: #e3eee7;
+}
+
+.users-page .user-table tbody tr:hover {
+    background: #f1f8f3;
+}
+
+.users-page .user-sub {
+    color: #718379;
+    font-size: 12px;
+}
+
+.users-page .role-badge {
+    background: var(--nb-day-green-soft);
+    color: var(--nb-day-green-hover);
+    border: 1px solid var(--nb-day-border);
+}
+
+.users-page .actions-cell {
+    display: table-cell;
+    width: 100px;
+    padding-right: 16px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.users-page .actions-cell > .icon-btn,
+.users-page .actions-cell > form {
+    display: inline-flex !important;
+    vertical-align: middle;
+    margin: 0;
+}
+
+.users-page .actions-cell > form {
+    margin-left: 6px;
+}
+
+.users-page .icon-btn {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.users-page .icon-btn:hover {
+    transform: translateY(-1px);
+}
+
+.users-page .pagination-bar {
+    padding: 14px 16px;
+}
+
+.users-page .page-header,
+.users-page .role-pills,
+.users-page .search-bar,
+.users-page .user-count,
+.users-page .user-table-wrapper {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+@media (max-width: 768px) {
+    .users-page .page-header {
+        align-items: stretch;
+    }
+
+    .users-page .search-bar {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .users-page .search-bar input {
+        flex: 1 1 220px;
+    }
+}
+
+/* =====================================================
+   SHARED PAGE SPACING AND ACTION ALIGNMENT
+===================================================== */
+
+.main-content > :first-child {
+    margin-top: 0;
+}
+
+.page-header,
+.dashboard-header,
+.section-header,
+.scan-page-header,
+.dsp-toolbar,
+.rpt-toolbar {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 769px) {
+    .page-header-actions,
+    .dsp-actions,
+    .rpt-actions,
+    .farm-weather__header-actions {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    .page-header-actions > *,
+    .dsp-actions > *,
+    .rpt-actions > *,
+    .farm-weather__header-actions > * {
+        flex-shrink: 0;
+    }
+
+    .dsp-actions form,
+    .rpt-actions form {
+        display: inline-flex;
+        margin: 0;
+        flex-shrink: 0;
+    }
+}
+
+.actions-cell {
+    white-space: nowrap;
+}

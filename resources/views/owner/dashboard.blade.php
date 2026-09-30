@@ -41,12 +41,7 @@
         <x-weather-widget />
     </div>
 
-    @if($lowStockAlert)
-        <div class="alert">
-            <span>⚠️</span>
-            <span><strong>Low stock alert</strong> — {{ $lowStockAlert }}.</span>
-        </div>
-    @endif
+    @include('dashboard.low-stock-alert')
 
     <!-- Stat cards -->
     <div class="stats-grid stats-grid--five">

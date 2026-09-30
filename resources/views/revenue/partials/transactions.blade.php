@@ -9,7 +9,7 @@
         <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search customer..." />
       </div>
 
-      <select name="sort" class="sort-select" onchange="this.form.submit()">
+      <select name="sort" class="sort-select" data-auto-submit>
         <option value="date_desc" {{ ($filters['sort'] ?? 'date_desc') === 'date_desc' ? 'selected' : '' }}>Newest First</option>
         <option value="date_asc" {{ ($filters['sort'] ?? '') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
         <option value="name_asc" {{ ($filters['sort'] ?? '') === 'name_asc' ? 'selected' : '' }}>Customer A–Z</option>

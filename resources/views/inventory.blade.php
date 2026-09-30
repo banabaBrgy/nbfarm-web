@@ -74,7 +74,7 @@
     <form method="GET" class="filter-bar">
         <input type="text" name="search" placeholder="Search item..." value="{{ $search }}">
 
-        <select name="status" onchange="this.form.submit()">
+        <select name="status" data-auto-submit>
             <option value="">All Status</option>
             <option value="LOW" {{ $statusFilter === 'LOW' ? 'selected' : '' }}>Low</option>
             <option value="WATCH" {{ $statusFilter === 'WATCH' ? 'selected' : '' }}>Watch</option>
@@ -134,9 +134,11 @@
         </table>
     </div>
 
-    <div class="pagination-bar">
-        {{ $items->links() }}
-    </div>
+    @if($items->hasPages())
+        <div class="pagination-bar">
+            {{ $items->links() }}
+        </div>
+    @endif
 
     <!-- TWO COLUMN: EGG TOTALS + RECENT MOVEMENTS -->
     <div class="bottom-grid">
@@ -150,7 +152,7 @@
                     <input type="hidden" name="search" value="{{ $search }}">
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
 
-                    <select name="year" class="sort-select" onchange="this.form.submit()">
+                    <select name="year" class="sort-select" data-auto-submit>
                         @foreach(($availableYears ?? $availableMonths->pluck('year')->unique()->sortDesc()) as $year)
                             <option value="{{ $year }}" {{ (int) $year === (int) $selectedYear ? 'selected' : '' }}>
                                 {{ $year }}
@@ -158,7 +160,7 @@
                         @endforeach
                     </select>
 
-                    <select name="month" class="sort-select" onchange="this.form.submit()">
+                    <select name="month" class="sort-select" data-auto-submit>
                         @foreach(range(1, 12) as $m)
                             <option value="{{ $m }}" {{ (int) $m === (int) $selectedMonth ? 'selected' : '' }}>
                                 {{ \Carbon\Carbon::create()->month($m)->format('F') }}

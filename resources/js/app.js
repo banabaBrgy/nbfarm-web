@@ -13,7 +13,7 @@ window.bootstrap = bootstrap;
 // Auto close alerts after 3 seconds
 document.addEventListener('DOMContentLoaded', () => {
 
-    const alerts = document.querySelectorAll('.alert');
+    const alerts = document.querySelectorAll('.alert:not(.alert-persistent)');
 
     alerts.forEach((alert) => {
 
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// Mobile sidebar toggle
+// Responsive sidebar toggle
 document.addEventListener('DOMContentLoaded', () => {
 
     const menuBtn   = document.getElementById('headerMenuBtn');
@@ -84,31 +84,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!menuBtn) return;
 
-    const open = () => {
+    const isDesktop = () => window.innerWidth > 768;
+
+    const updateMenuButton = (isOpen) => {
+        menuBtn.setAttribute('aria-expanded', String(isOpen));
+        menuBtn.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+    };
+
+    const openMobile = () => {
         document.body.classList.add('sidebar-open');
-        menuBtn.setAttribute('aria-expanded', 'true');
+        updateMenuButton(true);
         menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
     };
 
-    const close = () => {
+    const closeMobile = () => {
         document.body.classList.remove('sidebar-open');
-        menuBtn.setAttribute('aria-expanded', 'false');
+        updateMenuButton(false);
         menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    };
+
+    const collapseDesktop = () => {
+        document.body.classList.add('sidebar-collapsed');
+        updateMenuButton(false);
+    };
+
+    const expandDesktop = () => {
+        document.body.classList.remove('sidebar-collapsed');
+        updateMenuButton(true);
     };
 
     menuBtn.addEventListener('click', () => {
-        document.body.classList.contains('sidebar-open') ? close() : open();
+        if (isDesktop()) {
+            document.body.classList.contains('sidebar-collapsed')
+                ? expandDesktop()
+                : collapseDesktop();
+            return;
+        }
+
+        document.body.classList.contains('sidebar-open') ? closeMobile() : openMobile();
     });
 
-    if (closeBtn) closeBtn.addEventListener('click', close);
-    if (backdrop)  backdrop.addEventListener('click', close);
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            isDesktop() ? collapseDesktop() : closeMobile();
+        });
+    }
+
+    if (backdrop) backdrop.addEventListener('click', closeMobile);
 
     navLinks.forEach(link => link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) close();
+        if (!isDesktop()) closeMobile();
     }));
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) close();
+        if (isDesktop()) {
+            document.body.classList.remove('sidebar-open');
+        } else {
+            document.body.classList.remove('sidebar-collapsed');
+            closeMobile();
+        }
     });
 
 });
+
+// Filter controls submit their form on change. Blur runs before a click, so
+// that submit was cancelling sidebar, pagination, and other links.
+(function () {
+    let suppressAutoSubmit = false;
+
+    document.addEventListener('pointerdown', (event) => {
+        const link = event.target.closest('a[href]');
+        if (link && link.getAttribute('href') && link.target !== '_blank') {
+            suppressAutoSubmit = true;
+            return;
+        }
+
+        const button = event.target.closest('button');
+        if (button && button.type !== 'submit') {
+            suppressAutoSubmit = true;
+        }
+    }, true);
+
+    document.addEventListener('change', (event) => {
+        const field = event.target;
+        if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement)) {
+            return;
+        }
+        if (!field.matches('[data-auto-submit]') || !field.form || suppressAutoSubmit) {
+            return;
+        }
+        field.form.requestSubmit();
+    });
+
+    document.addEventListener('submit', (event) => {
+        if (!suppressAutoSubmit || event.submitter) {
+            return;
+        }
+        event.preventDefault();
+    }, true);
+
+    const release = () => {
+        setTimeout(() => {
+            suppressAutoSubmit = false;
+        }, 0);
+    };
+    window.addEventListener('pointerup', release, true);
+    window.addEventListener('pointercancel', release, true);
+})();

@@ -5,6 +5,36 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/users.css') }}">
+<style>
+    /* Make footer not fixed in User Management */
+    .footer {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        width: auto !important;
+        margin-left: 250px !important;
+        height: auto !important;
+        min-height: 48px;
+        padding: 14px 24px !important;
+        background: var(--nb-day-surface, #ffffff) !important;
+        border-top: 1px solid var(--nb-day-border, #E5E7EB) !important;
+        z-index: 10 !important;
+    }
+
+    @media (max-width: 992px) {
+        .footer {
+            margin-left: 220px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .footer {
+            margin-left: 0 !important;
+            padding: 14px 16px !important;
+        }
+    }
+</style>
 @endpush
 
 @section('content')
@@ -32,16 +62,14 @@
     <!-- SEARCH + STATUS -->
     <form method="GET" class="search-bar">
         <input type="hidden" name="role" value="{{ $role }}">
-        <input type="text" name="search" placeholder="Search name or username..." value="{{ $search }}" onchange="this.form.submit()">
+        <input type="text" name="search" placeholder="Search name or username..." value="{{ $search }}" data-auto-submit>
 
-        <select name="status" onchange="this.form.submit()">
+        <select name="status" data-auto-submit>
             <option value="">All Status</option>
             <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
             <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Inactive</option>
         </select>
     </form>
-
-    <div class="user-count">{{ $users->total() }} users</div>
 
     <!-- USER TABLE -->
     <div class="user-table-wrapper">
@@ -94,7 +122,7 @@
         <i class="fas fa-pen"></i>
     </button>
 
-    <form action="{{ route('owner.users.toggleStatus', $user->id) }}" method="POST" style="display:inline;">
+    <form action="{{ route('owner.users.toggleStatus', $user->id) }}" method="POST">
         @csrf
         @method('PATCH')
         <button type="submit"

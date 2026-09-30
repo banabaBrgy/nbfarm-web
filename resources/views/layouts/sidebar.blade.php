@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
 
     @vite([
@@ -40,6 +40,7 @@
 
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/app-ui.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/daylight-ui.css') }}">
 
 
 </head>
@@ -158,10 +159,6 @@
         <!-- SIDEBAR -->
     <aside class="sidebar" id="app-sidebar">
 
-        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close navigation">
-            <i class="fas fa-xmark"></i>
-        </button>
-
         <div class="profile">
             <div class="profile-image" aria-hidden="true">
                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
@@ -174,6 +171,9 @@
                     {{ $roleLabels[$role] ?? strtoupper($role) }}
                 </div>
             </div>
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close navigation">
+                <i class="fas fa-xmark"></i>
+            </button>
         </div>
 
         <nav>

@@ -16,6 +16,8 @@
         <x-weather-widget />
     </div>
 
+    @include('dashboard.low-stock-alert')
+
     <div class="stats-grid stats-grid--five">
 
         <div class="stat-card stat-card--eggs">

@@ -132,11 +132,11 @@
 
             </table>
 
-            <div class="pagination-wrapper">
-
-                {{ $transactions->links() }}
-
-            </div>
+            @if($transactions->hasPages())
+                <div class="pagination-wrapper">
+                    {{ $transactions->links() }}
+                </div>
+            @endif
 
         </div>
 

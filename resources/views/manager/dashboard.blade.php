@@ -58,17 +58,10 @@
 
 
 
-    @if($lowStockAlert)
+    @include('dashboard.low-stock-alert')
 
-        <div class="alert">
-            <span>⚠️</span>
-            <span>
-                <strong>Low stock alert</strong>
-                — {{ $lowStockAlert }} item(s)
-            </span>
-        </div>
-
-    @endif
+        
+    
 
 
 
