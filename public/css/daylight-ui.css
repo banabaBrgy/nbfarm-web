@@ -70,12 +70,16 @@ textarea,
     background: var(--nb-day-bg);
 }
 
-/* The navigation stays distinct, but uses a softer forest green than a
-   near-black sidebar so the overall interface remains comfortable in daylight. */
+/* The navigation stays distinct with a deeper forest panel against the
+   daylight canvas. */
 .sidebar {
-    background: linear-gradient(180deg, #2f8158 0%, #216e4b 56%, #19583b 100%);
-    border-right-color: rgba(255, 255, 255, 0.18);
-    box-shadow: 5px 0 20px rgba(28, 76, 50, 0.14);
+    background-color: #12382a;
+    background-image:
+        radial-gradient(ellipse 130% 70% at -10% -8%, rgba(226, 195, 106, 0.16), transparent 52%),
+        radial-gradient(ellipse 90% 55% at 120% 108%, rgba(47, 129, 88, 0.38), transparent 48%),
+        linear-gradient(180deg, #164632 0%, #12382a 42%, #0e2d22 100%);
+    border-right-color: #245b40;
+    box-shadow: 6px 0 24px rgba(12, 40, 28, 0.22);
 }
 
 .mobile-header,
@@ -143,28 +147,29 @@ textarea,
 }
 
 .profile {
-    background: linear-gradient(
-        145deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.06) 100%
-    );
-    border-color: rgba(255, 255, 255, 0.28);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: #1c573b;
+    border-color: #347956;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .header-menu-btn,
 .header-logo,
-.mobile-header .alert-bell,
-.sidebar a i,
-.logout button {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+.mobile-header .alert-bell {
+    background: var(--nb-day-green-soft);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .sidebar a i {
-    border-color: rgba(255, 255, 255, 0.18);
+    background: #2a7550;
+    border-color: #3d8c65;
+}
+
+.logout button {
+    background: #1c573b;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .sidebar li.active a {
@@ -173,12 +178,12 @@ textarea,
 }
 
 .sidebar li:not(.active) a:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: #225f41;
+    border-color: #438b65;
 }
 
 .sidebar li.active a {
-    color: #174f36;
+    color: #164a31;
 }
 
 .wrapper + .footer {
@@ -823,16 +828,9 @@ textarea,
 }
 
 /* =====================================================
-   SOLID SIDEBAR REFRESH
-   Keep the navigation crisp and readable without glassmorphism.
+   FARM COMMAND SIDEBAR
+   Layered brand, user card, grouped nav, and gold active rail.
 ===================================================== */
-
-.sidebar {
-    background: #123d2a;
-    background-image: none;
-    border-right: 1px solid #245b40;
-    box-shadow: 6px 0 22px rgba(21, 61, 42, 0.18);
-}
 
 .sidebar *,
 .sidebar *::before,
@@ -844,251 +842,26 @@ textarea,
 .sidebar-close-btn {
     background: #1e5b3e;
     border: 1px solid #347956;
+    color: #d7eadc;
 }
 
 .sidebar-close-btn:hover {
     background: #2a704d;
-}
-
-.profile {
-    background: #1c573b;
-    background-image: none;
-    border: 1px solid #347956;
-    box-shadow: 0 8px 18px rgba(7, 32, 21, 0.18);
-}
-
-.profile-image {
-    background: #f5fbf7;
-    color: #1d7049;
-}
-
-.role {
-    background: #2a704d;
-    border: 1px solid #3b8963;
-    color: #e4f4e9;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    color: #ffffff;
 }
 
 .sidebar nav::before {
-    color: #93c9a8;
-}
-
-.sidebar li {
-    margin-bottom: 6px;
-}
-
-.sidebar a {
-    background: #174b33;
-    background-image: none;
-    border-color: #245f42;
-    color: #f0f8f2;
-}
-
-.sidebar a i {
-    background: #2a7550;
-    background-image: none;
-    border-color: #3d8c65;
-    box-shadow: none;
-}
-
-.sidebar li:not(.active) a:hover {
-    background: #225f41;
-    border-color: #438b65;
-}
-
-.sidebar li:not(.active) a:hover i {
-    background: #34855b;
-    border-color: #57a178;
-}
-
-.sidebar li.active a {
-    background: #f5fbf7;
-    background-image: none;
-    border-color: #f5fbf7;
-    color: #164a31;
-    box-shadow: 0 7px 16px rgba(6, 34, 21, 0.18);
-}
-
-.sidebar li.active a i,
-.sidebar li.active a:hover i {
-    background: #2f8158;
-    background-image: none;
-    border-color: #3d9568;
-    box-shadow: 0 3px 8px rgba(10, 57, 34, 0.22);
-}
-
-.logout {
-    border-top-color: #245b40;
-}
-
-.logout button {
-    background: #1c573b;
-    background-image: none;
-    border-color: #347956;
-    box-shadow: none;
-}
-
-.logout button:hover {
-    background: #2a704d;
-    border-color: #4b966c;
-}
-
-.logout button:active {
-    background: #174b33;
+    display: none;
+    content: none;
 }
 
 /* =====================================================
-   CHAT-STYLE SIDEBAR
-   Flat navigation with a real desktop collapse control.
+   SIDEBAR COLLAPSE / MOBILE CLOSE
 ===================================================== */
 
 @media (min-width: 769px) {
     .sidebar-close-btn {
-        display: flex;
-        top: 16px;
-        right: 20px;
-        width: 36px;
-        height: 36px;
-        border: none;
-        border-radius: 9px;
-        background: #123d2a;
-        color: #b9ddc4;
-    }
-
-    .sidebar-close-btn:hover {
-        background: #205f42;
-        color: #ffffff;
-    }
-
-    .profile {
-        margin: 20px 12px 26px;
-        padding: 0;
-        background: #123d2a;
-        border: none;
-        box-shadow: none;
-        gap: 10px;
-    }
-
-    .profile-image {
-        width: 36px;
-        height: 36px;
-        background: #f5fbf7;
-    }
-
-    .profile-meta {
-        flex: 1 1 auto;
-        min-width: 0;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 2px;
-    }
-
-    .profile-name {
-        font-size: 14px;
-        line-height: 1.15;
-    }
-
-    .role {
-        padding: 0;
-        background: #123d2a;
-        border: none;
-        color: #93c9a8;
-        font-size: 9px;
-        line-height: 1.15;
-        white-space: nowrap;
-    }
-
-    .sidebar-close-btn {
-        position: static;
-        flex: 0 0 30px;
-        margin-left: auto;
-        width: 30px;
-        height: 36px;
-        padding: 0;
-    }
-
-    .sidebar nav {
-        padding: 0 12px 22px;
-    }
-
-    .sidebar nav::before {
-        margin: 0 10px 10px;
-    }
-
-    .sidebar li {
-        margin-bottom: 2px;
-    }
-
-    .sidebar a {
-        min-height: 44px;
-        padding: 6px 10px;
-        border: 1px solid #123d2a;
-        border-radius: 9px;
-        background: #123d2a;
-    }
-
-    .sidebar a i,
-    .sidebar li.active a i,
-    .sidebar li.active a:hover i {
-        width: 32px;
-        height: 32px;
-        background: #123d2a;
-        border: none;
-        box-shadow: none;
-        color: #b9ddc4;
-    }
-
-    .sidebar li:not(.active) a:hover {
-        background: #205f42;
-        border-color: #205f42;
-    }
-
-    .sidebar li:not(.active) a:hover i {
-        background: #205f42;
-        border: none;
-    }
-
-    .sidebar li.active a {
-        background: #205f42;
-        border-color: #205f42;
-        color: #ffffff;
-        box-shadow: none;
-    }
-
-    .sidebar li.active a i,
-    .sidebar li.active a:hover i {
-        background: #205f42;
-        color: #e4f4e9;
-    }
-
-    .logout {
-        padding: 14px 12px 20px;
-        border-top: none;
-    }
-
-    .logout button {
-        justify-content: flex-start;
-        gap: 12px;
-        min-height: 44px;
-        padding: 6px 10px;
-        border: 1px solid #347956;
-        border-radius: 9px;
-        background: #123d2a;
-    }
-
-    .logout button::before {
-        content: '\f2f5';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        color: #b9ddc4;
-        font-size: 16px;
-    }
-
-    .logout button:hover {
-        background: #205f42;
-        border-color: #205f42;
+        display: none;
     }
 
     body.sidebar-collapsed .sidebar {
@@ -1106,198 +879,35 @@ textarea,
     body.sidebar-collapsed .wrapper + .footer {
         margin-left: 0;
     }
-
-    body:not(.sidebar-collapsed) .header-menu-btn {
-        display: none;
-    }
-
-    body.sidebar-collapsed .header-menu-btn {
-        display: flex;
-    }
 }
 
 @media (max-width: 768px) {
-    .profile {
-        margin: 20px 12px 18px;
-        padding: 0;
-        gap: 10px;
-        background: #123d2a;
-        border: none;
-        box-shadow: none;
-    }
-
-    .profile-image {
-        width: 36px;
-        height: 36px;
-        background: #f5fbf7;
-    }
-
-    .profile-meta {
-        flex: 1 1 auto;
-        min-width: 0;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 2px;
-    }
-
-    .profile-name {
-        font-size: 14px;
-        line-height: 1.15;
-    }
-
-    .role {
-        padding: 0;
-        background: #123d2a;
-        border: none;
-        color: #93c9a8;
-        font-size: 9px;
-        line-height: 1.15;
-        white-space: nowrap;
-    }
-
     .sidebar-close-btn {
-        position: static;
         display: flex;
-        flex: 0 0 30px;
+        position: static;
+        flex: 0 0 28px;
         margin-left: auto;
-        width: 30px;
-        height: 36px;
+        width: 28px;
+        height: 28px;
         padding: 0;
         border: none;
-        border-radius: 9px;
-        background: #123d2a;
-        color: #b9ddc4;
-    }
-
-    .sidebar-close-btn:hover {
-        background: #205f42;
-        color: #ffffff;
-    }
-
-    .sidebar nav {
-        padding: 0 12px 22px;
-    }
-
-    .sidebar nav::before {
-        margin: 0 10px 10px;
-    }
-
-    .sidebar li {
-        margin-bottom: 2px;
-    }
-
-    .sidebar a {
-        min-height: 44px;
-        padding: 6px 10px;
-        border: 1px solid #123d2a;
-        border-radius: 9px;
-        background: #123d2a;
-    }
-
-    .sidebar a i,
-    .sidebar li.active a i,
-    .sidebar li.active a:hover i {
-        width: 32px;
-        height: 32px;
-        background: #123d2a;
-        border: none;
-        box-shadow: none;
-        color: #b9ddc4;
-    }
-
-    .sidebar li:not(.active) a:hover {
-        background: #205f42;
-        border-color: #205f42;
-    }
-
-    .sidebar li:not(.active) a:hover i {
-        background: #205f42;
-        border: none;
-    }
-
-    .sidebar li.active a {
-        background: #205f42;
-        border-color: #205f42;
-        color: #ffffff;
-        box-shadow: none;
-    }
-
-    .sidebar li.active a i,
-    .sidebar li.active a:hover i {
-        background: #205f42;
-        color: #e4f4e9;
-    }
-
-    .logout {
-        padding: 14px 12px 20px;
-        border-top: none;
-    }
-
-    .logout button {
-        justify-content: flex-start;
-        gap: 12px;
-        min-height: 44px;
-        padding: 6px 10px;
-        border: 1px solid #347956;
-        border-radius: 9px;
-        background: #123d2a;
-    }
-
-    .logout button::before {
-        content: '\f2f5';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        color: #b9ddc4;
-        font-size: 16px;
-    }
-
-    .logout button:hover {
-        background: #205f42;
-        border-color: #205f42;
+        background: transparent;
     }
 }
 
-@media (max-width: 480px) {
-    .profile {
-        margin: 18px 10px 16px;
-    }
-
-    .profile-name {
-        font-size: 13px;
-    }
-
-    .role {
-        font-size: 8px;
-    }
-}
-
-/* =====================================================
-   LOGOUT BUTTON POLISH
-===================================================== */
-
-.logout button {
-    border: none;
-    background: #205f42;
-    color: #ffffff;
-    box-shadow: 0 5px 12px rgba(7, 32, 21, 0.18);
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.logout button:hover {
-    background: #2a704d;
-    transform: translateY(-1px);
-    box-shadow: 0 7px 16px rgba(7, 32, 21, 0.24);
+.logout button::before {
+    content: none;
 }
 
 .logout button:active {
     background: #174b33;
     transform: translateY(0);
     box-shadow: 0 3px 8px rgba(7, 32, 21, 0.16);
+}
+
+.logout button:focus-visible {
+    outline: 2px solid #b9ddc4;
+    outline-offset: 2px;
 }
 
 /* =====================================================

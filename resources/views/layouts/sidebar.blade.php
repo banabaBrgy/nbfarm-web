@@ -55,7 +55,7 @@
     @endphp
     <!-- MOBILE HEADER (visible only on ≤768px) -->
     <header class="mobile-header">
-        <button class="header-menu-btn" id="headerMenuBtn" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Open navigation">
+        <button class="header-menu-btn" id="headerMenuBtn" type="button" aria-controls="app-sidebar" aria-expanded="true" aria-label="Hide navigation">
             <i class="fas fa-bars"></i>
         </button>
         <div class="header-title-group">
@@ -89,6 +89,7 @@
             [
                 'label' => 'Dashboard',
                 'icon' => 'fas fa-chart-line',
+                'group' => 'Operations',
                 'route' =>
                     $role == 'owner'
                     ? 'owner.dashboard'
@@ -100,6 +101,7 @@
             [
                 'label' => 'Production',
                 'icon' => 'fas fa-egg',
+                'group' => 'Operations',
                 'route' =>
                     $role == 'owner'
                     ? 'owner.production'
@@ -111,6 +113,7 @@
             [
                 'label' => 'Inventory',
                 'icon' => 'fas fa-box',
+                'group' => 'Operations',
                 'route' =>
                     $role == 'owner'
                     ? 'owner.inventory'
@@ -122,6 +125,7 @@
             [
                 'label' => 'Dispatch',
                 'icon' => 'fas fa-truck',
+                'group' => 'Operations',
                 'route' =>
                     $role == 'owner'
                     ? 'owner.dispatch'
@@ -131,26 +135,33 @@
                 'roles' => ['owner', 'manager'],
             ],
             [
-    'label' => 'Reports',
-    'icon' => 'fas fa-file-alt',
-    'route' => $role == 'owner'
-        ? 'owner.reports'
-        : 'manager.reports',
-    'roles' => ['owner', 'manager'],
-],
+                'label' => 'Reports',
+                'icon' => 'fas fa-file-alt',
+                'group' => 'Management',
+                'route' => $role == 'owner'
+                    ? 'owner.reports'
+                    : 'manager.reports',
+                'roles' => ['owner', 'manager'],
+            ],
             [
                 'label' => 'Sales',
                 'icon' => 'fas fa-money-bill-wave',
+                'group' => 'Management',
                 'route' => 'owner.revenue',
                 'roles' => ['owner'],
             ],
             [
                 'label' => 'User Management',
                 'icon' => 'fas fa-users',
+                'group' => 'Management',
                 'route' => 'owner.users',
                 'roles' => ['owner'],
             ],
         ];
+
+        $visibleMenu = array_values(array_filter($menuItems, function ($item) use ($role) {
+            return in_array($role, $item['roles']) && Route::has($item['route']);
+        }));
 
     @endphp
 
@@ -162,6 +173,7 @@
         <div class="profile">
             <div class="profile-image" aria-hidden="true">
                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                <span class="profile-status"></span>
             </div>
             <div class="profile-meta">
                 <div class="profile-name" title="{{ auth()->user()->name ?? 'User' }}">
@@ -177,24 +189,33 @@
         </div>
 
         <nav>
-            <ul>
-                @foreach ($menuItems as $item)
-                    @if (in_array($role, $item['roles']) && Route::has($item['route']))
-                        <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
-                            <a href="{{ route($item['route']) }}" title="{{ $item['label'] }}" aria-label="{{ $item['label'] }}">
-                                <i class="{{ $item['icon'] }}"></i>
-                                {{ $item['label'] }}
-                            </a>
-                        </li>
+            @php $currentGroup = null; @endphp
+            @foreach ($visibleMenu as $item)
+                @if ($currentGroup !== $item['group'])
+                    @if ($currentGroup !== null)
+                        </ul>
                     @endif
-                @endforeach
-            </ul>
+                    <p class="nav-group-label">{{ $item['group'] }}</p>
+                    <ul>
+                    @php $currentGroup = $item['group']; @endphp
+                @endif
+                <li class="{{ request()->routeIs($item['route']) ? 'active' : '' }}">
+                    <a href="{{ route($item['route']) }}" title="{{ $item['label'] }}" aria-label="{{ $item['label'] }}">
+                        <i class="{{ $item['icon'] }}"></i>
+                        <span class="nav-label">{{ $item['label'] }}</span>
+                    </a>
+                </li>
+            @endforeach
+            @if ($currentGroup !== null)
+                </ul>
+            @endif
         </nav>
 
         <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="logout">
             @csrf
             <button type="submit" aria-label="Logout" title="Logout">
-                Logout
+                <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                <span>Logout</span>
             </button>
         </form>
 

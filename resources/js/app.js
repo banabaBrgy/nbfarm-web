@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateMenuButton = (isOpen) => {
         menuBtn.setAttribute('aria-expanded', String(isOpen));
-        menuBtn.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+        menuBtn.setAttribute('aria-label', isOpen ? 'Hide navigation' : 'Open navigation');
     };
 
     const openMobile = () => {
@@ -112,6 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('sidebar-collapsed');
         updateMenuButton(true);
     };
+
+    updateMenuButton(isDesktop() ? !document.body.classList.contains('sidebar-collapsed') : document.body.classList.contains('sidebar-open'));
 
     menuBtn.addEventListener('click', () => {
         if (isDesktop()) {
