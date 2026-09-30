@@ -70,16 +70,22 @@ textarea,
     background: var(--nb-day-bg);
 }
 
-/* The navigation stays distinct with a deeper forest panel against the
-   daylight canvas. */
+/* Forest nav with a visible top-to-bottom gradient. */
 .sidebar {
     background-color: #12382a;
     background-image:
-        radial-gradient(ellipse 130% 70% at -10% -8%, rgba(226, 195, 106, 0.16), transparent 52%),
-        radial-gradient(ellipse 90% 55% at 120% 108%, rgba(47, 129, 88, 0.38), transparent 48%),
-        linear-gradient(180deg, #164632 0%, #12382a 42%, #0e2d22 100%);
+        radial-gradient(ellipse 120% 60% at 8% -8%, rgba(226, 195, 106, 0.2), transparent 58%),
+        linear-gradient(180deg, #1f6844 0%, #16563a 38%, #12382a 72%, #0c281e 100%);
     border-right-color: #245b40;
     box-shadow: 6px 0 24px rgba(12, 40, 28, 0.22);
+}
+
+.logout {
+    background: transparent;
+}
+
+.logout {
+    background: transparent;
 }
 
 .mobile-header,
@@ -100,7 +106,6 @@ textarea,
 }
 
 .header-menu-btn,
-.header-logo,
 .mobile-header .alert-bell {
     background: var(--nb-day-green-soft);
     border-color: var(--nb-day-border);
@@ -154,7 +159,6 @@ textarea,
 }
 
 .header-menu-btn,
-.header-logo,
 .mobile-header .alert-bell {
     background: var(--nb-day-green-soft);
     backdrop-filter: none;

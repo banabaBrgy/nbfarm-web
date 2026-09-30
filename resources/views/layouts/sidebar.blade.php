@@ -40,7 +40,7 @@
 
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/app-ui.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/daylight-ui.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/daylight-ui.css') }}?v={{ filemtime(public_path('css/daylight-ui.css')) }}">
 
 
 </head>
@@ -59,9 +59,6 @@
             <i class="fas fa-bars"></i>
         </button>
         <div class="header-title-group">
-            <div class="header-logo" aria-hidden="true">
-                <i class="fas fa-leaf"></i>
-            </div>
             <div class="header-title">
                 <h1>NB Farm</h1>
                 <p class="header-subtitle">Poultry Management</p>
