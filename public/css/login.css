@@ -19,7 +19,6 @@
 }
 
 body {
-    
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     display: flex;
@@ -32,12 +31,13 @@ body {
     background-size: cover;
     padding: 30px;
     color: var(--ink);
+    overflow-x: hidden;
 }
 
 
 .login-wrapper {
-    width: 1080px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 1080px;
     background: var(--paper);
     border-radius: 6px;
     overflow: hidden;
@@ -195,6 +195,16 @@ body {
     flex-direction: column;
     justify-content: center;
     position: relative;
+}
+
+form,
+.field,
+.input-icon-wrap,
+.terms,
+.remember-row,
+.recaptcha-frame {
+    width: 100%;
+    max-width: 100%;
 }
 
 .form-eyebrow {
@@ -512,6 +522,7 @@ input:focus-visible {
     border-radius: 6px;
     display: flex;
     justify-content: center;
+    overflow: hidden;
 }
 
 .recaptcha-field.is-invalid .recaptcha-frame {
@@ -624,6 +635,73 @@ input[readonly] {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
+    }
+}
+
+@media(max-width:600px) {
+    body {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .login-wrapper {
+        border-radius: 4px;
+    }
+
+    .left-panel {
+        padding: 28px 24px 24px;
+    }
+
+    .stamp-badge {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 20px;
+    }
+
+    .left-panel h1 {
+        font-size: 28px;
+    }
+
+    .left-panel .lede {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .ledger-tag {
+        margin-top: 24px;
+        padding-top: 14px;
+    }
+
+    .right-panel {
+        padding: 32px 24px 28px;
+    }
+
+    .title {
+        font-size: 28px;
+    }
+
+    .terms {
+        font-size: 13px;
+    }
+
+    .recaptcha-frame {
+        padding: 10px 0;
+    }
+}
+
+@media(max-width:360px) {
+    body {
+        padding: 8px;
+    }
+
+    .left-panel,
+    .right-panel {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .right-panel {
+        padding-top: 28px;
     }
 }
 
