@@ -40,7 +40,7 @@
     </div>
 @endif
 
-<div class="stats-grid {{ $canManageQr ? '' : 'stats-grid--three' }}">
+<div class="stats-grid stats-grid--three">
 
     <div class="stat-card stat-card--eggs">
         <div class="stat-icon">

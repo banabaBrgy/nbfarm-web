@@ -6,11 +6,20 @@
 
     @php
         $eggsChange = $eggsChange ?? 0;
+        $feedStock = $feedStock ?? 0;
+        $feedMin = $feedMin ?? 0;
+        $feedLow = $feedLow ?? false;
+        $eggsTotal = $eggsTotal ?? 0;
+        $eggTrays = $eggTrays ?? 0;
+        $vitamins = $vitamins ?? 0;
+        $vitaminMin = $vitaminMin ?? 0;
+        $vitaminLow = $vitaminLow ?? false;
+        $productionTrend = $productionTrend ?? ['months' => [], 'years' => [], 'selectedYear' => null, 'series' => []];
     @endphp
 
     <div class="dashboard-header">
         <div>
-            <h2>Dashboard</h2>
+            <h2>Staff Dashboard</h2>
             <p>Welcome back! Here's today's poultry farm overview.</p>
         </div>
         <x-weather-widget />
@@ -19,17 +28,14 @@
     @include('dashboard.low-stock-alert')
 
     <div class="stats-grid stats-grid--five">
-
         <div class="stat-card stat-card--eggs">
             <div class="stat-icon">
                 <i class="fas fa-egg"></i>
             </div>
             <div class="stat-info">
                 <span class="stat-title">Total Eggs Today</span>
-                <h2>{{ number_format($todayProduction) }}</h2>
-                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">
-                    {{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% vs yesterday
-                </small>
+                <h2>{{ number_format($eggsToday) }}</h2>
+                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">{{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% vs yesterday</small>
             </div>
         </div>
 
@@ -61,8 +67,8 @@
             </div>
             <div class="stat-info">
                 <span class="stat-title">Feeds Available</span>
-                <h2>{{ number_format($feeds) }}</h2>
-                <small>Bags remaining</small>
+                <h2>{{ number_format($feedStock) }}</h2>
+                <small>{{ $feedLow ? 'Low Stock' : 'Bags Remaining' }}</small>
             </div>
         </div>
 
@@ -73,77 +79,23 @@
             <div class="stat-info">
                 <span class="stat-title">Egg Trays</span>
                 <h2>{{ number_format($eggTrays) }}</h2>
-                <small>Available trays</small>
+                <small>Available</small>
             </div>
         </div>
-
     </div>
 
-    <div class="chart-card">
-        <div class="chart-title">Egg Production — Last 7 Days</div>
-        <div class="chart-wrap">
-            <canvas id="weeklyChart" height="200"></canvas>
-        </div>
-    </div>
+    <div class="content-grid">
+        @include('dashboard.egg-production-chart-card', [
+            'productionTrend' => $productionTrend,
+            'trendAction' => route('staff.dashboard'),
+        ])
 
-    <div class="quick-menu">
-        <a href="{{ route('staff.production') }}" class="quick-card">
-            <i class="fas fa-egg"></i>
-            <span>Record Production</span>
-        </a>
-        <a href="{{ route('staff.inventory') }}" class="quick-card">
-            <i class="fas fa-box"></i>
-            <span>View Inventory</span>
-        </a>
-        <a href="{{ route('staff.dashboard') }}" class="quick-card">
-            <i class="fas fa-chart-line"></i>
-            <span>Dashboard</span>
-        </a>
+        @include('dashboard.inventory-levels-panel')
     </div>
 
 @endsection
 
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <script>
-        (function () {
-            const canvas = document.getElementById('weeklyChart');
-            if (!canvas || typeof Chart === 'undefined') {
-                return;
-            }
-
-            const labels = @json($weeklyProduction->map(fn ($row) => \Illuminate\Support\Carbon::parse($row['production_date'])->format('M j')));
-            const values = @json($weeklyProduction->pluck('total'));
-
-            new Chart(canvas, {
-                type: 'bar',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Eggs produced',
-                        data: values,
-                        backgroundColor: '#34853F',
-                        borderRadius: 10,
-                        barThickness: 32,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(15, 23, 42, 0.06)' },
-                        },
-                        x: {
-                            grid: { display: false },
-                        },
-                    },
-                },
-            });
-        })();
-    </script>
+    @include('dashboard.production-trend-script')
 @endpush
