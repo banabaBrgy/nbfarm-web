@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function ensureOpensslConfig(): void
     {
-        if (getenv('OPENSSL_CONF')) {
+        if (PHP_OS_FAMILY !== 'Windows' || getenv('OPENSSL_CONF')) {
             return;
         }
 
@@ -48,9 +48,13 @@ class AppServiceProvider extends ServiceProvider
         $guesses[] = 'C:\\xampp\\php\\extras\\ssl\\openssl.cnf';
 
         foreach ($guesses as $cnf) {
-            if (is_file($cnf)) {
-                putenv('OPENSSL_CONF='.$cnf);
-                return;
+            try {
+                if (@is_file($cnf)) {
+                    putenv('OPENSSL_CONF='.$cnf);
+                    return;
+                }
+            } catch (\Throwable $e) {
+                continue;
             }
         }
     }
