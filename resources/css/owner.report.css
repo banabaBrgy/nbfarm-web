@@ -171,7 +171,13 @@
 }
 
 .modal-header .btn-close{
-    filter:invert(1);
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 1;
+}
+
+.modal-header .btn-close:hover,
+.modal-header .btn-close:focus {
+    opacity: 1;
 }
 
 .modal-content{

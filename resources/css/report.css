@@ -389,11 +389,17 @@
 
 .report-modal .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 1;
+}
+
+.report-modal .btn-close:hover,
+.report-modal .btn-close:focus {
+    opacity: 1;
 }
 
 .report-modal .modal-body {
-    padding: 22px 24px 12px;
-    max-height: calc(100vh - 180px);
+    padding: 22px 24px 20px;
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
 }
 
