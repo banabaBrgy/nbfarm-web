@@ -82,17 +82,18 @@
 
 </div>
 
-<div class="table-container">
+<div class="table-container production-table-panel">
 
-    <div class="table-title d-flex justify-content-between align-items-center">
+    <div class="table-title production-table-toolbar">
         <h2>Today's Egg Production</h2>
-        <form method="GET" action="{{ route($indexRoute) }}" class="d-flex gap-2">
+        <form method="GET" action="{{ route($indexRoute) }}" class="production-table-filters">
             <input
                 type="text"
                 name="search"
                 class="form-control"
                 placeholder="Search Batch"
-                value="{{ request('search') }}">
+                value="{{ request('search') }}"
+                aria-label="Search Batch">
             <input
                 type="date"
                 name="date"
@@ -100,86 +101,91 @@
                 min="{{ \App\Models\Production::sampleStartDate() }}"
                 max="{{ now()->toDateString() }}"
                 value="{{ $date->toDateString() }}"
-                data-auto-submit>
+                data-auto-submit
+                aria-label="Production date">
         </form>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Batch</th>
-                <th>Small</th>
-                <th>Medium</th>
-                <th>Large</th>
-                <th>Extra Large</th>
-                <th>Cracked</th>
-                <th>Total</th>
-                <th width="150">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php
-                $small = 0;
-                $medium = 0;
-                $large = 0;
-                $xl = 0;
-                $cracked = 0;
-                $total = 0;
-            @endphp
-
-            @forelse($productions as $production)
+    <div class="production-table-scroll">
+        <table class="table production-table">
+            <thead>
+                <tr>
+                    <th class="col-batch">Batch</th>
+                    <th class="col-num">Small</th>
+                    <th class="col-num">Medium</th>
+                    <th class="col-num">Large</th>
+                    <th class="col-num" title="Extra Large">XL</th>
+                    <th class="col-num">Cracked</th>
+                    <th class="col-num col-total">Total</th>
+                    <th class="col-action">Action</th>
+                </tr>
+            </thead>
+            <tbody>
                 @php
-                    $small += $production->small_eggs;
-                    $medium += $production->medium_eggs;
-                    $large += $production->large_eggs;
-                    $xl += $production->extra_large_eggs;
-                    $cracked += $production->cracked_eggs;
-                    $total += $production->totalEggCount();
+                    $small = 0;
+                    $medium = 0;
+                    $large = 0;
+                    $xl = 0;
+                    $cracked = 0;
+                    $total = 0;
                 @endphp
-                <tr>
-                    <td>
-                        <strong>Batch {{ $production->batch_id }}</strong>
-                    </td>
-                    <td><x-egg-count :value="$production->small_eggs" /></td>
-                    <td><x-egg-count :value="$production->medium_eggs" /></td>
-                    <td><x-egg-count :value="$production->large_eggs" /></td>
-                    <td><x-egg-count :value="$production->extra_large_eggs" /></td>
-                    <td><x-egg-count :value="$production->cracked_eggs" /></td>
-                    <td>
-                        <strong>
-                            <x-egg-count :value="$production->totalEggCount()" />
-                        </strong>
-                    </td>
-                    <td>
-                        <a href="{{ route($detailsRoute, $production->production_id) }}"
-                            class="btn btn-success btn-sm">
-                            <i class="fas fa-eye"></i>
-                            View / Edit
-                        </a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-muted text-center py-4">
-                        No harvest records for this date.
-                    </td>
-                </tr>
-            @endforelse
 
+                @forelse($productions as $production)
+                    @php
+                        $small += $production->small_eggs;
+                        $medium += $production->medium_eggs;
+                        $large += $production->large_eggs;
+                        $xl += $production->extra_large_eggs;
+                        $cracked += $production->cracked_eggs;
+                        $total += $production->totalEggCount();
+                    @endphp
+                    <tr>
+                        <td class="col-batch">
+                            <strong>Batch {{ $production->batch_id }}</strong>
+                        </td>
+                        <td class="col-num"><x-egg-count :value="$production->small_eggs" /></td>
+                        <td class="col-num"><x-egg-count :value="$production->medium_eggs" /></td>
+                        <td class="col-num"><x-egg-count :value="$production->large_eggs" /></td>
+                        <td class="col-num"><x-egg-count :value="$production->extra_large_eggs" /></td>
+                        <td class="col-num"><x-egg-count :value="$production->cracked_eggs" /></td>
+                        <td class="col-num col-total">
+                            <strong>
+                                <x-egg-count :value="$production->totalEggCount()" />
+                            </strong>
+                        </td>
+                        <td class="col-action">
+                            <a href="{{ route($detailsRoute, $production->production_id) }}"
+                                class="btn btn-success btn-sm production-action-btn"
+                                title="View or edit batch">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
+                                <span>View</span>
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="production-table-empty">
+                            No harvest records for this date.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
             @if($productions->isNotEmpty())
-                <tr class="table-success">
-                    <th>TOTAL</th>
-                    <th><x-egg-count :value="$small" /></th>
-                    <th><x-egg-count :value="$medium" /></th>
-                    <th><x-egg-count :value="$large" /></th>
-                    <th><x-egg-count :value="$xl" /></th>
-                    <th><x-egg-count :value="$cracked" /></th>
-                    <th><x-egg-count :value="$total" /></th>
-                    <th>-</th>
-                </tr>
+                <tfoot>
+                    <tr class="table-success production-table-total">
+                        <th class="col-batch">Total</th>
+                        <th class="col-num"><x-egg-count :value="$small" /></th>
+                        <th class="col-num"><x-egg-count :value="$medium" /></th>
+                        <th class="col-num"><x-egg-count :value="$large" /></th>
+                        <th class="col-num"><x-egg-count :value="$xl" /></th>
+                        <th class="col-num"><x-egg-count :value="$cracked" /></th>
+                        <th class="col-num col-total"><x-egg-count :value="$total" /></th>
+                        <th class="col-action"></th>
+                    </tr>
+                </tfoot>
             @endif
-        </tbody>
-    </table>
+        </table>
+    </div>
 
 </div>
 

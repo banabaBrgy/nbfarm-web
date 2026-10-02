@@ -177,7 +177,8 @@ body {
 
 .wrapper > .main-content .table-container,
 .wrapper > .main-content .inventory-table-wrapper,
-.wrapper > .main-content .table-responsive {
+.wrapper > .main-content .table-responsive,
+.wrapper > .main-content .production-table-scroll {
     max-width: 100%;
     overflow-x: auto;
 }

@@ -438,38 +438,60 @@ textarea,
     background: #f1f8f3;
 }
 
-/* Production has more specific legacy table rules, so mirror the daylight
-   treatment explicitly without touching its Blade data or table structure. */
-.production-page .table-container {
+/* Keep toolbar fixed; only the table body scrolls horizontally. */
+.wrapper > .main-content .production-page .table-container,
+.wrapper > .main-content .production-page .production-table-panel {
+    overflow: visible;
+    max-height: none;
+}
+
+.wrapper > .main-content .production-page .production-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.production-page .table-container,
+.production-page .production-table-panel {
     background: var(--nb-day-surface);
     border-color: var(--nb-day-border);
     box-shadow: var(--nb-day-shadow);
 }
 
-.production-page .table-title h2 {
+.production-page .table-title h2,
+.production-page .production-table-toolbar h2 {
     color: var(--nb-day-green);
 }
 
+.production-page .production-table-scroll {
+    border-color: var(--nb-day-border);
+}
+
 .production-page .table thead,
-.production-page .table thead th {
+.production-page .table thead th,
+.production-page .production-table thead,
+.production-page .production-table thead th {
     background: #2f8158 !important;
 }
 
-.production-page .table td {
+.production-page .table td,
+.production-page .production-table td {
     color: #2d4037;
     border-color: #e3eee7;
 }
 
-.production-page .table tbody tr:hover {
+.production-page .table tbody tr:hover,
+.production-page .production-table tbody tr:hover {
     background: #f1f8f3;
 }
 
-.production-page .table-success {
+.production-page .table-success,
+.production-page .production-table-total {
     background: var(--nb-day-green-soft) !important;
 }
 
 .production-page .table-success th,
-.production-page .table-success td {
+.production-page .table-success td,
+.production-page .production-table-total th {
     color: var(--nb-day-green) !important;
 }
 
@@ -734,12 +756,14 @@ textarea,
     padding: 11px 14px;
 }
 
-.production-page .table-container {
-    max-height: min(640px, calc(100vh - 220px));
-    overflow: auto;
+.production-page .table-container,
+.production-page .production-table-panel {
+    max-height: none;
+    overflow: visible;
 }
 
-.production-page .table-title {
+.production-page .table-title,
+.production-page .production-table-toolbar {
     margin-bottom: 12px;
 }
 
@@ -814,8 +838,10 @@ textarea,
         padding: 14px;
     }
 
-    .production-page .table-container {
-        max-height: calc(100vh - 250px);
+    .production-page .table-container,
+    .production-page .production-table-panel {
+        max-height: none;
+        overflow: visible;
     }
 }
 
