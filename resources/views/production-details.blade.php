@@ -49,9 +49,7 @@
     <div class="records-card">
 
         <div class="records-header">
-
-            QR Records
-
+            <h2>QR Records</h2>
         </div>
 
         <div class="card-body">
@@ -133,8 +131,27 @@
             </table>
 
             @if($transactions->hasPages())
-                <div class="pagination-wrapper">
-                    {{ $transactions->links() }}
+                <div class="details-pagination">
+                    <div class="details-pagination-info">
+                        Showing {{ $transactions->firstItem() }}–{{ $transactions->lastItem() }} of {{ $transactions->total() }}
+                    </div>
+                    <div class="details-pagination-controls">
+                        @if ($transactions->onFirstPage())
+                            <span class="details-page-btn disabled">Prev</span>
+                        @else
+                            <a href="{{ $transactions->previousPageUrl() }}" class="details-page-btn">Prev</a>
+                        @endif
+
+                        <span class="details-page-number">
+                            Page {{ $transactions->currentPage() }} of {{ $transactions->lastPage() }}
+                        </span>
+
+                        @if ($transactions->hasMorePages())
+                            <a href="{{ $transactions->nextPageUrl() }}" class="details-page-btn">Next</a>
+                        @else
+                            <span class="details-page-btn disabled">Next</span>
+                        @endif
+                    </div>
                 </div>
             @endif
 
