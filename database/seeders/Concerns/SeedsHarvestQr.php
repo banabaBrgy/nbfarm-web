@@ -93,6 +93,76 @@ trait SeedsHarvestQr
     }
 
     /**
+     * Replace harvest rows from the client PDFs. Each day already has Batch 1–3
+     * totals and size counts. Dummy QR scans are rebuilt to match those sizes.
+     *
+     * @param  list<array{date: string, batches: list<array{batch_id: int, small_eggs: int, medium_eggs: int, large_eggs: int, extra_large_eggs: int, cracked_eggs: int, eggs_produced: int}>}>  $days
+     */
+    protected function seedClientDays(array $days): int
+    {
+        QrRecord::ensurePrintedCodes();
+
+        $qrIds = QrRecord::query()->pluck('id', 'qr_code');
+        $seeded = 0;
+
+        Production::withoutEvents(function () use ($days, $qrIds, &$seeded) {
+            foreach (array_chunk($days, 45) as $chunk) {
+                $dates = array_column($chunk, 'date');
+
+                $existingIds = Production::query()
+                    ->whereIn('production_date', $dates)
+                    ->pluck('production_id');
+
+                if ($existingIds->isNotEmpty()) {
+                    QrTransaction::whereIn('production_id', $existingIds)->delete();
+                    Production::whereIn('production_id', $existingIds)->delete();
+                }
+
+                $rows = [];
+                foreach ($chunk as $day) {
+                    foreach ($day['batches'] as $batch) {
+                        $rows[] = [
+                            'production_date' => $day['date'],
+                            'batch_id' => $batch['batch_id'],
+                            'small_eggs' => $batch['small_eggs'],
+                            'medium_eggs' => $batch['medium_eggs'],
+                            'large_eggs' => $batch['large_eggs'],
+                            'extra_large_eggs' => $batch['extra_large_eggs'],
+                            'cracked_eggs' => $batch['cracked_eggs'],
+                            'eggs_produced' => $batch['eggs_produced'],
+                        ];
+                    }
+                }
+
+                Production::insert($rows);
+
+                $productions = Production::query()
+                    ->whereIn('production_date', $dates)
+                    ->orderBy('production_date')
+                    ->orderBy('batch_id')
+                    ->get();
+
+                $scans = [];
+                $now = now();
+                foreach ($productions as $production) {
+                    $scans = array_merge(
+                        $scans,
+                        $this->scanRowsForProduction($production, $qrIds, $now)
+                    );
+                }
+
+                foreach (array_chunk($scans, 400) as $batch) {
+                    QrTransaction::insert($batch);
+                }
+
+                $seeded += count($chunk);
+            }
+        });
+
+        return $seeded;
+    }
+
+    /**
      * Split one farm-day total across Batch 1–3. Parts stay multiples of 30 and sum to $farmTotal.
      *
      * @return array<int, int>

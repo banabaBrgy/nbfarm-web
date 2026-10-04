@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class ProductionYearTrend
 {
     /** @var list<int> */
-    private const YEARS = [2024, 2025, 2026];
+    private const YEARS = [2023, 2024, 2025, 2026];
 
     /** @var list<string> */
     private const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

@@ -17,7 +17,7 @@ class PresentYearProductionTest extends TestCase
         $this->assertSame(7, Production::STOCK_DAYS);
         $this->assertSame(1000, Production::TRAY_CAPACITY);
         $this->assertSame(30, Production::EGGS_PER_TRAY);
-        $this->assertSame('2024-01-01', Production::sampleStartDate());
+        $this->assertSame('2023-01-01', Production::sampleStartDate());
 
         Carbon::setTestNow();
     }

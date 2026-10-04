@@ -54,7 +54,7 @@ class Production extends Model
 
     public static function sampleStartDate(): string
     {
-        return '2024-01-01';
+        return '2023-01-01';
     }
 
     public static function visibleYear(DateTimeInterface|string|null $asOf = null): int
