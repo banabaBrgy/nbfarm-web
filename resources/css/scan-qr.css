@@ -36,8 +36,8 @@
     flex: 0 0 52px;
     border-radius: 14px;
     color: #ffffff;
-    background: linear-gradient(135deg, #3B8F47, #34853F);
-    box-shadow: 0 8px 18px rgba(59, 143, 71, 0.2);
+    background: linear-gradient(135deg, #34855b, #2f8158);
+    box-shadow: 0 8px 18px rgba(47, 129, 88, 0.2);
     font-size: 22px;
 }
 
@@ -65,7 +65,7 @@
     border: 1px solid #dbe4de;
     border-radius: 10px;
     padding: 9px 15px;
-    color: #34853F;
+    color: #2f8158;
     background: #ffffff;
     font-size: 14px;
     font-weight: 600;
@@ -83,9 +83,9 @@
 }
 
 .scan-back-button:hover {
-    border-color: #34853F;
+    border-color: #2f8158;
     color: #ffffff;
-    background: #34853F;
+    background: #2f8158;
 }
 
 .scan-content-grid {
@@ -135,8 +135,8 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    color: #34853F;
-    background: #eaf6ed;
+    color: #2f8158;
+    background: #e8f3ec;
     flex-shrink: 0;
 }
 
@@ -174,8 +174,8 @@
 }
 
 .scanner-status--active::before {
-    background: #3B8F47;
-    box-shadow: 0 0 0 3px rgba(59, 143, 71, 0.2);
+    background: #34855b;
+    box-shadow: 0 0 0 3px rgba(47, 129, 88, 0.2);
     animation: scan-pulse 1.6s ease-in-out infinite;
 }
 
@@ -190,7 +190,7 @@
     align-items: center;
     justify-content: center;
     min-height: 330px;
-    border: 1px dashed #cfe0d2;
+    border: 1px dashed #d8e7dd;
     border-radius: 16px;
     padding: 12px;
     background: linear-gradient(180deg, #f8fbf9 0%, #f1f6f2 100%);
@@ -265,13 +265,13 @@
     height: 64px;
     margin-bottom: 12px;
     border-radius: 16px;
-    color: #3B8F47;
-    background: linear-gradient(135deg, #eaf6ed, #dff2e3);
+    color: #34855b;
+    background: linear-gradient(135deg, #e8f3ec, #dff0e6);
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     font-size: 28px;
     content: "\f029";
-    box-shadow: 0 8px 20px rgba(59, 143, 71, 0.12);
+    box-shadow: 0 8px 20px rgba(47, 129, 88, 0.12);
 }
 
 #reader__scan_region:not(:has(video))::after {
@@ -332,8 +332,8 @@
 #reader__dashboard_section_csr select:focus,
 #reader select:focus {
     outline: none;
-    border-color: #3B8F47;
-    box-shadow: 0 0 0 3px rgba(59, 143, 71, 0.12);
+    border-color: #34855b;
+    box-shadow: 0 0 0 3px rgba(47, 129, 88, 0.12);
 }
 
 #reader__dashboard_section {
@@ -361,8 +361,8 @@
     border-radius: 12px;
     padding: 13px 20px;
     color: #ffffff;
-    background: linear-gradient(135deg, #3B8F47, #34853F);
-    box-shadow: 0 6px 16px rgba(59, 143, 71, 0.22);
+    background: linear-gradient(135deg, #34855b, #2f8158);
+    box-shadow: 0 6px 16px rgba(47, 129, 88, 0.22);
     font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.01em;
@@ -372,7 +372,7 @@
 
 #reader button:hover {
     filter: brightness(1.05);
-    box-shadow: 0 8px 20px rgba(59, 143, 71, 0.28);
+    box-shadow: 0 8px 20px rgba(47, 129, 88, 0.28);
     transform: translateY(-1px);
 }
 
@@ -388,10 +388,10 @@
     gap: 8px;
     width: 100%;
     margin: 4px 0 0;
-    border: 1px solid #cfe0d2;
+    border: 1px solid #d8e7dd;
     border-radius: 12px;
     padding: 12px 16px;
-    color: #34853F;
+    color: #2f8158;
     background: #f7fbf8;
     font-size: 14px;
     font-weight: 600;
@@ -417,9 +417,9 @@
 }
 
 #reader__dashboard_section_swaplink:hover {
-    border-color: #3B8F47;
-    color: #174d18;
-    background: #eaf6ed;
+    border-color: #34855b;
+    color: #216e4b;
+    background: #e8f3ec;
     transform: translateY(-1px);
 }
 
@@ -439,11 +439,11 @@
     gap: 8px;
     width: 100%;
     margin: 0;
-    border: 1px dashed #3B8F47;
+    border: 1px dashed #34855b;
     border-radius: 12px;
     padding: 14px 16px;
-    color: #34853F;
-    background: #f3faf4;
+    color: #2f8158;
+    background: #f3faf6;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -451,8 +451,8 @@
 }
 
 #reader label[for="html5-qrcode-private-filescan-input"]:hover {
-    background: #eaf6ed;
-    border-color: #34853F;
+    background: #e8f3ec;
+    border-color: #2f8158;
 }
 
 #reader__status_span {
@@ -473,7 +473,7 @@
 }
 
 #reader a[href="#"] {
-    color: #34853F;
+    color: #2f8158;
     font-weight: 600;
     text-decoration: none;
 }
@@ -501,7 +501,7 @@
 
 .scanner-instruction i {
     margin-top: 2px;
-    color: #3B8F47;
+    color: #34855b;
     flex-shrink: 0;
 }
 
@@ -523,8 +523,8 @@
     width: 34px;
     height: 34px;
     border-radius: 9px;
-    color: #3B8F47;
-    background: #dff2e3;
+    color: #34855b;
+    background: #dff0e6;
 }
 
 .scan-result-body {
@@ -591,8 +591,8 @@
 }
 
 .scan-status-badge--success {
-    color: #1f7a38;
-    background: #e4f7e8;
+    color: #216e4b;
+    background: #e8f3ec;
 }
 
 .scan-status-badge--error {

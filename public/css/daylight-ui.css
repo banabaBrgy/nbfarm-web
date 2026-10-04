@@ -1256,3 +1256,169 @@ body,
 .actions-cell {
     white-space: nowrap;
 }
+
+/* =====================================================
+   QR PRINT + SCAN — match daylight teal brand
+===================================================== */
+
+.qr-alert {
+    background: var(--nb-day-green-soft);
+    color: var(--nb-day-green);
+    border-color: var(--nb-day-border);
+}
+
+.qr-back:hover {
+    color: var(--nb-day-green);
+}
+
+.qr-print-header-copy h1 {
+    color: var(--nb-day-text);
+}
+
+.qr-btn-ghost {
+    color: var(--nb-day-green);
+    border-color: var(--nb-day-border);
+}
+
+.qr-btn-ghost:hover {
+    background: var(--nb-day-green-soft);
+    color: var(--nb-day-green-hover);
+    border-color: var(--nb-day-green);
+}
+
+.qr-btn-print {
+    background: var(--nb-day-green);
+    box-shadow: 0 6px 16px rgba(47, 129, 88, 0.18);
+}
+
+.qr-btn-print:hover {
+    background: var(--nb-day-green-hover);
+}
+
+.qr-label-brand {
+    background: var(--nb-day-green);
+}
+
+.qr-size,
+.qr-size-medium {
+    background: var(--nb-day-green-soft);
+    color: var(--nb-day-green);
+}
+
+.qr-size-small {
+    background: #eef6f1;
+    color: #347a56;
+}
+
+.qr-size-large {
+    background: #e2efe8;
+    color: var(--nb-day-green-hover);
+}
+
+.qr-size-extra-large {
+    background: #d5e8dc;
+    color: #164a31;
+}
+
+.qr-page-btn:hover,
+.qr-page-num:hover {
+    border-color: var(--nb-day-green);
+    color: var(--nb-day-green);
+}
+
+.qr-page-num.active {
+    background: var(--nb-day-green);
+    border-color: var(--nb-day-green);
+}
+
+.scan-page-icon {
+    background: linear-gradient(135deg, #34855b, var(--nb-day-green));
+    box-shadow: 0 8px 18px rgba(47, 129, 88, 0.2);
+}
+
+.scanner-card-title-icon {
+    color: var(--nb-day-green);
+    background: var(--nb-day-green-soft);
+}
+
+.scanner-status--active::before {
+    background: var(--nb-day-green);
+    box-shadow: 0 0 0 3px rgba(47, 129, 88, 0.2);
+}
+
+.scanner-frame {
+    border-color: var(--nb-day-border);
+    background: linear-gradient(180deg, #f8fbf9 0%, #f1f6f3 100%);
+}
+
+#reader__dashboard_section_csr select:focus,
+#reader select:focus {
+    border-color: var(--nb-day-green);
+    box-shadow: 0 0 0 3px rgba(47, 129, 88, 0.12);
+}
+
+#reader__scan_region:not(:has(video))::before {
+    color: var(--nb-day-green);
+    background: linear-gradient(135deg, var(--nb-day-green-soft), #dff0e6);
+    box-shadow: 0 8px 20px rgba(47, 129, 88, 0.12);
+}
+
+#reader button {
+    background: linear-gradient(135deg, #34855b, var(--nb-day-green));
+    box-shadow: 0 6px 16px rgba(47, 129, 88, 0.22);
+}
+
+#reader button:hover {
+    box-shadow: 0 8px 20px rgba(47, 129, 88, 0.28);
+}
+
+#reader__dashboard_section_swaplink {
+    border-color: var(--nb-day-border);
+    color: var(--nb-day-green);
+    background: #f7fbf8;
+}
+
+#reader__dashboard_section_swaplink:hover {
+    border-color: var(--nb-day-green);
+    color: var(--nb-day-green-hover);
+    background: var(--nb-day-green-soft);
+}
+
+#reader label[for="html5-qrcode-private-filescan-input"] {
+    border-color: var(--nb-day-green);
+    color: var(--nb-day-green);
+    background: #f3faf6;
+}
+
+#reader label[for="html5-qrcode-private-filescan-input"]:hover {
+    background: var(--nb-day-green-soft);
+    border-color: var(--nb-day-green-hover);
+}
+
+#reader a[href="#"] {
+    color: var(--nb-day-green);
+}
+
+.scanner-instruction i {
+    color: var(--nb-day-green);
+}
+
+.scan-result-header {
+    background: linear-gradient(135deg, #f1faf4, #f8fbf9);
+}
+
+.scan-result-header-icon {
+    color: var(--nb-day-green);
+    background: #dff0e6;
+}
+
+.scan-status-badge--success {
+    color: var(--nb-day-green-hover);
+    background: var(--nb-day-green-soft);
+}
+
+@media print {
+    .qr-label-brand {
+        background: var(--nb-day-green) !important;
+    }
+}

@@ -18,10 +18,6 @@
     $tempLabel = $forecastSummary['temperature'] !== null
         ? number_format((float) $forecastSummary['temperature'], 1).'°C'
         : 'not available';
-    $historyYears = (int) $forecastSummary['history_years'];
-    $historyStartYear = \Carbon\Carbon::parse($forecastSummary['history_start'])->format('Y');
-    $historyEndYear = \Carbon\Carbon::parse($forecastSummary['history_end'])->format('Y');
-    $sampleDays = (int) $forecastSummary['sample_days'];
 @endphp
 
 <div class="modal fade" id="forecastSummaryModal" tabindex="-1" aria-labelledby="forecastSummaryLabel" aria-hidden="true">
@@ -40,14 +36,6 @@
                         · {{ $tempLabel }}
                     </small>
                 </div>
-
-                <p class="forecast-summary-note">
-                    Based on linear regression using the same date across the last
-                    {{ $historyYears }} years of production
-                    ({{ $historyStartYear }}–{{ $historyEndYear }}{{ $sampleDays > 0 ? ', '.$sampleDays.' matching '.($sampleDays === 1 ? 'day' : 'days') : '' }}),
-                    then adjusted with tomorrow’s forecast temperature ({{ $tempLabel }}).
-                    Cooler weather favors Large eggs; warmer weather favors Small eggs.
-                </p>
 
                 <table class="table mb-0 forecast-summary-table">
                     <thead>

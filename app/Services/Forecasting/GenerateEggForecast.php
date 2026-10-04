@@ -55,7 +55,6 @@ class GenerateEggForecast
             'medium' => 'Medium',
             'large' => 'Large',
             'extra_large' => 'Extra Large',
-            'cracked' => 'Cracked',
         ];
 
         $predicted = (int) $prediction['eggs'];

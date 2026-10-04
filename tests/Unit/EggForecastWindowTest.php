@@ -70,7 +70,7 @@ class EggForecastWindowTest extends TestCase
         $this->assertSame(3, $summary['sample_days']);
         $this->assertSame(26.5, $summary['temperature']);
         $this->assertSame(6600, collect($summary['sizes'])->sum('eggs'));
-        $this->assertTrue(collect($summary['sizes'])->contains(fn ($size) => $size['key'] === 'cracked'));
+        $this->assertFalse(collect($summary['sizes'])->contains(fn ($size) => $size['key'] === 'cracked'));
 
         Carbon::setTestNow();
     }
