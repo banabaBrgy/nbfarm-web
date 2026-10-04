@@ -27,6 +27,74 @@
     justify-content:flex-end;
 }
 
+.stat-card--predicted.stat-card--clickable{
+    cursor:pointer;
+}
+
+.stat-card--predicted.stat-card--clickable:focus-visible{
+    outline:2px solid #34853F;
+    outline-offset:2px;
+}
+
+.forecast-summary-modal .forecast-summary-total{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    margin-bottom:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:#F4F8F4;
+}
+
+.forecast-summary-modal .forecast-summary-total span{
+    font-size:12px;
+    color:#6B7C6E;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+.forecast-summary-modal .forecast-summary-total strong{
+    font-size:22px;
+    color:#34853F;
+    line-height:1.2;
+}
+
+.forecast-summary-modal .forecast-summary-total small{
+    color:#6B7C6E;
+}
+
+.forecast-summary-modal .forecast-summary-note{
+    font-size:13px;
+    color:#6B7C6E;
+    margin-bottom:14px;
+}
+
+.forecast-summary-modal .forecast-summary-table th,
+.forecast-summary-modal .forecast-summary-table td{
+    vertical-align:middle;
+}
+
+.forecast-summary-modal .forecast-summary-table thead,
+.modal .forecast-summary-table thead{
+    background:#E8F2EA !important;
+}
+
+.forecast-summary-modal .forecast-summary-table thead th,
+.modal .forecast-summary-table thead th{
+    color:#1F3324 !important;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    border-bottom:1px solid #C5D8CA !important;
+    background:#E8F2EA !important;
+}
+
+.forecast-summary-modal .forecast-summary-table .forecast-summary-category{
+    font-weight:600;
+    color:#24362A;
+}
+
 .production-page .card{
     border:1px solid #E6ECE8;
     border-radius:16px;

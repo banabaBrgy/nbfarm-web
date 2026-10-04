@@ -747,6 +747,18 @@ textarea,
     padding: 11px 14px;
 }
 
+.forecast-summary-modal .table thead,
+.forecast-summary-modal .forecast-summary-table thead {
+    background: #E8F2EA !important;
+}
+
+.forecast-summary-modal .table thead th,
+.forecast-summary-modal .forecast-summary-table thead th {
+    color: #1F3324 !important;
+    background: #E8F2EA !important;
+    border-bottom: 1px solid #C5D8CA !important;
+}
+
 .table tbody td,
 .inventory-table td,
 .user-table td,

@@ -9,6 +9,38 @@ use Illuminate\Support\Facades\Log;
 
 class WeatherService
 {
+    /**
+     * Mean daily temperature (°C) for a calendar date from the farm forecast.
+     * Uses (max + min) / 2 when that day is in the Open-Meteo daily list.
+     */
+    public function temperatureForDate(Carbon|string $date): ?float
+    {
+        $weather = $this->current();
+        if ($weather === null) {
+            return null;
+        }
+
+        $target = Carbon::parse($date, 'Asia/Manila')->toDateString();
+
+        foreach ($weather['forecast'] ?? [] as $day) {
+            if (($day['date'] ?? null) === $target) {
+                $max = (float) ($day['max'] ?? 0);
+                $min = (float) ($day['min'] ?? 0);
+
+                return round(($max + $min) / 2, 1);
+            }
+        }
+
+        // Only reuse the live reading when the requested day is today.
+        // Never pretend today's temp is tomorrow's forecast.
+        $today = Carbon::now('Asia/Manila')->toDateString();
+        if ($target === $today && isset($weather['temperature'])) {
+            return (float) $weather['temperature'];
+        }
+
+        return null;
+    }
+
     public function current(): ?array
     {
         $lat = config('services.weather.lat');

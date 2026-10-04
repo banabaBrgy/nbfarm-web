@@ -64,19 +64,20 @@
         </div>
     </div>
 
-    <div class="stat-card stat-card--predicted">
-        <button
-            type="button"
-            class="stat-icon border-0"
-            data-bs-toggle="modal"
-            data-bs-target="#forecastHistoryModal"
-            aria-label="View forecast history">
+    <div
+        class="stat-card stat-card--predicted stat-card--clickable"
+        role="button"
+        tabindex="0"
+        data-bs-toggle="modal"
+        data-bs-target="#forecastSummaryModal"
+        aria-label="View forecast summary by size">
+        <div class="stat-icon">
             <i class="fas fa-chart-line"></i>
-        </button>
+        </div>
         <div class="stat-info">
             <span class="stat-title">Predicted Eggs</span>
             <h2>{{ number_format($predictedEggs) }}</h2>
-            <small>Next-day forecast</small>
+            <small>Next-day forecast · tap for sizes</small>
         </div>
     </div>
 
@@ -188,6 +189,8 @@
     </div>
 
 </div>
+
+<x-forecast-summary-modal :forecast-summary="$forecastSummary ?? null" :show-history="true" />
 
 <div class="modal fade" id="forecastHistoryModal" tabindex="-1" aria-labelledby="forecastHistoryLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

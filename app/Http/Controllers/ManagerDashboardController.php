@@ -214,7 +214,8 @@ class ManagerDashboardController extends Controller
         $forecast = app(GenerateEggForecast::class)->forWeek($weekStart, $weekEnd);
         $eggForecastLabels = $forecast['labels'];
         $eggForecastData = $forecast['data'];
-        $predictedEggs = $forecast['predicted_eggs'];
+        $forecastSummary = app(GenerateEggForecast::class)->summary();
+        $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? $forecast['predicted_eggs']);
 
         $productionTrend = app(ProductionYearTrend::class)
             ->forYear($request->query('trend_year'));
@@ -251,6 +252,7 @@ class ManagerDashboardController extends Controller
                 'eggForecastData',
 
                 'predictedEggs',
+                'forecastSummary',
 
                 'productionTrend'
 

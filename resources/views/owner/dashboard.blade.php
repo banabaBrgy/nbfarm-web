@@ -64,14 +64,20 @@
         </div>
 
         {{-- Predicted eggs (Python linear regression) --}}
-        <div class="stat-card stat-card--predicted">
+        <div
+            class="stat-card stat-card--predicted stat-card--clickable"
+            role="button"
+            tabindex="0"
+            data-bs-toggle="modal"
+            data-bs-target="#forecastSummaryModal"
+            aria-label="View forecast summary by size">
             <div class="stat-icon">
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="stat-info">
                 <span class="stat-title">Predicted Eggs</span>
                 <h2>{{ number_format($predictedEggs) }}</h2>
-                <small>Next-day forecast</small>
+                <small>Next-day forecast · tap for sizes</small>
             </div>
         </div>
 
@@ -172,6 +178,8 @@
 
         @include('dashboard.inventory-levels-panel')
     </div>
+
+    <x-forecast-summary-modal :forecast-summary="$forecastSummary ?? null" />
 
 @endsection
 

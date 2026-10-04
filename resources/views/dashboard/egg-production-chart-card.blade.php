@@ -13,7 +13,7 @@
                 @if(! empty($productionTrend['selectedYear']))
                     Egg Production — {{ $productionTrend['selectedYear'] }}
                 @else
-                    Egg Production — Last 7 Days + Forecast
+                    Egg Production — This Week + 3-Year Forecast
                 @endif
             </h3>
         </div>

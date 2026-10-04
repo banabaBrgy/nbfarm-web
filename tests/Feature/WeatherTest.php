@@ -72,4 +72,15 @@ class WeatherTest extends TestCase
         $this->getJson(route('weather.current'))
             ->assertUnauthorized();
     }
+
+    public function test_temperature_for_date_uses_daily_mean_and_does_not_spoof_missing_days(): void
+    {
+        $this->fakeForecast();
+        Cache::flush();
+
+        $weather = app(WeatherService::class);
+
+        $this->assertSame(27.0, $weather->temperatureForDate('2026-08-30'));
+        $this->assertNull($weather->temperatureForDate('2026-09-10'));
+    }
 }

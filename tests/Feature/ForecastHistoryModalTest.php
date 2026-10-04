@@ -16,14 +16,31 @@ class ForecastHistoryModalTest extends TestCase
     {
         $this->app->instance(ForecastEngine::class, new class implements ForecastEngine
         {
-            public function predict(array $history, array $predictDates, int $window): array
-            {
+            public function predict(
+                array $history,
+                array $predictDates,
+                int $window = 7,
+                array $temperatures = [],
+                array $options = [],
+            ): array {
                 return [
                     'predicted_eggs' => 0,
                     'forecast_date' => '2026-09-24',
                     'labels' => [],
                     'data' => [],
-                    'series' => [],
+                    'series' => [[
+                        'date' => '2026-09-24',
+                        'eggs' => 0,
+                        'sample_days' => 0,
+                        'temperature' => null,
+                        'sizes' => [
+                            'small' => 0,
+                            'medium' => 0,
+                            'large' => 0,
+                            'extra_large' => 0,
+                            'cracked' => 0,
+                        ],
+                    ]],
                 ];
             }
         });
@@ -38,6 +55,8 @@ class ForecastHistoryModalTest extends TestCase
         $response = $this->actingAs($user)->get('/staff/production');
 
         $response->assertOk();
+        $response->assertSee('id="forecastSummaryModal"', false);
+        $response->assertSee('Forecast Summary', false);
         $response->assertSee('id="forecastHistoryModal"', false);
         $response->assertSee('View forecast history', false);
         $response->assertSee('Sep 21, 2026', false);
@@ -48,14 +67,31 @@ class ForecastHistoryModalTest extends TestCase
     {
         $this->app->instance(ForecastEngine::class, new class implements ForecastEngine
         {
-            public function predict(array $history, array $predictDates, int $window): array
-            {
+            public function predict(
+                array $history,
+                array $predictDates,
+                int $window = 7,
+                array $temperatures = [],
+                array $options = [],
+            ): array {
                 return [
                     'predicted_eggs' => 0,
                     'forecast_date' => '2026-09-24',
                     'labels' => [],
                     'data' => [],
-                    'series' => [],
+                    'series' => [[
+                        'date' => '2026-09-24',
+                        'eggs' => 0,
+                        'sample_days' => 0,
+                        'temperature' => null,
+                        'sizes' => [
+                            'small' => 0,
+                            'medium' => 0,
+                            'large' => 0,
+                            'extra_large' => 0,
+                            'cracked' => 0,
+                        ],
+                    ]],
                 ];
             }
         });

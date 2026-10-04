@@ -219,6 +219,15 @@ body{
 
 /* Per-metric accent colors (dashboard summary row) */
 .stat-card--eggs .stat-icon,
+.stat-card--predicted.stat-card--clickable{
+    cursor:pointer;
+}
+
+.stat-card--predicted.stat-card--clickable:focus-visible{
+    outline:2px solid #34853F;
+    outline-offset:2px;
+}
+
 .stat-card--predicted .stat-icon,
 .stat-card--inventory .stat-icon{
     background:linear-gradient(145deg, #4CAF50 0%, #2E7D32 100%);
