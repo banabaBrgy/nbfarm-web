@@ -3,7 +3,7 @@
 @section('title','Batch Details')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/production-details.css') }}">
+<link rel="stylesheet" href="{{ versioned_asset('css/production-details.css') }}">
 @endpush
 
 @section('content')

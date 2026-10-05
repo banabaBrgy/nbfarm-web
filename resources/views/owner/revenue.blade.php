@@ -5,7 +5,7 @@
 @section('page-label', 'Revenue')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/revenue.css') }}">
+  <link rel="stylesheet" href="{{ versioned_asset('css/revenue.css') }}">
 @endpush
 
 @section('content')
@@ -107,5 +107,5 @@
       csrfToken: document.querySelector('meta[name="csrf-token"]').content,
     };
   </script>
-  <script src="{{ asset('js/revenue.js') }}"></script>
+  <script src="{{ versioned_asset('js/revenue.js') }}"></script>
 @endpush

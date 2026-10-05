@@ -4,7 +4,7 @@
 @section('page-label', 'Dispatch')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dispatch.css') }}">
+<link rel="stylesheet" href="{{ versioned_asset('css/dispatch.css') }}">
 @endpush
 
 @section('content')

@@ -4,7 +4,7 @@
 @section('page-label', 'Inventory')
 
 @push('styles')
-  <link rel="stylesheet" href="{{ asset('css/inventory.css') }}">
+  <link rel="stylesheet" href="{{ versioned_asset('css/inventory.css') }}">
 @endpush
 
 @section('content')

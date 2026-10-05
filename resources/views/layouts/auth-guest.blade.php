@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link rel="stylesheet" href="{{ versioned_asset('css/login.css') }}">
     @stack('head')
 </head>
 
@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/auth-recovery.js') }}"></script>
+    <script src="{{ versioned_asset('js/auth-recovery.js') }}"></script>
     @stack('scripts')
 </body>
 

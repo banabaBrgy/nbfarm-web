@@ -5,8 +5,8 @@
 @section('page-label', 'Manager Dashboard')
 
     @push('styles')
-        <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/manager.dashboard.css') }}">
+        <link rel="stylesheet" href="{{ versioned_asset('css/dashboard.css') }}">
+        <link rel="stylesheet" href="{{ versioned_asset('css/manager.dashboard.css') }}">
     @endpush
 
 

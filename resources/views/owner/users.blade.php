@@ -4,7 +4,7 @@
 @section('page-label', 'Users')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/users.css') }}">
+<link rel="stylesheet" href="{{ versioned_asset('css/users.css') }}">
 @endpush
 
 @section('content')

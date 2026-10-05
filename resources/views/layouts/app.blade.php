@@ -18,7 +18,7 @@
         'resources/css/dashboard.css',
         'resources/js/app.js'
     ])
-    <link rel="stylesheet" href="{{ asset('css/daylight-ui.css') }}">
+    <link rel="stylesheet" href="{{ versioned_asset('css/daylight-ui.css') }}">
 
 </head>
 
