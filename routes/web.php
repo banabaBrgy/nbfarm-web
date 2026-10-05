@@ -35,9 +35,6 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
-Route::get('/owner/users', [UserController::class, 'index'])
-    ->name('owner.users');
-
 // Forgot Password
 
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])
@@ -83,7 +80,7 @@ Route::middleware('auth')->prefix('alerts')->name('alerts.')->group(function () 
 |--------------------------------------------------------------------------
 */
 Route::prefix('manager')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'role:manager'])
     ->name('manager.')
     ->group(function () {
 
@@ -159,7 +156,7 @@ Route::prefix('manager')
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->prefix('owner')->name('owner.')->group(function () {
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/production', [ProductionController::class, 'index'])->name('production');
     Route::get('/production/{id}/details', [ProductionDetailsController::class, 'index'])->name('production.details');
@@ -220,7 +217,7 @@ Route::post('/reports/{report}/remark', [OwnerReportController::class, 'saveRema
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->prefix('staff')->name('staff.')->group(function () {
+Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -265,20 +262,4 @@ Route::middleware('auth')->prefix('staff')->name('staff.')->group(function () {
 
     Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])
         ->name('qr.update');
-
-    Route::prefix('owner')->name('owner.')->group(function () {
-
-        Route::get('/users', [UserController::class, 'index'])
-            ->name('users');
-
-        Route::post('/users', [UserController::class, 'store'])
-            ->name('users.store');
-
-        Route::put('/users/{user}', [UserController::class, 'update'])
-            ->name('users.update');
-
-        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
-            ->name('users.toggleStatus');
-
-    });
 });

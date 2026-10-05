@@ -12,7 +12,7 @@
 
     <label for="trendYear">View</label>
     <select id="trendYear" name="trend_year" data-auto-submit>
-        <option value="">Week + 3-year forecast</option>
+        <option value="">7-day forecast</option>
         @foreach(($productionTrend['years'] ?? [2023, 2024, 2025, 2026]) as $year)
             <option value="{{ $year }}" @selected((int) $productionTrend['selectedYear'] === $year)>
                 {{ $year }}
