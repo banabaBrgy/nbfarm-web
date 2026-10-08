@@ -25,6 +25,7 @@
         $pendingDeliveries = $pendingDeliveries ?? 0;
 
         $revenueToday = $revenueToday ?? 0;
+        $salesThisMonth = $salesThisMonth ?? 0;
 
         $eggsTotal = $eggsTotal ?? 0;
 
@@ -66,7 +67,7 @@
 
 
 
-    <div class="stats-grid stats-grid--five">
+    <div class="stats-grid stats-grid--six">
 
 
         {{-- TODAY EGGS --}}
@@ -220,6 +221,20 @@
                 </div>
 
             </div>
+
+            <a
+                href="{{ route('manager.sales.history') }}"
+                class="stat-card stat-card--revenue stat-card--clickable"
+                aria-label="View sales history">
+                <div class="stat-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-title">This Month's Sales</span>
+                    <h2>₱{{ number_format($salesThisMonth, 2) }}</h2>
+                    <small>Tap to view all sales</small>
+                </div>
+            </a>
 
 
 

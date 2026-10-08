@@ -46,6 +46,54 @@ class Transaction extends Model
                       ->whereYear('transaction_date', Carbon::now()->year);
     }
 
+    /**
+     * Sales history periods: all, today, month, previous, YYYY-MM, or custom.
+     */
+    public function scopeForSalesRange(Builder $query, string $range, ?string $from = null, ?string $to = null): Builder
+    {
+        $today = Carbon::today();
+
+        if ($range === 'today') {
+            return $query->whereDate('transaction_date', $today);
+        }
+
+        if ($range === 'month') {
+            return $query->whereBetween('transaction_date', [
+                $today->copy()->startOfMonth()->toDateString(),
+                $today->copy()->endOfMonth()->toDateString(),
+            ]);
+        }
+
+        if ($range === 'previous') {
+            return $query->where('transaction_date', '<', $today->copy()->startOfMonth()->toDateString());
+        }
+
+        if (preg_match('/^\d{4}-\d{2}$/', $range) === 1) {
+            [$year, $month] = array_map('intval', explode('-', $range));
+            $start = Carbon::create($year, $month, 1)->startOfMonth();
+
+            return $query->whereBetween('transaction_date', [
+                $start->toDateString(),
+                $start->copy()->endOfMonth()->toDateString(),
+            ]);
+        }
+
+        if ($range === 'custom' && $from && $to) {
+            return $query->whereBetween('transaction_date', [$from, $to]);
+        }
+
+        if ($range === 'custom') {
+            return $query->whereRaw('0 = 1');
+        }
+
+        return $query;
+    }
+
+    public static function thisMonthTotal(): float
+    {
+        return (float) static::query()->forSalesRange('month')->sum('price');
+    }
+
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'Pending');

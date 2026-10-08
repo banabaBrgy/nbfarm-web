@@ -12,10 +12,18 @@ class HistoricalProductionSeeder extends Seeder
     use SeedsHarvestQr;
 
     /**
-     * Client harvest for 2023, 2024, and 2025 (daily batch and size totals).
-     * 2026 stays on the weekly seeder.
+     * Client harvest for 2023–2026. Each year comes from the farm PDF.
      */
     public function run(): void
+    {
+        $count = $this->seedClientFile();
+
+        Cache::flush();
+
+        $this->command?->info("Client harvest 2023–2026: {$count} days loaded from the updated PDFs.");
+    }
+
+    public function seedClientFile(?int $year = null): int
     {
         $path = database_path('seeders/data/client_egg_production.json');
         $days = json_decode((string) file_get_contents($path), true);
@@ -24,10 +32,18 @@ class HistoricalProductionSeeder extends Seeder
             throw new RuntimeException('Client egg production file is missing or empty.');
         }
 
-        $count = $this->seedClientDays($days);
+        if ($year !== null) {
+            $prefix = $year.'-';
+            $days = array_values(array_filter(
+                $days,
+                fn (array $day): bool => str_starts_with((string) $day['date'], $prefix)
+            ));
+        }
 
-        Cache::flush();
+        if ($days === []) {
+            throw new RuntimeException('No client harvest days matched the requested year.');
+        }
 
-        $this->command?->info("Client harvest 2023–2025: {$count} days loaded from the updated PDFs.");
+        return $this->seedClientDays($days);
     }
 }

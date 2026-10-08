@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductionDetailsController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\RevenueController;
+use App\Http\Controllers\SalesHistoryController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\QrScannerController;
 use App\Http\Controllers\QrRecordController;
@@ -87,6 +88,9 @@ Route::prefix('manager')
         Route::get('/dashboard', [ManagerDashboardController::class, 'index'])
             ->name('dashboard');
 
+        Route::get('/sales/history', [SalesHistoryController::class, 'index'])
+            ->name('sales.history');
+
         // Production
         Route::get('/production', [ProductionController::class, 'index'])->name('production');
 
@@ -158,6 +162,7 @@ Route::prefix('manager')
 
 Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard', [OwnerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/sales/history', [SalesHistoryController::class, 'index'])->name('sales.history');
     Route::get('/production', [ProductionController::class, 'index'])->name('production');
     Route::get('/production/{id}/details', [ProductionDetailsController::class, 'index'])->name('production.details');
     Route::get('/production/batch/{batch}', [BatchController::class, 'show'])->name('batch.details');
