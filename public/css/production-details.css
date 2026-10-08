@@ -12,7 +12,7 @@
 ================================ */
 
 .btn-back{
-    background:#34853F;
+    background:var(--nb-day-green, #2f8158);
     color:#fff;
     border:none;
     border-radius:10px;
@@ -23,7 +23,7 @@
 }
 
 .btn-back:hover{
-    background:#1E5318;
+    background:var(--nb-day-green-hover, #216e4b);
     color:#fff;
 }
 
@@ -66,7 +66,7 @@
 .detail-card h1{
     margin:0;
     font-size:20px;
-    color:#34853F;
+    color:var(--nb-day-green, #2f8158);
     font-weight:700;
 }
 
@@ -76,10 +76,12 @@
 
 .records-card{
     background:#FFFFFF;
-    border-radius:16px;
+    border:1px solid var(--nb-day-border, #d8e7dd);
+    border-radius:12px;
     overflow:hidden;
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
+    box-shadow:0 4px 18px rgba(26, 73, 48, 0.08);
     margin-top:20px;
+    padding:22px 24px;
 }
 
 .records-header{
@@ -125,8 +127,9 @@
 .records-card tbody td{
     padding:16px;
     border-bottom:1px solid #E5E7EB;
-    color:#374151;
-    font-size:14px;
+    color:#21352c;
+    font-size:15px;
+    font-weight:500;
 }
 
 .records-card tbody tr:hover{

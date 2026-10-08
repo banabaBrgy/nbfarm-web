@@ -23,18 +23,9 @@ html {
 }
 
 body {
-    display: flex;
-    flex-direction: column;
     min-height: 100vh;
     background: var(--nb-day-bg);
     color: var(--nb-day-text);
-}
-
-/* Short pages (e.g. User Management) should keep the footer at the bottom
-   like Sales, without using position: fixed. */
-.wrapper {
-    flex: 1 0 auto;
-    min-height: 0;
 }
 
 body,
@@ -100,8 +91,6 @@ textarea,
 
 .wrapper + .footer {
     border-top: 1px solid rgba(26, 73, 48, 0.08);
-    position: relative;
-    z-index: 10;
     box-shadow: 0 -4px 18px rgba(26, 73, 48, 0.12) !important;
 }
 
@@ -132,19 +121,18 @@ textarea,
     box-shadow: none;
 }
 
-/* Keep the application footer in normal document flow instead of covering
-   the last rows of long tables or pages. */
+/* Pin the application footer to the bottom of the viewport (client preference). */
 .wrapper + .footer {
-    position: relative;
-    z-index: 10;
-    left: auto;
-    right: auto;
+    position: fixed;
+    z-index: 999;
+    bottom: 0;
+    left: 250px;
+    right: 0;
     width: auto;
-    height: auto;
+    height: 48px;
     min-height: 48px;
-    margin-left: 250px;
-    padding: 14px 24px;
-    flex-shrink: 0;
+    margin-left: 0;
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -504,14 +492,42 @@ textarea,
     box-shadow: 0 0 0 3px rgba(33, 110, 75, 0.16);
 }
 
-.production-page .btn-success {
+.production-page .btn-success,
+.production-details-page .btn-success,
+.modal .btn-success {
     background: var(--nb-day-green);
     border-color: var(--nb-day-green);
 }
 
-.production-page .btn-success:hover {
+.production-page .btn-success:hover,
+.production-details-page .btn-success:hover,
+.modal .btn-success:hover {
     background: var(--nb-day-green-hover);
     border-color: var(--nb-day-green-hover);
+}
+
+.production-details-page .btn-secondary,
+.modal .btn-secondary {
+    background: #8a9a91;
+    border-color: #8a9a91;
+    color: #fff;
+}
+
+.production-details-page .btn-secondary:hover,
+.modal .btn-secondary:hover {
+    background: #738278;
+    border-color: #738278;
+    color: #fff;
+}
+
+.production-details-page .modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.production-details-page .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 1;
 }
 
 /* Keep the inventory sections visually connected without removing pagination. */
@@ -657,14 +673,14 @@ textarea,
 
 @media (max-width: 992px) {
     .wrapper + .footer {
-        margin-left: 220px;
+        left: 220px;
     }
 }
 
 @media (max-width: 768px) {
     .wrapper + .footer {
-        margin-left: 0;
-        padding: 14px 16px;
+        left: 0;
+        padding: 0 12px;
     }
 }
 
@@ -674,7 +690,8 @@ textarea,
 ===================================================== */
 
 .main-content {
-    padding: 24px 28px 32px;
+    /* Extra bottom padding clears the fixed footer. */
+    padding: 24px 28px 72px;
 }
 
 .page-header,
@@ -837,7 +854,7 @@ textarea,
 
 @media (max-width: 768px) {
     .main-content {
-        padding: 18px 16px 28px;
+        padding: 18px 16px 72px;
     }
 
     .table-container,
@@ -859,7 +876,7 @@ textarea,
 
 @media (max-width: 480px) {
     .main-content {
-        padding: 14px 12px 24px;
+        padding: 14px 12px 68px;
     }
 
     .stat-card,
@@ -920,7 +937,7 @@ textarea,
     }
 
     body.sidebar-collapsed .wrapper + .footer {
-        margin-left: 0;
+        left: 0;
     }
 }
 
