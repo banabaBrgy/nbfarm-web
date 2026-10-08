@@ -130,7 +130,7 @@
                         <th>Items</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th>{{ $canManage ? 'Action' : 'View' }}</th>
+                        <th class="dsp-action-col">{{ $canManage ? 'Action' : 'View' }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -181,7 +181,7 @@
                             <td>
                                 <span class="dsp-badge dsp-badge-{{ $statusKey }}">{{ $dispatch->status }}</span>
                             </td>
-                            <td>
+                            <td class="dsp-action-col">
                                 <div class="dsp-actions">
                                     @if($canManage)
                                         <button

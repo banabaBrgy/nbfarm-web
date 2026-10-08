@@ -137,6 +137,8 @@
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    min-width: 0;
+    max-width: 100%;
 }
 
 .dsp-toolbar {
@@ -298,13 +300,18 @@
 /* ----- Table ----- */
 
 .dsp-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .dsp-table {
     width: 100%;
-    border-collapse: collapse;
-    min-width: 860px;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 990px;
     table-layout: fixed;
 }
 
@@ -315,11 +322,19 @@
 .dsp-col-items { width: 160px; }
 .dsp-col-price { width: 92px; }
 .dsp-col-status { width: 122px; }
-.dsp-col-action { width: 64px; }
+.dsp-col-action { width: 116px; }
 
 .dsp-table th,
 .dsp-table td {
     overflow: hidden;
+}
+
+.dsp-table th.dsp-action-col,
+.dsp-table td.dsp-action-col {
+    width: 116px;
+    min-width: 116px;
+    overflow: visible;
+    white-space: nowrap;
 }
 
 .dsp-table thead {
@@ -469,7 +484,13 @@
 .dsp-actions {
     display: flex;
     align-items: center;
+    flex-wrap: nowrap;
     gap: 8px;
+}
+
+.dispatch-page .dsp-actions > *,
+.dispatch-page .dsp-icon-btn {
+    flex: 0 0 auto;
 }
 
 .dsp-icon-btn {
@@ -505,8 +526,9 @@
 }
 
 .delete-dispatch-form {
-    display: inline;
+    display: inline-flex;
     margin: 0;
+    flex: 0 0 auto;
 }
 
 /* ----- Empty / pagination ----- */
@@ -813,6 +835,36 @@
         width: 100%;
         justify-content: flex-start;
         flex-wrap: wrap;
+    }
+
+    .dispatch-page .dsp-table th.dsp-action-col,
+    .dispatch-page .dsp-table td.dsp-action-col {
+        position: sticky;
+        right: 0;
+        background: #fff;
+        box-shadow: -8px 0 10px rgba(26, 73, 48, 0.06);
+    }
+
+    .dispatch-page .dsp-table td.dsp-action-col {
+        z-index: 1;
+    }
+
+    .dispatch-page .dsp-table thead th.dsp-action-col {
+        top: 0;
+        z-index: 4;
+        background: #2f8158;
+    }
+
+    .dispatch-page .dsp-table tbody tr:hover td.dsp-action-col {
+        background: #f1f8f3;
+    }
+
+    .dispatch-page .dsp-table tbody tr.dsp-row-selected td.dsp-action-col {
+        background: #f3faf3;
+    }
+
+    .dispatch-page .dsp-table tbody tr.dsp-row-selected:hover td.dsp-action-col {
+        background: #eaf6ea;
     }
 }
 
