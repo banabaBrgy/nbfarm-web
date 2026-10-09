@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
-@section('title', 'Sales History')
-@section('page-label', 'Sales History')
+@section('title', 'Revenue History')
+@section('page-label', 'Revenue History')
 
 @push('styles')
     <link rel="stylesheet" href="{{ versioned_asset('css/sales-history.css') }}">
@@ -16,8 +16,8 @@
 <div class="sales-history-page">
     <div class="page-header">
         <div>
-            <h2>Sales History</h2>
-            <p>Review every recorded sale. Use the date filter to look at today, this month, previous months, or a custom range.</p>
+            <h2>Revenue History</h2>
+            <p>Review all recorded sales and filter revenue by today, this week, this month, previous months, or a custom date range.</p>
         </div>
     </div>
 
@@ -27,6 +27,7 @@
             <select name="range" data-auto-submit aria-label="Sales date filter">
                 <option value="all" @selected($range === 'all')>All sales</option>
                 <option value="today" @selected($range === 'today')>Today</option>
+                <option value="week" @selected($range === 'week')>This week</option>
                 <option value="month" @selected($range === 'month')>This month</option>
                 <option value="previous" @selected($range === 'previous')>All previous months</option>
                 <option value="custom" @selected($range === 'custom')>Custom range</option>

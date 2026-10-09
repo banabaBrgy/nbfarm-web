@@ -47,7 +47,7 @@ class Transaction extends Model
     }
 
     /**
-     * Sales history periods: all, today, month, previous, YYYY-MM, or custom.
+     * Sales history periods: all, today, week, month, previous, YYYY-MM, or custom.
      */
     public function scopeForSalesRange(Builder $query, string $range, ?string $from = null, ?string $to = null): Builder
     {
@@ -55,6 +55,13 @@ class Transaction extends Model
 
         if ($range === 'today') {
             return $query->whereDate('transaction_date', $today);
+        }
+
+        if ($range === 'week') {
+            return $query->whereBetween('transaction_date', [
+                $today->copy()->startOfWeek()->toDateString(),
+                $today->copy()->endOfWeek()->toDateString(),
+            ]);
         }
 
         if ($range === 'month') {
@@ -87,11 +94,6 @@ class Transaction extends Model
         }
 
         return $query;
-    }
-
-    public static function thisMonthTotal(): float
-    {
-        return (float) static::query()->forSalesRange('month')->sum('price');
     }
 
     public function scopePending(Builder $query): Builder

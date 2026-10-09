@@ -144,8 +144,8 @@
                 'label' => 'Sales',
                 'icon' => 'fas fa-money-bill-wave',
                 'group' => 'Management',
-                'route' => 'owner.revenue',
-                'roles' => ['owner'],
+                'route' => $role == 'owner' ? 'owner.revenue' : 'manager.sales.history',
+                'roles' => ['owner', 'manager'],
             ],
             [
                 'label' => 'User Management',

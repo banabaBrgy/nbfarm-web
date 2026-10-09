@@ -46,7 +46,7 @@ class SalesHistoryController extends Controller
     {
         $range = is_string($range) ? $range : 'all';
 
-        if (in_array($range, ['all', 'today', 'month', 'previous', 'custom'], true)) {
+        if (in_array($range, ['all', 'today', 'week', 'month', 'previous', 'custom'], true)) {
             return $range;
         }
 
@@ -74,6 +74,10 @@ class SalesHistoryController extends Controller
     {
         if ($range === 'today') {
             return 'Today';
+        }
+
+        if ($range === 'week') {
+            return 'This week · '.Carbon::today()->startOfWeek()->format('M j').'–'.Carbon::today()->endOfWeek()->format('M j, Y');
         }
 
         if ($range === 'month') {

@@ -112,10 +112,6 @@ class ManagerDashboardController extends Controller
             today()
         )->sum('price');
 
-        $salesThisMonth = Transaction::thisMonthTotal();
-
-
-
         // ============================
         // LOW STOCK ALERT
         // ============================
@@ -244,7 +240,6 @@ class ManagerDashboardController extends Controller
                 'pendingDeliveries',
 
                 'revenueToday',
-                'salesThisMonth',
 
                 'lowStockAlert',
 

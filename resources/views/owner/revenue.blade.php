@@ -1,8 +1,8 @@
 
 @extends('layouts.sidebar')
 
-@section('title', 'Revenue')
-@section('page-label', 'Revenue')
+@section('title', 'Sales')
+@section('page-label', 'Sales')
 
 @push('styles')
   <link rel="stylesheet" href="{{ versioned_asset('css/revenue.css') }}">
@@ -16,7 +16,13 @@
         <h2>Sales</h2>
         <p>Track income, customers, and payment status.</p>
     </div>
-    @include('revenue.partials.form')
+    <div class="sales-page-actions">
+        <a href="{{ route('owner.sales.history') }}" class="btn-secondary-sm">
+            <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
+            Revenue History
+        </a>
+        @include('revenue.partials.form')
+    </div>
 </div>
 
 @include('revenue.partials.stats', ['stats' => $stats])

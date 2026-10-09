@@ -64,8 +64,6 @@ class OwnerDashboardController extends Controller
             today()
         )->sum('price');
 
-        $salesThisMonth = Transaction::thisMonthTotal();
-
         $lowStockAlert = InventoryItem::whereColumn(
             'current_stock',
             '<=',
@@ -132,7 +130,6 @@ class OwnerDashboardController extends Controller
             'dispatchedTrays',
             'pendingDeliveries',
             'revenueToday',
-            'salesThisMonth',
             'eggsTotal',
             'eggTrays',
             'vitamins',

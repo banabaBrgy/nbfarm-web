@@ -32,9 +32,10 @@ class SalesHistoryTest extends TestCase
         $response = $this->actingAs($owner)->get(route('owner.sales.history'));
 
         $response->assertOk();
-        $response->assertSee('Sales History');
+        $response->assertSee('Revenue History');
         $response->assertSee('All recorded sales');
         $response->assertSee('Today');
+        $response->assertSee('This week');
         $response->assertSee('This month');
         $response->assertSee('All previous months');
         $response->assertSee('Custom range');
@@ -52,6 +53,13 @@ class SalesHistoryTest extends TestCase
 
         $this->actingAs($manager)
             ->get(route('manager.sales.history', ['range' => 'today']))
+            ->assertOk()
+            ->assertSee('North Store')
+            ->assertDontSee('South Store')
+            ->assertSee('₱100.00');
+
+        $this->actingAs($manager)
+            ->get(route('manager.sales.history', ['range' => 'week']))
             ->assertOk()
             ->assertSee('North Store')
             ->assertDontSee('South Store')
@@ -92,28 +100,33 @@ class SalesHistoryTest extends TestCase
             ->assertSee('₱200.00');
     }
 
-    public function test_dashboard_card_links_to_the_full_history(): void
+    public function test_sales_page_links_to_revenue_history(): void
     {
-        $manager = User::factory()->create(['role' => 'manager']);
         $owner = User::factory()->create(['role' => 'owner']);
         $this->seedSales();
 
-        $managerPage = $this->actingAs($manager)->get(route('manager.dashboard'));
-        $ownerPage = $this->actingAs($owner)->get(route('owner.dashboard'));
+        $salesPage = $this->actingAs($owner)->get(route('owner.revenue'));
 
-        $managerPage->assertOk();
-        $ownerPage->assertOk();
+        $salesPage->assertOk();
+        $salesPage->assertSee('Sales');
+        $salesPage->assertSee('Revenue History');
+        $salesPage->assertSee(route('owner.sales.history'), false);
+    }
 
-        $managerPage->assertSee('This Month\'s Sales', false);
-        $ownerPage->assertSee('This Month\'s Sales', false);
-        $managerPage->assertSee('₱300.00', false);
-        $ownerPage->assertSee('₱300.00', false);
-        $managerPage->assertSee(route('manager.sales.history'), false);
-        $ownerPage->assertSee(route('owner.sales.history'), false);
-        $this->assertStringNotContainsString(
-            'sales/history?range=month',
-            $managerPage->getContent()
-        );
+    public function test_dashboard_does_not_contain_the_sales_card(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+        $owner = User::factory()->create(['role' => 'owner']);
+
+        $this->actingAs($manager)
+            ->get(route('manager.dashboard'))
+            ->assertOk()
+            ->assertDontSee("This Month's Sales", false);
+
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard'))
+            ->assertOk()
+            ->assertDontSee("This Month's Sales", false);
     }
 
     private function seedSales(): void
