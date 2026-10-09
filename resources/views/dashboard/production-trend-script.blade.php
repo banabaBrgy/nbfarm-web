@@ -118,12 +118,14 @@
                     y: {
                         display: true,
                         beginAtZero: true,
+                        max: 12000,
                         border: { display: false },
                         grid: {
                             color: gridGray,
                             drawTicks: false,
                         },
                         ticks: {
+                            stepSize: 3000,
                             color: axisGray,
                             padding: 8,
                             font: { size: 11 },
