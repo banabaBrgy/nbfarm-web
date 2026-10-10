@@ -77,6 +77,34 @@
                 ],
             };
 
+        const chartValues = data.datasets
+            .flatMap(function (dataset) {
+                return dataset.data;
+            })
+            .filter(function (value) {
+                return value !== null && value !== undefined && Number.isFinite(Number(value));
+            })
+            .map(Number)
+            .filter(function (value) {
+                return Number.isFinite(value);
+            });
+
+        const dataMin = chartValues.length ? Math.min(...chartValues) : 0;
+        const dataMax = chartValues.length ? Math.max(...chartValues) : 12000;
+        const dataRange = Math.max(dataMax - dataMin, 1);
+        const roughStep = dataRange / 5;
+        const stepMagnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const normalizedStep = roughStep / stepMagnitude;
+        const stepSize = normalizedStep <= 1
+            ? stepMagnitude
+            : normalizedStep <= 2
+                ? 2 * stepMagnitude
+                : normalizedStep <= 5
+                    ? 5 * stepMagnitude
+                    : 10 * stepMagnitude;
+        const axisMin = Math.floor(dataMin / stepSize) * stepSize;
+        const axisMax = Math.ceil(dataMax / stepSize) * stepSize;
+
         const chart = new Chart(canvas.getContext('2d'), {
             type: 'line',
             data: data,
@@ -117,15 +145,16 @@
                 scales: {
                     y: {
                         display: true,
-                        beginAtZero: true,
-                        max: 12000,
+                        beginAtZero: false,
+                        min: axisMin === axisMax ? axisMin - stepSize : axisMin,
+                        max: axisMin === axisMax ? axisMax + stepSize : axisMax,
                         border: { display: false },
                         grid: {
                             color: gridGray,
                             drawTicks: false,
                         },
                         ticks: {
-                            stepSize: 3000,
+                            stepSize: stepSize,
                             color: axisGray,
                             padding: 8,
                             font: { size: 11 },
