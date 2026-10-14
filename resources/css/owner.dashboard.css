@@ -285,6 +285,11 @@ body{
     align-items:stretch;
 
 }
+
+.content-grid > *{
+    min-width:0;
+    max-width:100%;
+}
 /* =====================================================
    OWNER DASHBOARD
    PART 2
@@ -312,10 +317,13 @@ body{
     border-radius:16px;
     border:none;
     box-shadow:0 4px 20px rgba(15, 45, 25, 0.08);
+    min-width:0;
+    max-width:100%;
 }
 
 .egg-production-chart__header{
-    align-items:flex-start;
+    align-items:center;
+    gap:12px 16px;
     margin-bottom:4px;
 }
 
@@ -324,7 +332,7 @@ body{
     align-items:center;
     gap:12px;
     min-width:0;
-    flex:1;
+    flex:1 1 14rem;
 }
 
 .egg-production-chart__icon{
@@ -342,7 +350,12 @@ body{
 }
 
 .egg-production-chart__title{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    gap:0 0.35em;
     margin:0;
+    min-width:0;
     font-size:17px;
     font-weight:700;
     line-height:1.25;
@@ -350,12 +363,26 @@ body{
     letter-spacing:0.01em;
 }
 
+.egg-production-chart__heading,
+.egg-production-chart__period{
+    min-width:0;
+}
+
+.egg-production-chart__period::before{
+    content:"— ";
+}
+
 .egg-production-chart__filter{
-    flex-shrink:0;
-    margin-top:2px;
+    display:flex;
+    align-items:center;
+    flex:0 1 auto;
+    gap:8px;
+    margin-top:0;
+    max-width:100%;
 }
 
 .egg-production-chart__filter label{
+    flex-shrink:0;
     font-size:12px;
     font-weight:600;
     color:#6b7280;
@@ -363,6 +390,7 @@ body{
 
 .egg-production-chart__filter select{
     min-width:148px;
+    max-width:100%;
     border:1px solid #d1d5db;
     border-radius:999px;
     padding:7px 32px 7px 14px;
@@ -453,6 +481,136 @@ body{
 .egg-production-chart__wrap{
     height:300px;
     margin-top:4px;
+    width:100%;
+    max-width:100%;
+}
+
+.content-grid .chart-wrap.egg-production-chart__wrap{
+    flex:0 0 auto;
+    height:300px;
+    min-height:220px;
+}
+
+.egg-production-chart__wrap canvas{
+    display:block;
+    max-width:100%;
+}
+
+@media (max-width: 768px) {
+    .chart-card.egg-production-card,
+    .panel-card.inventory-levels-card{
+        padding:16px 16px 14px;
+    }
+
+    .trend-chart-header.egg-production-chart__header{
+        flex-direction:column;
+        align-items:stretch;
+        gap:12px;
+    }
+
+    .egg-production-chart__title-wrap{
+        flex:1 1 auto;
+        width:100%;
+    }
+
+    .egg-production-chart__title{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:2px;
+        font-size:16px;
+    }
+
+    .egg-production-chart__period{
+        font-size:13px;
+        font-weight:600;
+        color:#4b5563;
+    }
+
+    .egg-production-chart__period::before{
+        content:"";
+    }
+
+    .egg-production-chart__filter{
+        width:100%;
+        justify-content:space-between;
+    }
+
+    .egg-production-chart__filter select{
+        flex:1 1 auto;
+        min-width:0;
+        width:auto;
+    }
+
+    .egg-production-chart__legend{
+        padding:8px 0 0;
+        justify-content:flex-start;
+    }
+
+    .egg-chart-legend{
+        width:100%;
+        justify-content:flex-start;
+        gap:12px 20px;
+    }
+
+    .egg-production-chart__wrap,
+    .content-grid .chart-wrap.egg-production-chart__wrap{
+        flex:0 0 auto;
+        height:220px;
+        min-height:200px;
+        margin-top:8px;
+    }
+
+    .inventory-levels-item__meta{
+        flex-wrap:wrap;
+        gap:4px 10px;
+    }
+
+    .inventory-levels-item__value{
+        white-space:normal;
+    }
+
+    .chart-card:hover,
+    .panel-card:hover{
+        transform:none;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-grid{
+        gap:14px;
+    }
+
+    .chart-card.egg-production-card,
+    .panel-card.inventory-levels-card{
+        padding:14px 12px 12px;
+        border-radius:14px;
+    }
+
+    .egg-production-chart__icon{
+        width:34px;
+        height:34px;
+        font-size:15px;
+    }
+
+    .egg-production-chart__title{
+        font-size:15px;
+    }
+
+    .egg-production-chart__filter label{
+        font-size:11px;
+    }
+
+    .egg-production-chart__filter select{
+        min-height:38px;
+        font-size:13px;
+        padding:8px 32px 8px 12px;
+    }
+
+    .egg-production-chart__wrap,
+    .content-grid .chart-wrap.egg-production-chart__wrap{
+        height:200px;
+        min-height:180px;
+    }
 }
 
 .chart-title{
@@ -511,6 +669,8 @@ body{
     border-radius:16px;
     border:none;
     box-shadow:0 4px 20px rgba(15, 45, 25, 0.08);
+    min-width:0;
+    max-width:100%;
 }
 
 .inventory-levels-head{

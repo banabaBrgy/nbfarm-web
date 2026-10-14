@@ -10,11 +10,14 @@
                 <i class="fas fa-egg"></i>
             </span>
             <h3 class="egg-production-chart__title">
-                @if(! empty($productionTrend['selectedYear']))
-                    Egg Production — {{ $productionTrend['selectedYear'] }}
-                @else
-                    Egg Production — This Week + 3-Year Forecast
-                @endif
+                <span class="egg-production-chart__heading">Egg Production</span>
+                <span class="egg-production-chart__period">
+                    @if(! empty($productionTrend['selectedYear']))
+                        {{ $productionTrend['selectedYear'] }}
+                    @else
+                        This Week
+                    @endif
+                </span>
             </h3>
         </div>
         @include('dashboard.production-trend', [

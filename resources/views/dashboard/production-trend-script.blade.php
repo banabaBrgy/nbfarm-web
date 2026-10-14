@@ -10,11 +10,13 @@
         const forecastOrange = '#f0a030';
         const axisGray = '#9ca3af';
         const gridGray = 'rgba(148, 163, 184, 0.35)';
+        const compactQuery = window.matchMedia('(max-width: 768px)');
 
         const monthlyYear = @json($productionTrend['selectedYear'] ?? null);
         const monthly = monthlyYear !== null && monthlyYear !== '';
         const months = @json($productionTrend['months'] ?? []);
         const series = @json($productionTrend['series'] ?? []);
+        const compact = compactQuery.matches;
 
         const data = monthly
             ? {
@@ -26,9 +28,9 @@
                         data: row.data,
                         borderColor: row.color || green,
                         backgroundColor: greenFill,
-                        borderWidth: 2.5,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
+                        borderWidth: compact ? 2 : 2.5,
+                        pointRadius: compact ? 3.5 : 4,
+                        pointHoverRadius: compact ? 5 : 6,
                         pointBackgroundColor: row.color || green,
                         pointBorderColor: '#fff',
                         pointBorderWidth: 1.5,
@@ -47,9 +49,9 @@
                         data: @json($eggChartData ?? []),
                         borderColor: green,
                         backgroundColor: greenFill,
-                        borderWidth: 2.5,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
+                        borderWidth: compact ? 2 : 2.5,
+                        pointRadius: compact ? 3.5 : 5,
+                        pointHoverRadius: compact ? 5 : 7,
                         pointBackgroundColor: green,
                         pointBorderColor: green,
                         fill: true,
@@ -64,9 +66,9 @@
                         borderColor: forecastOrange,
                         backgroundColor: 'transparent',
                         borderDash: [7, 5],
-                        borderWidth: 2.5,
-                        pointRadius: 3,
-                        pointHoverRadius: 4,
+                        borderWidth: compact ? 2 : 2.5,
+                        pointRadius: compact ? 2.5 : 3,
+                        pointHoverRadius: compact ? 5 : 4,
                         pointBackgroundColor: forecastOrange,
                         pointBorderColor: forecastOrange,
                         fill: false,
@@ -116,6 +118,14 @@
                     mode: 'index',
                     intersect: false,
                 },
+                layout: {
+                    padding: {
+                        top: 8,
+                        right: compact ? 4 : 8,
+                        left: 0,
+                        bottom: 0,
+                    },
+                },
                 plugins: {
                     legend: {
                         display: monthly,
@@ -125,10 +135,10 @@
                             color: '#54595e',
                             boxWidth: 14,
                             boxHeight: 14,
-                            padding: 18,
+                            padding: compact ? 10 : 18,
                             usePointStyle: false,
                             font: {
-                                size: 13,
+                                size: compact ? 11 : 13,
                                 weight: '700',
                                 family: "'Poppins', 'Nunito', sans-serif",
                             },
@@ -156,8 +166,8 @@
                         ticks: {
                             stepSize: stepSize,
                             color: axisGray,
-                            padding: 8,
-                            font: { size: 11 },
+                            padding: compact ? 4 : 8,
+                            font: { size: compact ? 10 : 11 },
                             callback: function (value) {
                                 return Number(value).toLocaleString();
                             },
@@ -173,12 +183,42 @@
                         ticks: {
                             color: axisGray,
                             padding: 6,
-                            font: { size: 11, weight: '500' },
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: compact && monthly ? 6 : undefined,
+                            font: { size: compact ? 10 : 11, weight: '500' },
                         },
                     },
                 },
             },
         });
+
+        function applyCompactChart(compact) {
+            chart.data.datasets.forEach(function (dataset) {
+                const isForecast = dataset.label === 'Forecast';
+                dataset.borderWidth = compact ? 2 : 2.5;
+                dataset.pointRadius = compact
+                    ? (isForecast ? 2.5 : 3.5)
+                    : (isForecast ? 3 : (monthly ? 4 : 5));
+                dataset.pointHoverRadius = compact
+                    ? 5
+                    : (isForecast ? 4 : (monthly ? 6 : 7));
+            });
+            chart.options.scales.x.ticks.font.size = compact ? 10 : 11;
+            chart.options.scales.y.ticks.font.size = compact ? 10 : 11;
+            chart.options.scales.y.ticks.padding = compact ? 4 : 8;
+            chart.options.layout.padding.right = compact ? 4 : 8;
+            chart.options.plugins.legend.labels.padding = compact ? 10 : 18;
+            chart.options.plugins.legend.labels.font.size = compact ? 11 : 13;
+            chart.options.scales.x.ticks.maxTicksLimit = compact && monthly ? 6 : undefined;
+        }
+
+        if (typeof compactQuery.addEventListener === 'function') {
+            compactQuery.addEventListener('change', function (event) {
+                applyCompactChart(event.matches);
+                chart.update('none');
+            });
+        }
 
         if (!monthly) {
             const legendButtons = document.querySelectorAll('[data-egg-chart-toggle]');
