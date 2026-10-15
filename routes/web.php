@@ -193,6 +193,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::post('/qr/generate', [QrRecordController::class, 'generate'])->name('qr.generate');
     Route::get('/qr/list', [QrRecordController::class, 'index'])->name('qr.list');
     Route::get('/qr/print', [QrRecordController::class, 'print'])->name('qr.print');
+    Route::post('/qr/update/{id}', [QrTransactionController::class, 'update'])->name('qr.update');
 
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
     Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');

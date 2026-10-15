@@ -84,10 +84,12 @@
                         <td>
 
                             <button
+                                type="button"
                                 class="btn-edit editQR"
                                 data-id="{{ $transaction->id }}"
                                 data-code="{{ $transaction->qrRecord->qr_code }}"
                                 data-size="{{ $transaction->qrRecord->egg_size }}"
+                                data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
                                 data-eggs="{{ $transaction->total_eggs }}">
 
                                 Edit
@@ -258,6 +260,7 @@ document.querySelectorAll('.editQR').forEach(btn=>{
     btn.addEventListener('click',function(){
 
         document.getElementById('transaction_id').value=this.dataset.id;
+        document.getElementById('transaction_id').dataset.updateUrl=this.dataset.updateUrl;
 
         document.getElementById('qr_code').value=this.dataset.code;
 
@@ -273,9 +276,13 @@ document.querySelectorAll('.editQR').forEach(btn=>{
 
 document.getElementById('saveQR').addEventListener('click', function () {
 
-    let id = document.getElementById('transaction_id').value;
+    const transactionId = document.getElementById('transaction_id');
+    const saveButton = this;
 
-    fetch('/qr/update/' + id, {
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+
+    fetch(transactionId.dataset.updateUrl, {
 
         method: 'POST',
 
@@ -292,14 +299,13 @@ document.getElementById('saveQR').addEventListener('click', function () {
     })
 
     .then(async response => {
+        const data = await response.json();
 
-        console.log("STATUS:", response.status);
+        if (!response.ok) {
+            throw new Error(data.message || 'Unable to save the edited egg count.');
+        }
 
-        const text = await response.text();
-
-        console.log("RAW RESPONSE:", text);
-
-        return JSON.parse(text);
+        return data;
 
     })
 
@@ -309,12 +315,17 @@ document.getElementById('saveQR').addEventListener('click', function () {
 
             modal.hide();
 
-            setTimeout(() => {
-
+            Swal.fire({
+                icon: 'success',
+                title: 'Saved successfully',
+                text: 'The egg count has been updated.',
+                confirmButtonText: 'OK'
+            }).then(() => {
                 location.reload();
+            });
 
-            },300);
-
+        } else {
+            throw new Error(data.message || 'Unable to save the edited egg count.');
         }
 
     })
@@ -323,7 +334,15 @@ document.getElementById('saveQR').addEventListener('click', function () {
 
         console.error(error);
 
-        alert("Something went wrong.");
+        saveButton.disabled = false;
+        saveButton.textContent = 'Save';
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Save failed',
+            text: error.message || 'Something went wrong.',
+            confirmButtonText: 'OK'
+        });
 
     });
 
