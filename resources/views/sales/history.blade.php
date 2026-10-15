@@ -22,7 +22,7 @@
     </div>
 
     <form method="GET" action="{{ $historyRoute }}" class="sales-history-filters">
-        <label class="sales-history-field">
+        <label class="sales-history-field sales-history-range-field">
             <span>Date</span>
             <select name="range" data-auto-submit aria-label="Sales date filter">
                 <option value="all" @selected($range === 'all')>All sales</option>

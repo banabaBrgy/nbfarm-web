@@ -24,6 +24,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
+    justify-content: flex-end;
     gap: 12px;
     margin-bottom: 18px;
 }
@@ -41,6 +42,16 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #6b7280;
+}
+
+.sales-history-range-field {
+    flex-direction: row;
+    align-items: center;
+    min-width: auto;
+}
+
+.sales-history-range-field span {
+    white-space: nowrap;
 }
 
 .sales-history-field select,
@@ -236,6 +247,14 @@
     .sales-history-field,
     .sales-history-apply {
         width: 100%;
+    }
+
+    .sales-history-range-field {
+        justify-content: space-between;
+    }
+
+    .sales-history-range-field select {
+        flex: 1;
     }
 
     .sales-history-summary,
