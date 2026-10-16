@@ -14,11 +14,40 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reports = Report::with('manager')->latest()->get();
+        $reportTypes = ['overall', 'production', 'inventory', 'dispatch', 'sales'];
+        $statuses = ['Draft', 'Sent', 'Read'];
+        $filters = [
+            'report_type' => in_array($request->query('report_type'), $reportTypes, true)
+                ? $request->query('report_type')
+                : '',
+            'status' => in_array($request->query('status'), $statuses, true)
+                ? $request->query('status')
+                : '',
+        ];
 
-        return view('manager.reports', compact('reports'));
+        $query = Report::with('manager')->latest();
+
+        if ($filters['report_type'] !== '') {
+            $query->where('report_type', $filters['report_type']);
+        }
+
+        if ($filters['status'] !== '') {
+            $query->where('status', $filters['status']);
+        }
+
+        $reports = $query->paginate(5)->withQueryString();
+
+        return view('manager.reports', [
+            'reports' => $reports,
+            'filters' => $filters,
+            'reportStats' => [
+                'total' => Report::count(),
+                'sent' => Report::where('status', 'Sent')->count(),
+                'read' => Report::where('status', 'Read')->count(),
+            ],
+        ]);
     }
 
     public function store(Request $request)

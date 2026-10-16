@@ -19,7 +19,7 @@
                 <div class="rpt-stat-icon"><i class="fas fa-file-alt"></i></div>
                 <div>
                     <div class="rpt-stat-label">Total Reports</div>
-                    <div class="rpt-stat-value">{{ $reports->count() }}</div>
+                    <div class="rpt-stat-value">{{ $reportStats['total'] }}</div>
                 </div>
             </div>
 
@@ -27,7 +27,7 @@
                 <div class="rpt-stat-icon"><i class="fas fa-paper-plane"></i></div>
                 <div>
                     <div class="rpt-stat-label">Unread</div>
-                    <div class="rpt-stat-value">{{ $reports->where('status', 'Sent')->count() }}</div>
+                    <div class="rpt-stat-value">{{ $reportStats['sent'] }}</div>
                 </div>
             </div>
 
@@ -35,7 +35,7 @@
                 <div class="rpt-stat-icon"><i class="fas fa-envelope-open"></i></div>
                 <div>
                     <div class="rpt-stat-label">Reviewed</div>
-                    <div class="rpt-stat-value">{{ $reports->where('status', 'Read')->count() }}</div>
+                    <div class="rpt-stat-value">{{ $reportStats['read'] }}</div>
                 </div>
             </div>
         </div>
@@ -43,7 +43,33 @@
         <div class="rpt-card">
             <div class="rpt-toolbar">
                 <h2>Received reports</h2>
-                <span class="rpt-count">{{ $reports->count() }} {{ Str::plural('record', $reports->count()) }}</span>
+                <div class="rpt-toolbar-actions">
+                    <form method="GET" action="{{ route('owner.reports') }}" class="rpt-filter-form">
+                        <label class="rpt-filter-field">
+                            <span>Type</span>
+                            <select name="report_type" data-auto-submit aria-label="Filter reports by type">
+                                <option value="">All types</option>
+                                <option value="overall" @selected($filters['report_type'] === 'overall')>Overall</option>
+                                <option value="production" @selected($filters['report_type'] === 'production')>Production</option>
+                                <option value="inventory" @selected($filters['report_type'] === 'inventory')>Inventory</option>
+                                <option value="dispatch" @selected($filters['report_type'] === 'dispatch')>Dispatch</option>
+                                <option value="sales" @selected($filters['report_type'] === 'sales')>Sales</option>
+                            </select>
+                        </label>
+                        <label class="rpt-filter-field">
+                            <span>Status</span>
+                            <select name="status" data-auto-submit aria-label="Filter reports by status">
+                                <option value="">All statuses</option>
+                                <option value="Sent" @selected($filters['status'] === 'Sent')>Unread</option>
+                                <option value="Read" @selected($filters['status'] === 'Read')>Reviewed</option>
+                            </select>
+                        </label>
+                        @if($filters['report_type'] || $filters['status'])
+                            <a href="{{ route('owner.reports') }}" class="rpt-filter-clear">Clear</a>
+                        @endif
+                    </form>
+                    <span class="rpt-count">{{ $reports->total() }} {{ Str::plural('record', $reports->total()) }}</span>
+                </div>
             </div>
 
             <div class="rpt-table-wrap">
@@ -116,6 +142,25 @@
                     </tbody>
                 </table>
             </div>
+
+            @if($reports->total() > 0)
+                <div class="rpt-pagination">
+                    <div>Showing {{ $reports->firstItem() }}–{{ $reports->lastItem() }} of {{ $reports->total() }}</div>
+                    <div class="rpt-pagination-controls">
+                        @if($reports->onFirstPage())
+                            <span class="rpt-page-btn disabled">Prev</span>
+                        @else
+                            <a href="{{ $reports->previousPageUrl() }}" class="rpt-page-btn">Prev</a>
+                        @endif
+                        <span>Page {{ $reports->currentPage() }} of {{ $reports->lastPage() }}</span>
+                        @if($reports->hasMorePages())
+                            <a href="{{ $reports->nextPageUrl() }}" class="rpt-page-btn">Next</a>
+                        @else
+                            <span class="rpt-page-btn disabled">Next</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
         {{-- ===========================================
         VIEW REPORT MODALS

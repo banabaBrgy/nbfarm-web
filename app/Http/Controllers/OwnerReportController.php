@@ -10,14 +10,44 @@ class OwnerReportController extends Controller{
     /**
      * Show all reports sent by the manager.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reports = Report::with('manager')
-            ->whereIn('status', ['Sent', 'Read'])
-            ->latest()
-            ->get();
+        $reportTypes = ['overall', 'production', 'inventory', 'dispatch', 'sales'];
+        $statuses = ['Sent', 'Read'];
+        $filters = [
+            'report_type' => in_array($request->query('report_type'), $reportTypes, true)
+                ? $request->query('report_type')
+                : '',
+            'status' => in_array($request->query('status'), $statuses, true)
+                ? $request->query('status')
+                : '',
+        ];
 
-        return view('owner.reports', compact('reports'));
+        $query = Report::with('manager')
+            ->whereIn('status', $statuses)
+            ->latest();
+
+        if ($filters['report_type'] !== '') {
+            $query->where('report_type', $filters['report_type']);
+        }
+
+        if ($filters['status'] !== '') {
+            $query->where('status', $filters['status']);
+        }
+
+        $reports = $query->paginate(5)->withQueryString();
+
+        $visibleReports = Report::whereIn('status', $statuses);
+
+        return view('owner.reports', [
+            'reports' => $reports,
+            'filters' => $filters,
+            'reportStats' => [
+                'total' => (clone $visibleReports)->count(),
+                'sent' => (clone $visibleReports)->where('status', 'Sent')->count(),
+                'read' => (clone $visibleReports)->where('status', 'Read')->count(),
+            ],
+        ]);
     }
 
     /**
