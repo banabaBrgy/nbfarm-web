@@ -21,8 +21,6 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\OwnerReportController;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\AlertController;
-use App\Models\Production;
-use App\Services\WeatherService;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +28,7 @@ use App\Services\WeatherService;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function (WeatherService $weather) {
+Route::get('/', function () {
     if (auth()->check()) {
         $role = strtolower(trim((string) auth()->user()->role));
 
@@ -46,10 +44,7 @@ Route::get('/', function (WeatherService $weather) {
             : redirect('/login');
     }
 
-    return view('landing', [
-        'eggsStock' => Production::leftoverStock(),
-        'weather' => $weather->current(),
-    ]);
+    return redirect()->route('login');
 })->name('landing');
 
 // Login
