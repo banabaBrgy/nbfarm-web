@@ -144,7 +144,7 @@
                                         </form>
 
                                         <form action="{{ route('manager.reports.destroy', $report->id) }}" method="POST"
-                                            onsubmit="return confirm('Delete Report?')">
+                                            class="report-delete-form">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="rpt-icon-btn rpt-icon-delete" title="Delete">
@@ -364,5 +364,33 @@
         });
     </script>
 @endif
+
+<script>
+    document.querySelectorAll('.report-delete-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (form.dataset.confirmed === 'true') {
+                return;
+            }
+
+            event.preventDefault();
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Delete report?',
+                text: 'This action cannot be undone.',
+                showCancelButton: true,
+                confirmButtonColor: '#d32f2f',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, delete it',
+                cancelButtonText: 'Cancel'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    form.dataset.confirmed = 'true';
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
 @endpush
 @endsection
