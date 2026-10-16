@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Dispatch;
 use App\Models\DispatchItem;
+use App\Models\Production;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class DispatchController extends Controller
 {
@@ -59,17 +61,26 @@ class DispatchController extends Controller
 
     public function update(Request $request, Dispatch $dispatch)
     {
-        $request->validate([
+        $validated = $request->validate([
             'dispatch_date' => 'required|date',
             'status' => 'required|in:Pending,On Transit,Delivered',
         ]);
+        $this->validateDispatchDate($validated['dispatch_date']);
 
-        $dispatch->update([
-            'dispatch_date' => $request->dispatch_date,
-            'status' => $request->status,
-        ]);
+        DB::transaction(function () use ($dispatch, $validated) {
+            Production::lockStockWindow();
 
-        $dispatch->syncSale();
+            if (! $this->isWithinStockWindow($dispatch->dispatch_date)) {
+                $this->ensureDispatchItemsAvailable($dispatch);
+            }
+
+            $dispatch->update([
+                'dispatch_date' => $validated['dispatch_date'],
+                'status' => $validated['status'],
+            ]);
+
+            $dispatch->syncSale();
+        });
 
         return back()->with('success', 'Dispatch updated successfully.');
     }
@@ -105,7 +116,7 @@ class DispatchController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'recipient' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'dispatch_date' => 'required|date',
@@ -117,21 +128,50 @@ class DispatchController extends Controller
             'quantity.*' => 'required|integer|min:1',
         ]);
 
-        DB::transaction(function () use ($request) {
+        $this->validateDispatchDate($validated['dispatch_date']);
+
+        if (count($validated['size']) !== count($validated['quantity'])) {
+            throw ValidationException::withMessages([
+                'quantity' => 'Each egg size must have a matching tray quantity.',
+            ]);
+        }
+
+        DB::transaction(function () use ($validated) {
+            Production::lockStockWindow();
+            $availableBySize = Production::availableDispatchTraysBySize();
+            $requestedBySize = array_fill_keys(array_keys(Production::EGG_SIZE_COLUMNS), 0);
+
+            foreach ($validated['size'] as $index => $size) {
+                $requestedBySize[$size] += (int) $validated['quantity'][$index];
+            }
+
+            $shortages = [];
+            foreach ($requestedBySize as $size => $requested) {
+                $available = $availableBySize[$size] ?? 0;
+                if ($requested > $available) {
+                    $shortages[] = "{$size}: {$available} tray(s) available";
+                }
+            }
+
+            if ($shortages !== []) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Insufficient egg stock. '.implode('; ', $shortages).'.',
+                ]);
+            }
 
             $dispatch = Dispatch::create([
-                'recipient' => $request->recipient,
-                'address' => $request->address,
-                'dispatch_date' => $request->dispatch_date,
-                'price' => $request->price,
-                'status' => $request->status,   // ✅ ibase sa dropdown, hindi hardcoded
+                'recipient' => $validated['recipient'],
+                'address' => $validated['address'],
+                'dispatch_date' => $validated['dispatch_date'],
+                'price' => $validated['price'],
+                'status' => $validated['status'],
             ]);
 
-            foreach ($request->size as $index => $size) {
+            foreach ($validated['size'] as $index => $size) {
 
                 $dispatch->items()->create([
                     'size' => $size,
-                    'quantity' => $request->quantity[$index],
+                    'quantity' => $validated['quantity'][$index],
                 ]);
 
             }
@@ -165,5 +205,48 @@ class DispatchController extends Controller
         $role = strtolower((string) (auth()->user()->role ?? 'manager'));
 
         return $role === 'owner' ? 'owner.dispatch' : 'manager.dispatch';
+    }
+
+    private function validateDispatchDate(string $date): void
+    {
+        if (! $this->isWithinStockWindow($date)) {
+            [$start, $end] = Production::stockWindow();
+            throw ValidationException::withMessages([
+                'dispatch_date' => "Dispatch date must be between {$start} and {$end}.",
+            ]);
+        }
+    }
+
+    private function isWithinStockWindow(string $date): bool
+    {
+        [$start, $end] = Production::stockWindow();
+
+        return $date >= $start && $date <= $end;
+    }
+
+    private function ensureDispatchItemsAvailable(Dispatch $dispatch): void
+    {
+        $dispatch->loadMissing('items');
+        $availableBySize = Production::availableDispatchTraysBySize();
+        $requestedBySize = array_fill_keys(array_keys(Production::EGG_SIZE_COLUMNS), 0);
+
+        foreach ($dispatch->items as $item) {
+            $requestedBySize[$item->size] = ($requestedBySize[$item->size] ?? 0)
+                + (int) $item->quantity;
+        }
+
+        $shortages = [];
+        foreach ($requestedBySize as $size => $requested) {
+            $available = $availableBySize[$size] ?? 0;
+            if ($requested > $available) {
+                $shortages[] = "{$size}: {$available} tray(s) available";
+            }
+        }
+
+        if ($shortages !== []) {
+            throw ValidationException::withMessages([
+                'dispatch_date' => 'Insufficient egg stock. '.implode('; ', $shortages).'.',
+            ]);
+        }
     }
 }

@@ -4,9 +4,18 @@
     $indexRoute = $rolePrefix . '.dispatch';
     $sizes = ['Small', 'Medium', 'Large', 'Extra Large', 'Cracked'];
     $hasFilters = request()->filled('search') || request()->filled('status') || request()->filled('size');
+    $availableDispatchTrays = array_sum(
+        \App\Models\Production::availableDispatchTraysBySize()
+    );
 @endphp
 
 <div class="dispatch-page">
+    @if($errors->any())
+        <div class="dsp-alert dsp-alert-error" role="alert">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
 
     <div class="page-header">
         <div class="page-header-copy">
@@ -15,9 +24,16 @@
         </div>
 
         @if($canManage)
-            <button type="button" class="btn-new" data-bs-toggle="modal" data-bs-target="#newDispatchModal">
+            <button
+                type="button"
+                class="btn-new"
+                data-bs-toggle="modal"
+                data-bs-target="#newDispatchModal"
+                @disabled($availableDispatchTrays < 1)
+                title="{{ $availableDispatchTrays > 0 ? 'Create a new dispatch' : 'No egg trays are available for dispatch' }}"
+            >
                 <i class="fas fa-plus"></i>
-                New Dispatch
+                {{ $availableDispatchTrays > 0 ? 'New Dispatch' : 'No Egg Stock' }}
             </button>
         @endif
     </div>

@@ -20,6 +20,14 @@ class Production extends Model
 
     public const EGGS_PER_TRAY = 30;
 
+    public const EGG_SIZE_COLUMNS = [
+        'Small' => 'small_eggs',
+        'Medium' => 'medium_eggs',
+        'Large' => 'large_eggs',
+        'Extra Large' => 'extra_large_eggs',
+        'Cracked' => 'cracked_eggs',
+    ];
+
     /** Tray pool used for the Inventory Overview Egg Trays card. */
     public const TRAY_CAPACITY = 1000;
 
@@ -73,27 +81,96 @@ class Production extends Model
 
     /**
      * Eggs on hand for the last 7 harvest days (not the 3-year archive).
-     * Delivered trays in the same window are subtracted.
+     * Existing dispatch trays in the same window are reserved.
      */
     public static function leftoverStock(DateTimeInterface|string|null $asOf = null): int
     {
-        $asOfDate = $asOf ? Carbon::parse($asOf) : now();
-        $end = $asOfDate->toDateString();
-        $start = $asOfDate->copy()->subDays(self::STOCK_DAYS - 1)->toDateString();
+        return array_sum(static::availableEggStockBySize($asOf));
+    }
 
-        $harvested = (int) static::query()
+    /**
+     * Return remaining egg stock by size after reserved dispatch trays.
+     *
+     * @return array<string, int>
+     */
+    public static function availableEggStockBySize(DateTimeInterface|string|null $asOf = null): array
+    {
+        [$start, $end] = static::stockWindow($asOf);
+        $columns = implode(', ', array_map(
+            static fn (string $column): string => "COALESCE(SUM({$column}), 0) as {$column}",
+            array_values(self::EGG_SIZE_COLUMNS)
+        ));
+        $harvested = static::query()
             ->whereDate('production_date', '>=', $start)
             ->whereDate('production_date', '<=', $end)
-            ->sum('eggs_produced');
+            ->selectRaw($columns)
+            ->first();
 
-        $trays = (int) DB::table('dispatches')
+        $reserved = DB::table('dispatches')
             ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
-            ->where('dispatches.status', 'Delivered')
             ->whereDate('dispatches.dispatch_date', '>=', $start)
             ->whereDate('dispatches.dispatch_date', '<=', $end)
-            ->sum('dispatch_items.quantity');
+            ->select('dispatch_items.size')
+            ->selectRaw('COALESCE(SUM(dispatch_items.quantity), 0) as trays')
+            ->groupBy('dispatch_items.size')
+            ->pluck('trays', 'size');
 
-        return max(0, $harvested - ($trays * self::EGGS_PER_TRAY));
+        $available = [];
+        foreach (self::EGG_SIZE_COLUMNS as $size => $column) {
+            $available[$size] = max(
+                0,
+                (int) ($harvested->{$column} ?? 0)
+                - ((int) ($reserved[$size] ?? 0) * self::EGGS_PER_TRAY)
+            );
+        }
+
+        return $available;
+    }
+
+    /**
+     * Return whole-tray stock available by egg size.
+     *
+     * @return array<string, int>
+     */
+    public static function availableDispatchTraysBySize(
+        DateTimeInterface|string|null $asOf = null
+    ): array {
+        return array_map(
+            static fn (int $eggs): int => intdiv($eggs, self::EGGS_PER_TRAY),
+            static::availableEggStockBySize($asOf)
+        );
+    }
+
+    /**
+     * Lock production rows in the stock window for dispatch reservations.
+     */
+    public static function lockStockWindow(DateTimeInterface|string|null $asOf = null): void
+    {
+        DB::table('dispatch_stock_locks')
+            ->where('id', 1)
+            ->lockForUpdate()
+            ->first();
+
+        [$start, $end] = static::stockWindow($asOf);
+
+        static::query()
+            ->whereDate('production_date', '>=', $start)
+            ->whereDate('production_date', '<=', $end)
+            ->lockForUpdate()
+            ->get();
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    public static function stockWindow(DateTimeInterface|string|null $asOf = null): array
+    {
+        $asOfDate = $asOf ? Carbon::parse($asOf) : now();
+
+        return [
+            $asOfDate->copy()->subDays(self::STOCK_DAYS - 1)->toDateString(),
+            $asOfDate->toDateString(),
+        ];
     }
 
     /**

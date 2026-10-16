@@ -6,6 +6,17 @@
     padding: 8px 4px 32px;
 }
 
+.dsp-alert {
+    margin: 0 0 16px;
+    padding: 12px 16px;
+    border: 1px solid #f2b8b5;
+    border-radius: 10px;
+    background: #fff4f3;
+    color: #b42318;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 /* ----- Header ----- */
 
 .dispatch-page .page-header {
@@ -50,6 +61,13 @@
     background: #1e5318;
     color: #fff;
     transform: translateY(-1px);
+}
+
+.dispatch-page .btn-new:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* ----- Stat cards ----- */
