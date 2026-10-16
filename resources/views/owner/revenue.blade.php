@@ -6,6 +6,7 @@
 
 @push('styles')
   <link rel="stylesheet" href="{{ versioned_asset('css/revenue.css') }}">
+  <link rel="stylesheet" href="{{ versioned_asset('css/sales-history.css') }}">
 @endpush
 
 @section('content')
@@ -17,11 +18,32 @@
         <p>Track income, customers, and payment status.</p>
     </div>
     <div class="sales-page-actions">
-        <a href="{{ route('owner.sales.history') }}" class="btn-secondary-sm">
+        <button
+            type="button"
+            class="btn-secondary-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#revenueHistoryModal">
             <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
             Revenue History
-        </a>
+        </button>
         @include('revenue.partials.form')
+    </div>
+</div>
+
+<div class="modal fade revenue-history-modal" id="revenueHistoryModal" tabindex="-1" aria-labelledby="revenueHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="revenueHistoryModalLabel">Revenue History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div
+                class="modal-body"
+                id="revenueHistoryContent"
+                data-history-url="{{ route('owner.sales.history', ['modal' => 1]) }}">
+                <div class="revenue-history-loading" role="status">Loading revenue history...</div>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -106,6 +106,72 @@
     box.style.display = messages.length ? 'block' : 'none';
   }
 
+  function setupRevenueHistoryModal() {
+    const modal = document.getElementById('revenueHistoryModal');
+    const content = document.getElementById('revenueHistoryContent');
+
+    if (!modal || !content) return;
+
+    const historyUrl = content.dataset.historyUrl;
+    let hasLoadedHistory = false;
+
+    async function loadHistory(url) {
+      content.setAttribute('aria-busy', 'true');
+      content.innerHTML = '<div class="revenue-history-loading" role="status">Loading revenue history...</div>';
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'text/html',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Unable to load revenue history.');
+        }
+
+        content.innerHTML = await response.text();
+        content.removeAttribute('aria-busy');
+        hasLoadedHistory = true;
+      } catch (error) {
+        console.error('loadHistory error:', error);
+        content.innerHTML = `
+          <div class="revenue-history-error">
+            Unable to load revenue history. Please close the modal and try again.
+          </div>
+        `;
+        content.removeAttribute('aria-busy');
+      }
+    }
+
+    modal.addEventListener('show.bs.modal', () => {
+      if (!hasLoadedHistory) {
+        loadHistory(historyUrl);
+      }
+    });
+
+    content.addEventListener('submit', event => {
+      const form = event.target.closest('.sales-history-filters');
+      if (!form) return;
+
+      event.preventDefault();
+
+      const url = new URL(form.action, window.location.href);
+      url.search = new URLSearchParams(new FormData(form)).toString();
+      url.searchParams.set('modal', '1');
+      loadHistory(url.toString());
+    });
+
+    content.addEventListener('click', event => {
+      const link = event.target.closest('.sales-history-pagination a');
+      if (!link) return;
+
+      event.preventDefault();
+      loadHistory(link.href);
+    });
+  }
+
   async function submitTransaction() {
     const btn = document.getElementById('btnSubmit');
 
@@ -176,6 +242,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     buildChart();
+    setupRevenueHistoryModal();
 
     // Show a toast left over from a save that just triggered a reload.
     const pendingToast = sessionStorage.getItem('nb_toast');

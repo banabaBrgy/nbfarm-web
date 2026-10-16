@@ -30,7 +30,11 @@ class SalesHistoryController extends Controller
             ->forSalesRange($range, $from, $to)
             ->sum('price');
 
-        return view('sales.history', [
+        $view = $request->boolean('modal')
+            ? 'sales.partials.history-content'
+            : 'sales.history';
+
+        return view($view, [
             'sales' => $sales,
             'periodTotal' => $periodTotal,
             'filters' => [
