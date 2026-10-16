@@ -22,6 +22,7 @@ class DailyInventory
 
         if (DailyInventoryLog::where('log_date', $today)->exists()) {
             $this->catchUpNewRates($today);
+            $this->resetEggTrays();
             $this->syncAlerts();
 
             return;
