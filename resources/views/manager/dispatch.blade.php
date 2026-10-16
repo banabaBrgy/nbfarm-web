@@ -3,7 +3,7 @@
 @section('title', 'Dispatch')
 @section('page-label', 'Dispatch')
 
-@push('styles')
+@push('late-styles')
 <link rel="stylesheet" href="{{ versioned_asset('css/dispatch.css') }}">
 @endpush
 

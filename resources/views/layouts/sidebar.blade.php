@@ -42,8 +42,11 @@
 <link rel="stylesheet" href="{{ versioned_asset('css/theme.css') }}">
 
     @stack('styles')
+
     <link rel="stylesheet" href="{{ versioned_asset('css/app-ui.css') }}">
     <link rel="stylesheet" href="{{ versioned_asset('css/daylight-ui.css') }}">
+
+    @stack('late-styles')
 
 
 </head>

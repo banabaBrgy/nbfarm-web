@@ -202,11 +202,6 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
 
     Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
-    Route::post('/dispatch/store', [DispatchController::class, 'store'])->name('dispatch.store');
-    Route::patch('/dispatch/{dispatch}/status', [DispatchController::class, 'updateStatus'])->name('dispatch.updateStatus');
-    Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])->name('dispatch.update');
-    Route::delete('/dispatch/{dispatch}', [DispatchController::class, 'destroy'])
-        ->name('dispatch.destroy');
 
     Route::view('/forecast', 'forecast')->name('forecast');
     Route::get('/users', [UserController::class, 'index'])->name('users');
