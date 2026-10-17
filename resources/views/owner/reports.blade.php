@@ -34,7 +34,7 @@
             <div class="rpt-stat rpt-stat-read">
                 <div class="rpt-stat-icon"><i class="fas fa-envelope-open"></i></div>
                 <div>
-                    <div class="rpt-stat-label">Reviewed</div>
+                    <div class="rpt-stat-label">Read</div>
                     <div class="rpt-stat-value">{{ $reportStats['read'] }}</div>
                 </div>
             </div>
@@ -59,9 +59,9 @@
                         <label class="rpt-filter-field">
                             <span>Status</span>
                             <select name="status" data-auto-submit aria-label="Filter reports by status">
-                                <option value="">All statuses</option>
+                                <option value="">All status</option>
                                 <option value="Sent" @selected($filters['status'] === 'Sent')>Unread</option>
-                                <option value="Read" @selected($filters['status'] === 'Read')>Reviewed</option>
+                                <option value="Read" @selected($filters['status'] === 'Read')>Read</option>
                             </select>
                         </label>
                         @if($filters['report_type'] || $filters['status'])

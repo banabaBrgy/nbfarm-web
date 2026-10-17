@@ -63,7 +63,7 @@
                     <label class="rpt-filter-field">
                         <span>Status</span>
                         <select name="status" data-auto-submit aria-label="Filter reports by status">
-                            <option value="">All statuses</option>
+                            <option value="">All status</option>
                             <option value="Draft" @selected($filters['status'] === 'Draft')>Draft</option>
                             <option value="Sent" @selected($filters['status'] === 'Sent')>Sent</option>
                             <option value="Read" @selected($filters['status'] === 'Read')>Read</option>
