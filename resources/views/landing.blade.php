@@ -77,7 +77,7 @@
                 </div>
             </section>
 
-            <section class="thesis-section" id="about">
+            <section class="thesis-section thesis-overview" id="about">
                 <div class="thesis-wrap">
                     <h2>Overview</h2>
                     <p class="thesis-lead">
