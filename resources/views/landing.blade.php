@@ -137,6 +137,20 @@
             NB Poultry Farm Management System, San Jose, Batangas. 2026.
             <a href="{{ route('login') }}">Log in</a>
         </footer>
+
+        <script>
+            document.querySelectorAll('.thesis-header nav a[href^="#"]').forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    const section = document.querySelector(link.getAttribute('href'));
+                    const target = section?.querySelector('h2') ?? section;
+                    if (!target) return;
+
+                    event.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    history.replaceState(null, '', link.getAttribute('href'));
+                });
+            });
+        </script>
     </div>
 
     @if (false)
