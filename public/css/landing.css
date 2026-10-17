@@ -946,6 +946,10 @@ body > .site-footer {
 .thesis-page {
     --thesis-green: #3f9a74;
     --thesis-green-deep: #12402f;
+    --thesis-login-start: #3b8f47;
+    --thesis-login-mid: #34853f;
+    --thesis-login-end: #2c6b35;
+    --thesis-login-hover: #245a2c;
     --thesis-amber: #c27a2c;
     --thesis-paper: #0e1a14;
     --thesis-mint: #1b2a22;
@@ -1024,7 +1028,27 @@ body > .site-footer {
     opacity: 1;
     padding: 0.6rem 1rem;
     border-radius: 999px;
-    background: var(--thesis-amber);
+    background: linear-gradient(
+        135deg,
+        var(--thesis-login-start) 0%,
+        var(--thesis-login-mid) 52%,
+        var(--thesis-login-end) 100%
+    );
+    box-shadow: 0 4px 12px rgba(18, 64, 47, 0.24);
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.thesis-header nav .thesis-login:hover,
+.thesis-header nav .thesis-login:focus-visible {
+    background: linear-gradient(
+        135deg,
+        var(--thesis-login-mid) 0%,
+        var(--thesis-login-end) 52%,
+        var(--thesis-login-hover) 100%
+    );
+    box-shadow: 0 6px 16px rgba(18, 64, 47, 0.32);
+    transform: translateY(-1px);
     text-decoration: none;
 }
 
@@ -1077,12 +1101,24 @@ body > .site-footer {
 }
 
 .thesis-btn-primary {
-    background: var(--thesis-amber);
+    background: linear-gradient(
+        135deg,
+        var(--thesis-login-start) 0%,
+        var(--thesis-login-mid) 52%,
+        var(--thesis-login-end) 100%
+    );
+    box-shadow: 0 6px 16px rgba(18, 64, 47, 0.24);
     color: #fff;
 }
 
 .thesis-btn-primary:hover {
-    background: #a96722;
+    background: linear-gradient(
+        135deg,
+        var(--thesis-login-mid) 0%,
+        var(--thesis-login-end) 52%,
+        var(--thesis-login-hover) 100%
+    );
+    box-shadow: 0 8px 20px rgba(18, 64, 47, 0.32);
 }
 
 .thesis-btn-ghost {
