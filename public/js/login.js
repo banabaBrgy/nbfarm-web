@@ -5,6 +5,14 @@
     const submitBtn = document.getElementById('login-submit');
     const toggleBtn = document.getElementById('toggle-password');
     const capsHint = document.getElementById('password-caps');
+    const termsModal = document.getElementById('terms-modal');
+    const termsModalBody = document.getElementById('terms-modal-body');
+    const termsAgreeBtn = document.getElementById('terms-agree');
+    const termsReadStatus = document.getElementById('terms-read-status');
+    const termsHint = document.getElementById('terms-hint');
+    const termsOpenLink = form.querySelector('.terms-link');
+    const termsCloseButtons = termsModal?.querySelectorAll('[data-terms-close]') || [];
+    const termsReadStorageKey = 'nb_terms_read';
 
     const fields = {
         username: {
@@ -104,9 +112,87 @@
 
     fields.terms.input.addEventListener('change', () => validateField('terms', { showValid: true }));
 
-    form.querySelector('.terms a')?.addEventListener('click', (event) => {
+    function hasStoredTermsRead() {
+        try {
+            return window.localStorage.getItem(termsReadStorageKey) === 'true';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function rememberTermsRead() {
+        try {
+            window.localStorage.setItem(termsReadStorageKey, 'true');
+        } catch (error) {
+            // Continue without persistence if browser storage is unavailable.
+        }
+    }
+
+    let termsRead = fields.terms.input.checked || hasStoredTermsRead();
+    let lastTermsFocus = null;
+
+    function updateTermsReadiness() {
+        if (!termsModalBody || !termsAgreeBtn || termsRead) return;
+
+        const reachedEnd = termsModalBody.scrollHeight - termsModalBody.scrollTop - termsModalBody.clientHeight <= 12;
+        if (!reachedEnd) return;
+
+        termsRead = true;
+        rememberTermsRead();
+        termsAgreeBtn.disabled = false;
+        if (termsHint) termsHint.textContent = 'Click Done to agree to the terms.';
+        if (termsReadStatus) termsReadStatus.textContent = 'You have reached the end. Click Done to agree.';
+    }
+
+    function openTermsModal(event) {
+        event.preventDefault();
         event.stopPropagation();
-    });
+        if (!termsModal) return;
+
+        lastTermsFocus = document.activeElement;
+        termsModal.hidden = false;
+        document.body.classList.add('terms-modal-open');
+        termsModal.querySelector('.terms-modal-close')?.focus();
+        updateTermsReadiness();
+    }
+
+    function closeTermsModal() {
+        if (!termsModal) return;
+
+        termsModal.hidden = true;
+        document.body.classList.remove('terms-modal-open');
+        lastTermsFocus?.focus();
+    }
+
+    if (termsModal && termsModalBody && termsAgreeBtn && termsOpenLink) {
+        fields.terms.input.addEventListener('click', (event) => {
+            if (!termsRead) openTermsModal(event);
+        });
+        termsOpenLink.addEventListener('click', (event) => {
+            if (!termsRead) openTermsModal(event);
+        });
+        termsModalBody.addEventListener('scroll', updateTermsReadiness);
+        termsCloseButtons.forEach((button) => button.addEventListener('click', closeTermsModal));
+
+        termsAgreeBtn.addEventListener('click', () => {
+            rememberTermsRead();
+            termsRead = true;
+            fields.terms.input.checked = true;
+            validateField('terms', { showValid: true });
+            closeTermsModal();
+            fields.terms.input.focus();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !termsModal.hidden) closeTermsModal();
+        });
+
+        if (termsRead) {
+            termsAgreeBtn.disabled = false;
+            if (termsReadStatus) termsReadStatus.textContent = 'Terms and Conditions were already accepted.';
+            if (termsHint) termsHint.textContent = 'Terms already read. Check the box to agree.';
+        }
+    }
 
     function updateCapsLock(event) {
         if (!capsHint) return;
@@ -150,6 +236,7 @@
             const invalid = firstInvalidField();
             const target = invalid && fields[invalid].input;
             if (target) target.focus();
+            if (invalid === 'terms' && target?.disabled) termsOpenLink?.focus();
             return;
         }
 

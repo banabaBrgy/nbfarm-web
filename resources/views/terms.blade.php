@@ -85,6 +85,93 @@ p{
 
 </style>
 
+<style>
+    :root {
+        --terms-paper: #fbfdfb;
+        --terms-ink: #21352c;
+        --terms-soft: #52665d;
+        --terms-moss: #216e4b;
+        --terms-line: #d8e7dd;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 32px 18px;
+        background:
+            linear-gradient(180deg, rgba(33, 110, 75, .2), rgba(25, 88, 59, .42)),
+            url('/images/farm-hero.jpg') center / cover fixed;
+        color: var(--terms-ink);
+        font-family: 'Inter', Arial, Helvetica, sans-serif;
+    }
+
+    .container {
+        max-width: 820px;
+        padding: clamp(28px, 5vw, 56px);
+        border: 1px solid var(--terms-line);
+        border-radius: 18px;
+        background: var(--terms-paper);
+        box-shadow: 0 24px 60px rgba(25, 88, 59, .22);
+    }
+
+    h1 {
+        margin: 0 0 12px;
+        color: var(--terms-ink);
+        font-family: 'Fraunces', Georgia, serif;
+        font-size: clamp(30px, 5vw, 44px);
+        line-height: 1.1;
+        text-align: left;
+    }
+
+    .terms-kicker {
+        margin: 0 0 10px;
+        color: var(--terms-moss);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .terms-lede {
+        margin: 0 0 30px;
+        color: var(--terms-soft);
+        font-size: 15px;
+    }
+
+    h3 {
+        margin-top: 28px;
+        color: var(--terms-moss);
+        font-size: 17px;
+    }
+
+    p {
+        color: var(--terms-soft);
+        font-size: 14px;
+        line-height: 1.75;
+    }
+
+    .back {
+        text-align: left;
+    }
+
+    .back a {
+        display: inline-flex;
+        border-radius: 999px;
+        background: var(--terms-moss);
+        font-weight: 700;
+        transition: background .2s ease, transform .12s ease;
+    }
+
+    .back a:hover {
+        background: #19583b;
+        transform: translateY(-1px);
+    }
+</style>
+
 </head>
 
 
@@ -94,9 +181,9 @@ p{
 <div class="container">
 
 
-<h1>
-NB Poultry Farm Management System
-</h1>
+<p class="terms-kicker">NB Poultry Farm Management System</p>
+<h1>Terms and Conditions</h1>
+<p class="terms-lede">These guidelines help protect farm records, user accounts, and the people who rely on the system.</p>
 
 
 

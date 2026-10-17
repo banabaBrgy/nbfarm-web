@@ -111,9 +111,10 @@
                         >
                         <span>
                             I have read and agree to the
-                            <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer">Terms and Conditions</a>
+                            <a href="{{ route('terms') }}" class="terms-link" data-terms-open>Terms and Conditions</a>
                         </span>
                     </label>
+                    <p class="terms-hint" id="terms-hint">Click the checkbox to read the terms first.</p>
                     <p class="field-error" id="terms-error" role="alert">{{ $errors->first('terms') }}</p>
                 </div>
 
@@ -140,6 +141,30 @@
 
         </div>
 
+    </div>
+
+    <div class="terms-modal" id="terms-modal" hidden>
+        <div class="terms-modal-backdrop" data-terms-close></div>
+        <section class="terms-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+            <div class="terms-modal-header">
+                <div>
+                    <p class="terms-modal-kicker">Before you sign in</p>
+                    <h2 id="terms-modal-title">Terms and Conditions</h2>
+                </div>
+                <button type="button" class="terms-modal-close" data-terms-close aria-label="Close Terms and Conditions">&times;</button>
+            </div>
+            <div class="terms-modal-body" id="terms-modal-body" tabindex="0">
+                @include('partials.terms-content')
+            </div>
+            <div class="terms-modal-footer">
+                <p class="terms-read-status" id="terms-read-status" role="status">
+                    Scroll to the end to continue.
+                </p>
+                <button type="button" class="terms-agree-btn" id="terms-agree" disabled>
+                    Done — I agree
+                </button>
+            </div>
+        </section>
     </div>
 
     <script src="{{ versioned_asset('js/login.js') }}"></script>
