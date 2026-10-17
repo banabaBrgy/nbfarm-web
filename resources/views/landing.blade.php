@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NB Poultry Farm — Production, Inventory & Forecasting</title>
-    <meta name="description" content="NB Poultry Farm Management System for San Jose, Batangas. Track egg production, inventory, dispatch, QR trays, and forecasting.">
+    <title>NB Poultry Farm Management System | Thesis</title>
+    <meta name="description" content="A web-based NB Poultry Farm Management System with QR code egg tracking and egg production forecasting for San Jose, Batangas.">
     <meta name="theme-color" content="#216E4B">
     <meta name="application-name" content="NB Poultry Farm">
     <meta name="author" content="NB Poultry Farm">
@@ -17,14 +17,14 @@
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NB Poultry Farm">
-    <meta property="og:title" content="NB Poultry Farm — Production, Inventory & Forecasting">
-    <meta property="og:description" content="NB Poultry Farm management for egg production, inventory, dispatch, and forecasting in San Jose, Batangas.">
+    <meta property="og:title" content="NB Poultry Farm Management System | Thesis">
+    <meta property="og:description" content="A web-based NB Poultry Farm Management System with QR code egg tracking and egg production forecasting.">
     <meta property="og:image" content="{{ asset('images/nb-farm-logo.png') }}">
     <meta property="og:locale" content="en_PH">
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="NB Poultry Farm">
-    <meta name="twitter:description" content="Production, inventory, dispatch, and forecasting for NB Poultry Farm in San Jose, Batangas.">
+    <meta name="twitter:title" content="NB Poultry Farm Management System">
+    <meta name="twitter:description" content="QR code egg tracking and egg production forecasting for NB Poultry Farm.">
     <meta name="twitter:image" content="{{ asset('images/nb-farm-logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,6 +33,113 @@
     <link rel="stylesheet" href="{{ versioned_asset('css/landing.css') }}">
 </head>
 <body>
+    <div class="thesis-page" id="top">
+        <header class="thesis-header">
+            <a class="thesis-mark" href="#top" aria-label="NB Poultry Farm">
+                <img
+                    src="{{ asset('images/nb-farm-logo.png') }}"
+                    alt="NB Poultry Farm logo"
+                    width="52"
+                    height="52"
+                >
+            </a>
+            <nav aria-label="Primary">
+                <a href="#about">About</a>
+                <a href="#modules">System</a>
+                <a href="#team">Team</a>
+                <a class="thesis-login" href="{{ route('login') }}">Log in</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="thesis-hero">
+                <div class="thesis-wrap">
+                    <h1>NB Poultry Farm Management System</h1>
+                    <p class="thesis-sub">
+                        A web-based, service-oriented management system with QR code egg tracking
+                        and egg production forecasting, built for NB Poultry Farm in San Jose, Batangas.
+                    </p>
+                    <div class="thesis-cta">
+                        <a class="thesis-btn thesis-btn-primary" href="{{ route('login') }}">Log in</a>
+                        <a class="thesis-btn thesis-btn-ghost" href="#about">About the system</a>
+                    </div>
+                </div>
+
+                <div class="egg-tray" aria-hidden="true">
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                    <span class="thesis-egg"></span>
+                </div>
+            </section>
+
+            <section class="thesis-section" id="about">
+                <div class="thesis-wrap">
+                    <h2>Overview</h2>
+                    <p class="thesis-lead">
+                        NB Poultry Farm still records egg production, stock, dispatch, and sales
+                        in logbooks and ledgers. This study develops a web-based management system
+                        that replaces those records, tracks egg batches with QR codes, and forecasts
+                        egg production using Linear Regression.
+                    </p>
+                </div>
+            </section>
+
+            <section class="thesis-section thesis-modules" id="modules">
+                <div class="thesis-wrap">
+                    <h2>What the system does</h2>
+                    <div class="thesis-module-grid">
+                        <article class="thesis-module">
+                            <h3>Production Monitoring</h3>
+                            <p>Daily egg counts by batch, with QR code tracking to identify and trace each egg batch.</p>
+                        </article>
+                        <article class="thesis-module">
+                            <h3>Inventory Management</h3>
+                            <p>Feeds, vitamins, and trays on hand, with stock updates.</p>
+                        </article>
+                        <article class="thesis-module">
+                            <h3>Dispatch and Sales</h3>
+                            <p>Sorting, delivery, stock recall, and revenue records.</p>
+                        </article>
+                        <article class="thesis-module">
+                            <h3>Forecasting</h3>
+                            <p>Predict egg production, availability, and stock levels.</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="thesis-section" id="team">
+                <div class="thesis-wrap">
+                    <h2>Researchers</h2>
+                    <div class="thesis-team">
+                        <div class="thesis-person"><b>Gawaran, Louise Ann 1</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Laqui, Charisse</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Medrazo, Klyzza Mae 3</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Saclao, Ma. Jaira 3</b><span>Researcher</span></div>
+                    </div>
+
+                    <div class="thesis-info">
+                        <div><small>Adviser Name</small><b>Zymon Andrew Maquinto</b></div>
+                        <div><small>College</small><b>College of Informatics and Computing Sciences</b></div>
+                        <div><small>University</small><b>Batangas State University, Lipa Campus</b></div>
+                        <div><small>Academic year</small><b>2026</b></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="thesis-footer">
+            NB Poultry Farm Management System, San Jose, Batangas. 2026.
+            <a href="{{ route('login') }}">Log in</a>
+        </footer>
+    </div>
+
+    @if (false)
     <header class="topbar">
         <div class="topbar-inner">
             <a class="brand" href="#home" aria-label="NB Farm home">
@@ -311,5 +418,6 @@
             reveals.forEach((el) => observer.observe(el));
         })();
     </script>
+    @endif
 </body>
 </html>

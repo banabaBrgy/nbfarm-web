@@ -44,7 +44,7 @@ Route::get('/', function () {
             : redirect('/login');
     }
 
-    return redirect()->route('login');
+    return view('landing');
 })->name('landing');
 
 // Login
