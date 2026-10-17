@@ -23,7 +23,7 @@ class SalesHistoryController extends Controller
             ->forSalesRange($range, $from, $to)
             ->orderByDesc('transaction_date')
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         $periodTotal = (float) Transaction::query()
