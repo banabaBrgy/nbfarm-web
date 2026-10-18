@@ -673,4 +673,22 @@
 
     }
 
+    .inventory-page .filter-bar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: stretch;
+        gap: 10px;
+    }
+
+    .inventory-page .filter-bar input {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+    }
+
+    .inventory-page .filter-bar select {
+        flex: 0 0 132px;
+        width: 132px;
+    }
+
 }
