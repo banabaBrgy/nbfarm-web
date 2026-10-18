@@ -3,8 +3,7 @@
         <div class="stamp-badge"><span>N·B</span></div>
         <h1>NB Poultry Farm</h1>
         <p class="lede">
-            One registry for production, inventory, dispatch,
-            and forecasting &mdash; kept as tidy as a well-run coop.
+            An integrated system that helps manage farm operations and improve decision-making.
         </p>
 
         <div class="module-list">
