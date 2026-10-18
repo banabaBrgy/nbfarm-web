@@ -117,10 +117,10 @@
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
                     <div class="thesis-team">
-                        <div class="thesis-person"><b>Gawaran, Louise Ann 1</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Gawaran, Louise Ann</b><span>Researcher</span></div>
                         <div class="thesis-person"><b>Laqui, Charisse</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Medrazo, Klyzza Mae 3</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Saclao, Ma. Jaira 3</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Medrazo, Klyzza Mae</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Saclao, Ma. Jaira</b><span>Researcher</span></div>
                     </div>
 
                     <div class="thesis-info">
