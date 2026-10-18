@@ -893,3 +893,18 @@ button.stat-icon:hover {
         -webkit-overflow-scrolling: touch;
     }
 }
+
+/* Keep long stock and currency values inside two-column mobile cards. */
+.inventory-page .stat-info h2,
+.revenue-page .stat-info h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .inventory-page .stat-info h2,
+    .revenue-page .stat-info h2 {
+        font-size: clamp(18px, 4.5vw, 24px);
+    }
+}
