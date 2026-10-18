@@ -108,7 +108,7 @@
     </div>
 
     <div class="production-table-scroll">
-        <table class="table production-table">
+        <table class="table production-table has-action-column">
             <thead>
                 <tr>
                     <th class="col-batch">Batch</th>

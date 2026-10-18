@@ -120,7 +120,7 @@
         </div>
 
         <div class="dsp-table-wrap">
-            <table class="dsp-table">
+            <table class="dsp-table has-action-column">
                 <colgroup>
                     @if($canManage)
                         <col class="dsp-col-check">

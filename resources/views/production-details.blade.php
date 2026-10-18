@@ -54,7 +54,7 @@
 
         <div class="card-body">
 
-            <table>
+            <table class="has-action-column">
 
                 <thead>
 

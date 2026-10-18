@@ -95,7 +95,7 @@
 
     <!-- ITEMS TABLE -->
     <div class="inventory-table-wrapper">
-        <table class="inventory-table">
+        <table class="inventory-table has-action-column">
             <thead>
                 <tr>
                     <th>Item</th>

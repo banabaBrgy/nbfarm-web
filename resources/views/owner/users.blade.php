@@ -43,7 +43,7 @@
 
     <!-- USER TABLE -->
     <div class="user-table-wrapper">
-        <table class="user-table">
+        <table class="user-table has-action-column">
             <thead>
                 <tr>
                     <th>User</th>

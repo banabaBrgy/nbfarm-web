@@ -78,7 +78,7 @@
         </div>
 
         <div class="rpt-table-wrap">
-            <table class="rpt-table">
+            <table class="rpt-table has-action-column">
                 <thead>
                     <tr>
                         <th>Date</th>
