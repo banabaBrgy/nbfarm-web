@@ -117,14 +117,14 @@
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
                     <div class="thesis-team">
-                        <div class="thesis-person"><b>Gawaran, Louise Ann</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Laqui, Charisse</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Medrazo, Klyzza Mae</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Saclao, Ma. Jaira</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Alex Rivera</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Jamie Cruz</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Morgan Reyes</b><span>Researcher</span></div>
+                        <div class="thesis-person"><b>Taylor Santos</b><span>Researcher</span></div>
                     </div>
 
                     <div class="thesis-info">
-                        <div><small>Adviser Name</small><b>Zymon Andrew Maquinto</b></div>
+                        <div><small>Adviser Name</small><b>Casey Mendoza</b></div>
                         <div><small>College</small><b>College of Informatics and Computing Sciences</b></div>
                         <div><small>University</small><b>Batangas State University, Lipa Campus</b></div>
                         <div><small>Academic year</small><b>2026</b></div>
