@@ -1228,11 +1228,28 @@ body > .site-footer {
     overflow: hidden;
 }
 
-.thesis-person {
+.thesis-team {
+    display: flex;
+    gap: 1.75rem;
     min-width: 0;
-    min-height: 5rem;
+    padding: 0.25rem 0.25rem 1rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.thesis-team::-webkit-scrollbar {
+    display: none;
+}
+
+.thesis-person {
+    flex: 0 0 clamp(240px, 28vw, 300px);
+    min-width: 0;
     padding: 0.25rem 0 0.25rem 1rem;
     border-left: 3px solid var(--thesis-green);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .thesis-person b {
@@ -1336,6 +1353,12 @@ body > .site-footer {
         margin-top: 1.8rem;
     }
 
+    .thesis-team {
+        gap: 1.2rem;
+        touch-action: pan-x;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .thesis-info {
         gap: 1rem;
         margin-top: 2rem;
@@ -1353,6 +1376,21 @@ body > .site-footer {
         grid-template-columns: 1fr;
     }
 
+    .thesis-person {
+        flex-basis: min(82vw, 300px);
+    }
+}
+
+@media (min-width: 768px) {
+    .thesis-team {
+        overflow: hidden;
+        scroll-snap-type: none;
+        touch-action: auto;
+    }
+
+    .thesis-person {
+        flex: 1 1 0;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

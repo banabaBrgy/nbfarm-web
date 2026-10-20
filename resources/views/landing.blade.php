@@ -31,7 +31,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ versioned_asset('css/landing.css') }}">
-    @vite('resources/js/landing.js')
 </head>
 <body>
     <div class="thesis-page" id="top">
@@ -117,21 +116,21 @@
             <section class="thesis-section" id="team">
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
-                    <div class="thesis-team-carousel swiper" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
-                        <div class="swiper-wrapper thesis-team">
-                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
+                    <div class="thesis-team-carousel" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
+                        <div class="thesis-team">
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
                                 <b>Alex Rivera</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
                                 <b>Jamie Cruz</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
                                 <b>Morgan Reyes</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
                                 <b>Taylor Santos</b>
                                 <span>Researcher</span>
                             </div>
