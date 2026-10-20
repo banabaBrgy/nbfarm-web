@@ -117,9 +117,6 @@
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
                     <div class="thesis-team-carousel" data-researchers-carousel>
-                        <button class="thesis-carousel-button" type="button" data-carousel-prev aria-label="Previous researcher" disabled>
-                            <span aria-hidden="true">←</span>
-                        </button>
                         <div class="thesis-team" role="region" aria-roledescription="carousel" aria-label="Researchers" tabindex="0">
                             <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
                                 <b>Alex Rivera</b>
@@ -138,9 +135,6 @@
                                 <span>Researcher</span>
                             </div>
                         </div>
-                        <button class="thesis-carousel-button" type="button" data-carousel-next aria-label="Next researcher">
-                            <span aria-hidden="true">→</span>
-                        </button>
                     </div>
 
                     <div class="thesis-info">
@@ -171,38 +165,41 @@
                 });
             });
 
-            const researcherCarousel = document.querySelector('[data-researchers-carousel]');
-            const researcherTrack = researcherCarousel?.querySelector('.thesis-team');
-            const previousResearcher = researcherCarousel?.querySelector('[data-carousel-prev]');
-            const nextResearcher = researcherCarousel?.querySelector('[data-carousel-next]');
+            const researcherTrack = document.querySelector('[data-researchers-carousel] .thesis-team');
 
-            if (researcherTrack && previousResearcher && nextResearcher) {
-                const updateResearcherControls = () => {
-                    const maxScroll = researcherTrack.scrollWidth - researcherTrack.clientWidth;
-                    previousResearcher.disabled = researcherTrack.scrollLeft <= 1;
-                    nextResearcher.disabled = researcherTrack.scrollLeft >= maxScroll - 1;
+            if (researcherTrack) {
+                let isDragging = false;
+                let startX = 0;
+                let startScrollLeft = 0;
+
+                const stopDragging = (event) => {
+                    isDragging = false;
+                    researcherTrack.classList.remove('is-dragging');
+                    if (event?.pointerId !== undefined && researcherTrack.hasPointerCapture(event.pointerId)) {
+                        researcherTrack.releasePointerCapture(event.pointerId);
+                    }
                 };
 
-                const moveResearcher = (direction) => {
-                    const slide = researcherTrack.querySelector('.thesis-person');
-                    if (!slide) return;
+                researcherTrack.addEventListener('pointerdown', (event) => {
+                    if (event.pointerType === 'mouse' && event.button !== 0) return;
 
-                    const gap = parseFloat(getComputedStyle(researcherTrack).gap) || 0;
-                    researcherTrack.scrollBy({
-                        left: direction * (slide.getBoundingClientRect().width + gap),
-                        behavior: 'smooth',
-                    });
-                };
-
-                previousResearcher.addEventListener('click', () => moveResearcher(-1));
-                nextResearcher.addEventListener('click', () => moveResearcher(1));
-                researcherTrack.addEventListener('scroll', updateResearcherControls, { passive: true });
-                researcherTrack.addEventListener('keydown', (event) => {
-                    if (event.key === 'ArrowLeft') moveResearcher(-1);
-                    if (event.key === 'ArrowRight') moveResearcher(1);
+                    isDragging = true;
+                    startX = event.clientX;
+                    startScrollLeft = researcherTrack.scrollLeft;
+                    researcherTrack.classList.add('is-dragging');
+                    researcherTrack.setPointerCapture(event.pointerId);
                 });
-                window.addEventListener('resize', updateResearcherControls);
-                updateResearcherControls();
+
+                researcherTrack.addEventListener('pointermove', (event) => {
+                    if (!isDragging) return;
+
+                    event.preventDefault();
+                    researcherTrack.scrollLeft = startScrollLeft - (event.clientX - startX);
+                });
+
+                researcherTrack.addEventListener('pointerup', stopDragging);
+                researcherTrack.addEventListener('pointercancel', stopDragging);
+                researcherTrack.addEventListener('lostpointercapture', stopDragging);
             }
         </script>
     </div>
