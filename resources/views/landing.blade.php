@@ -117,6 +117,11 @@
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
                     <div class="thesis-team-carousel" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
+                        <button class="thesis-carousel-button thesis-carousel-button--prev" type="button" data-carousel-prev aria-label="Previous researcher" disabled>
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="m14.5 5-7 7 7 7"></path>
+                            </svg>
+                        </button>
                         <div class="thesis-team">
                             <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
                                 <b>Alex Rivera</b>
@@ -135,6 +140,11 @@
                                 <span>Researcher</span>
                             </div>
                         </div>
+                        <button class="thesis-carousel-button thesis-carousel-button--next" type="button" data-carousel-next aria-label="Next researcher">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="m9.5 5 7 7-7 7"></path>
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="thesis-info">
@@ -164,6 +174,36 @@
                     history.replaceState(null, '', link.getAttribute('href'));
                 });
             });
+
+            const researcherCarousel = document.querySelector('[data-researchers-carousel]');
+            const researcherTrack = researcherCarousel?.querySelector('.thesis-team');
+            const previousResearcher = researcherCarousel?.querySelector('[data-carousel-prev]');
+            const nextResearcher = researcherCarousel?.querySelector('[data-carousel-next]');
+
+            if (researcherTrack && previousResearcher && nextResearcher) {
+                const updateResearcherControls = () => {
+                    const maxScroll = researcherTrack.scrollWidth - researcherTrack.clientWidth;
+                    previousResearcher.disabled = researcherTrack.scrollLeft <= 1;
+                    nextResearcher.disabled = researcherTrack.scrollLeft >= maxScroll - 1;
+                };
+
+                const moveResearcher = (direction) => {
+                    const slide = researcherTrack.querySelector('.thesis-person');
+                    if (!slide) return;
+
+                    const gap = parseFloat(getComputedStyle(researcherTrack).gap) || 0;
+                    researcherTrack.scrollBy({
+                        left: direction * (slide.getBoundingClientRect().width + gap),
+                        behavior: 'smooth',
+                    });
+                };
+
+                previousResearcher.addEventListener('click', () => moveResearcher(-1));
+                nextResearcher.addEventListener('click', () => moveResearcher(1));
+                researcherTrack.addEventListener('scroll', updateResearcherControls, { passive: true });
+                window.addEventListener('resize', updateResearcherControls);
+                updateResearcherControls();
+            }
 
         </script>
     </div>

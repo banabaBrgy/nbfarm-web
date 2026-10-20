@@ -1224,8 +1224,58 @@ body > .site-footer {
 }
 
 .thesis-team-carousel {
+    position: relative;
     margin-top: 2.4rem;
+    padding-inline: 2.75rem;
     overflow: hidden;
+}
+
+.thesis-carousel-button {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border: 1px solid rgba(63, 154, 116, 0.65);
+    border-radius: 50%;
+    background: var(--thesis-mint);
+    color: var(--thesis-green);
+    box-shadow: 0 6px 16px rgba(8, 25, 17, 0.2);
+    transform: translateY(-50%);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.thesis-carousel-button--prev {
+    left: 0;
+}
+
+.thesis-carousel-button--next {
+    right: 0;
+}
+
+.thesis-carousel-button svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.thesis-carousel-button:hover:not(:disabled),
+.thesis-carousel-button:focus-visible:not(:disabled) {
+    border-color: var(--thesis-green);
+    background: var(--thesis-green);
+    color: var(--thesis-paper);
+    outline: none;
+}
+
+.thesis-carousel-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.25;
 }
 
 .thesis-team {
@@ -1382,6 +1432,14 @@ body > .site-footer {
 }
 
 @media (min-width: 768px) {
+    .thesis-team-carousel {
+        padding-inline: 0;
+    }
+
+    .thesis-carousel-button {
+        display: none;
+    }
+
     .thesis-team {
         overflow: hidden;
         scroll-snap-type: none;
