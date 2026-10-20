@@ -31,6 +31,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ versioned_asset('css/landing.css') }}">
+    @vite('resources/js/landing.js')
 </head>
 <body>
     <div class="thesis-page" id="top">
@@ -116,21 +117,21 @@
             <section class="thesis-section" id="team">
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
-                    <div class="thesis-team-carousel" data-researchers-carousel>
-                        <div class="thesis-team" role="region" aria-roledescription="carousel" aria-label="Researchers" tabindex="0">
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
+                    <div class="thesis-team-carousel swiper" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
+                        <div class="swiper-wrapper thesis-team">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
                                 <b>Alex Rivera</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
                                 <b>Jamie Cruz</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
                                 <b>Morgan Reyes</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
                                 <b>Taylor Santos</b>
                                 <span>Researcher</span>
                             </div>
@@ -165,63 +166,6 @@
                 });
             });
 
-            const researcherTrack = document.querySelector('[data-researchers-carousel] .thesis-team');
-
-            if (researcherTrack) {
-                let isDragging = false;
-                let startX = 0;
-                let startScrollLeft = 0;
-                const mobileCarousel = window.matchMedia('(max-width: 767px)');
-
-                const snapToNearestResearcher = () => {
-                    if (!mobileCarousel.matches) return;
-
-                    const slide = researcherTrack.querySelector('.thesis-person');
-                    if (!slide) return;
-
-                    const gap = parseFloat(getComputedStyle(researcherTrack).gap) || 0;
-                    const step = slide.getBoundingClientRect().width + gap;
-                    const index = Math.round(researcherTrack.scrollLeft / step);
-
-                    researcherTrack.scrollTo({
-                        left: index * step,
-                        behavior: 'smooth',
-                    });
-                };
-
-                const stopDragging = (event) => {
-                    if (!isDragging) return;
-                    isDragging = false;
-                    researcherTrack.classList.remove('is-dragging');
-                    if (event?.pointerId !== undefined && researcherTrack.hasPointerCapture(event.pointerId)) {
-                        researcherTrack.releasePointerCapture(event.pointerId);
-                    }
-                    snapToNearestResearcher();
-                };
-
-                researcherTrack.addEventListener('pointerdown', (event) => {
-                    if (!mobileCarousel.matches) return;
-                    if (event.pointerType === 'mouse' && event.button !== 0) return;
-
-                    isDragging = true;
-                    startX = event.clientX;
-                    startScrollLeft = researcherTrack.scrollLeft;
-                    researcherTrack.classList.add('is-dragging');
-                    researcherTrack.setPointerCapture(event.pointerId);
-                });
-
-                researcherTrack.addEventListener('pointermove', (event) => {
-                    if (!isDragging) return;
-
-                    event.preventDefault();
-                    researcherTrack.scrollLeft = startScrollLeft - (event.clientX - startX);
-                });
-
-                researcherTrack.addEventListener('pointerup', stopDragging);
-                researcherTrack.addEventListener('pointercancel', stopDragging);
-                researcherTrack.addEventListener('lostpointercapture', stopDragging);
-                mobileCarousel.addEventListener('change', snapToNearestResearcher);
-            }
         </script>
     </div>
 
