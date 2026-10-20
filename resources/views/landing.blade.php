@@ -31,6 +31,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ versioned_asset('css/landing.css') }}">
+    @vite('resources/js/landing.js')
 </head>
 <body>
     <div class="thesis-page" id="top">
@@ -115,36 +116,40 @@
 
             <section class="thesis-section" id="team">
                 <div class="thesis-wrap">
-                    <h2>Researchers</h2>
-                    <div class="thesis-team-carousel" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
-                        <button class="thesis-carousel-button thesis-carousel-button--prev" type="button" data-carousel-prev aria-label="Previous researcher" disabled>
-                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="m14.5 5-7 7 7 7"></path>
-                            </svg>
-                        </button>
-                        <div class="thesis-team">
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
+                    <div class="thesis-team-heading">
+                        <h2>Researchers</h2>
+                        <div class="thesis-carousel-controls" data-researchers-controls>
+                            <button class="thesis-carousel-button thesis-carousel-button--prev" type="button" data-carousel-prev aria-label="Previous researcher" disabled>
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path d="m14.5 5-7 7 7 7"></path>
+                                </svg>
+                            </button>
+                            <button class="thesis-carousel-button thesis-carousel-button--next" type="button" data-carousel-next aria-label="Next researcher">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path d="m9.5 5 7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="thesis-team-carousel swiper" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
+                        <div class="swiper-wrapper thesis-team">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
                                 <b>Alex Rivera</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
                                 <b>Jamie Cruz</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
                                 <b>Morgan Reyes</b>
                                 <span>Researcher</span>
                             </div>
-                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
+                            <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
                                 <b>Taylor Santos</b>
                                 <span>Researcher</span>
                             </div>
                         </div>
-                        <button class="thesis-carousel-button thesis-carousel-button--next" type="button" data-carousel-next aria-label="Next researcher">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="m9.5 5 7 7-7 7"></path>
-                            </svg>
-                        </button>
                     </div>
 
                     <div class="thesis-info">
@@ -174,36 +179,6 @@
                     history.replaceState(null, '', link.getAttribute('href'));
                 });
             });
-
-            const researcherCarousel = document.querySelector('[data-researchers-carousel]');
-            const researcherTrack = researcherCarousel?.querySelector('.thesis-team');
-            const previousResearcher = researcherCarousel?.querySelector('[data-carousel-prev]');
-            const nextResearcher = researcherCarousel?.querySelector('[data-carousel-next]');
-
-            if (researcherTrack && previousResearcher && nextResearcher) {
-                const updateResearcherControls = () => {
-                    const maxScroll = researcherTrack.scrollWidth - researcherTrack.clientWidth;
-                    previousResearcher.disabled = researcherTrack.scrollLeft <= 1;
-                    nextResearcher.disabled = researcherTrack.scrollLeft >= maxScroll - 1;
-                };
-
-                const moveResearcher = (direction) => {
-                    const slide = researcherTrack.querySelector('.thesis-person');
-                    if (!slide) return;
-
-                    const gap = parseFloat(getComputedStyle(researcherTrack).gap) || 0;
-                    researcherTrack.scrollBy({
-                        left: direction * (slide.getBoundingClientRect().width + gap),
-                        behavior: 'smooth',
-                    });
-                };
-
-                previousResearcher.addEventListener('click', () => moveResearcher(-1));
-                nextResearcher.addEventListener('click', () => moveResearcher(1));
-                researcherTrack.addEventListener('scroll', updateResearcherControls, { passive: true });
-                window.addEventListener('resize', updateResearcherControls);
-                updateResearcherControls();
-            }
 
         </script>
     </div>

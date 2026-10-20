@@ -38,6 +38,8 @@ export default defineConfig({
 
                 'resources/js/revenue.js',
 
+                'resources/js/landing.js',
+
             ],
 
             refresh: true,
