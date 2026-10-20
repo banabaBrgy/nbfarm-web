@@ -171,16 +171,36 @@
                 let isDragging = false;
                 let startX = 0;
                 let startScrollLeft = 0;
+                const mobileCarousel = window.matchMedia('(max-width: 767px)');
+
+                const snapToNearestResearcher = () => {
+                    if (!mobileCarousel.matches) return;
+
+                    const slide = researcherTrack.querySelector('.thesis-person');
+                    if (!slide) return;
+
+                    const gap = parseFloat(getComputedStyle(researcherTrack).gap) || 0;
+                    const step = slide.getBoundingClientRect().width + gap;
+                    const index = Math.round(researcherTrack.scrollLeft / step);
+
+                    researcherTrack.scrollTo({
+                        left: index * step,
+                        behavior: 'smooth',
+                    });
+                };
 
                 const stopDragging = (event) => {
+                    if (!isDragging) return;
                     isDragging = false;
                     researcherTrack.classList.remove('is-dragging');
                     if (event?.pointerId !== undefined && researcherTrack.hasPointerCapture(event.pointerId)) {
                         researcherTrack.releasePointerCapture(event.pointerId);
                     }
+                    snapToNearestResearcher();
                 };
 
                 researcherTrack.addEventListener('pointerdown', (event) => {
+                    if (!mobileCarousel.matches) return;
                     if (event.pointerType === 'mouse' && event.button !== 0) return;
 
                     isDragging = true;
@@ -200,6 +220,7 @@
                 researcherTrack.addEventListener('pointerup', stopDragging);
                 researcherTrack.addEventListener('pointercancel', stopDragging);
                 researcherTrack.addEventListener('lostpointercapture', stopDragging);
+                mobileCarousel.addEventListener('change', snapToNearestResearcher);
             }
         </script>
     </div>

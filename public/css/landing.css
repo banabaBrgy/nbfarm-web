@@ -1256,6 +1256,7 @@ body > .site-footer {
     padding-left: 1rem;
     border-left: 3px solid var(--thesis-green);
     scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .thesis-person b {
@@ -1382,6 +1383,19 @@ body > .site-footer {
 
     .thesis-person {
         flex-basis: min(82vw, 300px);
+    }
+}
+
+@media (min-width: 768px) {
+    .thesis-team {
+        cursor: default;
+        overflow: hidden;
+        scroll-snap-type: none;
+        touch-action: auto;
+    }
+
+    .thesis-person {
+        flex: 1 1 0;
     }
 }
 
