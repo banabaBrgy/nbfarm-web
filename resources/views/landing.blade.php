@@ -116,11 +116,31 @@
             <section class="thesis-section" id="team">
                 <div class="thesis-wrap">
                     <h2>Researchers</h2>
-                    <div class="thesis-team">
-                        <div class="thesis-person"><b>Alex Rivera</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Jamie Cruz</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Morgan Reyes</b><span>Researcher</span></div>
-                        <div class="thesis-person"><b>Taylor Santos</b><span>Researcher</span></div>
+                    <div class="thesis-team-carousel" data-researchers-carousel>
+                        <button class="thesis-carousel-button" type="button" data-carousel-prev aria-label="Previous researcher" disabled>
+                            <span aria-hidden="true">←</span>
+                        </button>
+                        <div class="thesis-team" role="region" aria-roledescription="carousel" aria-label="Researchers" tabindex="0">
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
+                                <b>Alex Rivera</b>
+                                <span>Researcher</span>
+                            </div>
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
+                                <b>Jamie Cruz</b>
+                                <span>Researcher</span>
+                            </div>
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
+                                <b>Morgan Reyes</b>
+                                <span>Researcher</span>
+                            </div>
+                            <div class="thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
+                                <b>Taylor Santos</b>
+                                <span>Researcher</span>
+                            </div>
+                        </div>
+                        <button class="thesis-carousel-button" type="button" data-carousel-next aria-label="Next researcher">
+                            <span aria-hidden="true">→</span>
+                        </button>
                     </div>
 
                     <div class="thesis-info">
@@ -150,6 +170,40 @@
                     history.replaceState(null, '', link.getAttribute('href'));
                 });
             });
+
+            const researcherCarousel = document.querySelector('[data-researchers-carousel]');
+            const researcherTrack = researcherCarousel?.querySelector('.thesis-team');
+            const previousResearcher = researcherCarousel?.querySelector('[data-carousel-prev]');
+            const nextResearcher = researcherCarousel?.querySelector('[data-carousel-next]');
+
+            if (researcherTrack && previousResearcher && nextResearcher) {
+                const updateResearcherControls = () => {
+                    const maxScroll = researcherTrack.scrollWidth - researcherTrack.clientWidth;
+                    previousResearcher.disabled = researcherTrack.scrollLeft <= 1;
+                    nextResearcher.disabled = researcherTrack.scrollLeft >= maxScroll - 1;
+                };
+
+                const moveResearcher = (direction) => {
+                    const slide = researcherTrack.querySelector('.thesis-person');
+                    if (!slide) return;
+
+                    const gap = parseFloat(getComputedStyle(researcherTrack).gap) || 0;
+                    researcherTrack.scrollBy({
+                        left: direction * (slide.getBoundingClientRect().width + gap),
+                        behavior: 'smooth',
+                    });
+                };
+
+                previousResearcher.addEventListener('click', () => moveResearcher(-1));
+                nextResearcher.addEventListener('click', () => moveResearcher(1));
+                researcherTrack.addEventListener('scroll', updateResearcherControls, { passive: true });
+                researcherTrack.addEventListener('keydown', (event) => {
+                    if (event.key === 'ArrowLeft') moveResearcher(-1);
+                    if (event.key === 'ArrowRight') moveResearcher(1);
+                });
+                window.addEventListener('resize', updateResearcherControls);
+                updateResearcherControls();
+            }
         </script>
     </div>
 

@@ -1223,16 +1223,59 @@ body > .site-footer {
     font-size: 0.95rem;
 }
 
-.thesis-team {
+.thesis-team-carousel {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.75rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
     margin-top: 2.4rem;
 }
 
+.thesis-team {
+    display: flex;
+    gap: 1.75rem;
+    min-width: 0;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.thesis-team::-webkit-scrollbar {
+    display: none;
+}
+
 .thesis-person {
+    flex: 0 0 calc((100% - 5.25rem) / 4);
+    min-width: 0;
     padding-left: 1rem;
     border-left: 3px solid var(--thesis-green);
+    scroll-snap-align: start;
+}
+
+.thesis-carousel-button {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border: 1px solid var(--thesis-green);
+    border-radius: 50%;
+    color: var(--thesis-green);
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.thesis-carousel-button:hover:not(:disabled),
+.thesis-carousel-button:focus-visible:not(:disabled) {
+    background: var(--thesis-green);
+    color: var(--thesis-paper);
+    outline: none;
+}
+
+.thesis-carousel-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
 }
 
 .thesis-person b {
@@ -1332,9 +1375,13 @@ body > .site-footer {
         padding: 1.05rem 0;
     }
 
-    .thesis-team {
+    .thesis-team-carousel {
         gap: 1.2rem;
         margin-top: 1.8rem;
+    }
+
+    .thesis-team {
+        gap: 1.2rem;
     }
 
     .thesis-info {
@@ -1350,9 +1397,17 @@ body > .site-footer {
 
 @media (max-width: 767px) {
     .thesis-module-grid,
-    .thesis-team,
     .thesis-info {
         grid-template-columns: 1fr;
+    }
+
+    .thesis-person {
+        flex-basis: 100%;
+    }
+
+    .thesis-carousel-button {
+        width: 2rem;
+        height: 2rem;
     }
 }
 
