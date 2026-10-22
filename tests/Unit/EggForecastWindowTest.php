@@ -74,7 +74,7 @@ class EggForecastWindowTest extends TestCase
         $this->assertFalse(collect($summary['sizes'])->contains(fn ($size) => $size['key'] === 'cracked'));
 
         $previousSummary = app(GenerateEggForecast::class)->previousSummary();
-        $this->assertSame('2026-10-03', $previousSummary['forecast_date']);
+        $this->assertSame('2026-10-04', $previousSummary['forecast_date']);
         $this->assertSame(6600, $previousSummary['predicted_eggs']);
         $this->assertSame(6600, collect($previousSummary['sizes'])->sum('eggs'));
 

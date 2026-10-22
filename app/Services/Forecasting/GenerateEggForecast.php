@@ -61,7 +61,7 @@ class GenerateEggForecast
     }
 
     /**
-     * Forecast for yesterday, shown from the next-day summary.
+     * Forecast for the day before the next-day forecast (today).
      *
      * @return array{
      *     predicted_eggs: int,
@@ -77,7 +77,7 @@ class GenerateEggForecast
      */
     public function previousSummary(): array
     {
-        return $this->forecastSummaryForDate(Carbon::yesterday()->startOfDay());
+        return $this->forecastSummaryForDate(Carbon::tomorrow()->subDay()->startOfDay());
     }
 
     /**
