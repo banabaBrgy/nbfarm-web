@@ -6,6 +6,7 @@ use App\Models\DailyInventoryLog;
 use App\Models\Inventory;
 use App\Models\InventoryItem;
 use App\Models\InventoryItemHistory;
+use Illuminate\Support\Facades\Schema;
 
 class DailyInventory
 {
@@ -20,7 +21,13 @@ class DailyInventory
     {
         $today = now()->toDateString();
 
-        if (DailyInventoryLog::where('log_date', $today)->exists()) {
+        // Claim the day before deducting so a second request cannot insert a
+        // duplicate log and turn the caller's save (including production edit) into a 500.
+        $inserted = DailyInventoryLog::query()->insertOrIgnore([
+            'log_date' => $today,
+        ]);
+
+        if ($inserted === 0) {
             $this->catchUpNewRates($today);
             $this->resetEggTrays();
             $this->syncAlerts();
@@ -31,11 +38,6 @@ class DailyInventory
         $this->decrementSupply('Feeds', self::FEED_DAILY_USE, 'Daily feed use (15 sacks)');
         $this->decrementSupply('Vitamins', self::VITAMIN_DAILY_USE, 'Daily vitamin use (5 bottles)');
         $this->resetEggTrays();
-
-        DailyInventoryLog::create([
-            'log_date' => $today,
-        ]);
-
         $this->syncAlerts();
     }
 
@@ -99,9 +101,11 @@ class DailyInventory
             $item->update(['current_stock' => $after]);
             $item->current_stock = $after;
 
-            Inventory::where('item_type', 'Egg Tray')->update([
-                'quantity' => (int) $after,
-            ]);
+            if (Schema::hasColumn('inventory', 'item_type')) {
+                Inventory::where('item_type', 'Egg Tray')->update([
+                    'quantity' => (int) $after,
+                ]);
+            }
         }
 
         // Always latch the daily restock, even when stock already matches,

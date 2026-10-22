@@ -94,10 +94,13 @@
 
 document.addEventListener('DOMContentLoaded',function(){
 
+    let updateUrl = '';
+
     document.querySelectorAll('.editQR').forEach(btn=>{
 
         btn.addEventListener('click',function(){
 
+            updateUrl = this.dataset.updateUrl || '';
             transactionId.value=this.dataset.id;
             qrCode.value=this.dataset.code;
             eggSize.value=this.dataset.size;
@@ -111,7 +114,11 @@ document.addEventListener('DOMContentLoaded',function(){
 
         e.preventDefault();
 
-        fetch("{{ route('qr.update') }}",{
+        if (!updateUrl) {
+            return;
+        }
+
+        fetch(updateUrl,{
 
             method:'POST',
 
@@ -128,9 +135,14 @@ document.addEventListener('DOMContentLoaded',function(){
 
         .then(res=>{
 
-            bootstrap.Modal.getInstance(
-                document.getElementById('editQRModal')
-            ).hide();
+            if (!res.success) {
+                return;
+            }
+
+            const modalEl = document.getElementById('editQRModal');
+            if (window.bootstrap) {
+                window.bootstrap.Modal.getInstance(modalEl)?.hide();
+            }
 
             document.querySelector('.modal-backdrop')?.remove();
 

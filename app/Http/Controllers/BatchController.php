@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Production;
-use Illuminate\Http\Request;
+use App\Models\User;
 
 class BatchController extends Controller
 {
@@ -13,21 +13,13 @@ class BatchController extends Controller
             ->whereDate('production_date', today())
             ->first();
 
-        if (!$production) {
-
+        if (! $production) {
             abort(404);
-
         }
 
-        $qrRecords = $production->qrRecords()
-            ->latest()
-            ->get();
-
-        return view('batch-details', [
-
-            'production' => $production,
-            'qrRecords' => $qrRecords,
-
-        ]);
+        return redirect()->route(
+            User::routeRole().'.production.details',
+            $production->production_id
+        );
     }
 }

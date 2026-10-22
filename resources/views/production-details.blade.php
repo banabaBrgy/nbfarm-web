@@ -75,9 +75,9 @@
 
                     <tr>
 
-                        <td>{{ $transaction->qrRecord->qr_code }}</td>
+                        <td>{{ $transaction->qrRecord?->qr_code ?? '—' }}</td>
 
-                        <td>{{ $transaction->qrRecord->egg_size }}</td>
+                        <td>{{ $transaction->qrRecord?->egg_size ?? '—' }}</td>
 
                         <td>{{ number_format($transaction->total_eggs) }}</td>
 
@@ -87,8 +87,8 @@
                                 type="button"
                                 class="btn-edit editQR"
                                 data-id="{{ $transaction->id }}"
-                                data-code="{{ $transaction->qrRecord->qr_code }}"
-                                data-size="{{ $transaction->qrRecord->egg_size }}"
+                                data-code="{{ $transaction->qrRecord?->qr_code ?? '' }}"
+                                data-size="{{ $transaction->qrRecord?->egg_size ?? '' }}"
                                 data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
                                 data-eggs="{{ $transaction->total_eggs }}">
 
@@ -113,20 +113,6 @@
                     </tr>
 
                 @endforelse
-
-                @if($transactions->count()==0)
-
-                    <tr>
-
-                        <td colspan="4" class="text-center">
-
-                            No QR Records
-
-                        </td>
-
-                    </tr>
-
-                @endif
 
                 </tbody>
 
@@ -228,6 +214,7 @@
             <div class="modal-footer">
 
                 <button
+                    type="button"
                     class="btn btn-secondary"
                     data-bs-dismiss="modal">
 
@@ -236,6 +223,7 @@
                 </button>
 
                 <button
+                    type="button"
                     class="btn btn-success"
                     id="saveQR">
 
@@ -251,117 +239,130 @@
 
 </div>
 
+@push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('editQRModal');
+    const transactionInput = document.getElementById('transaction_id');
+    const totalEggsInput = document.getElementById('total_eggs');
+    const saveButton = document.getElementById('saveQR');
 
-const modal = new bootstrap.Modal(document.getElementById('editQRModal'));
+    if (!modalEl || !transactionInput || !totalEggsInput || !saveButton) {
+        return;
+    }
 
-document.querySelectorAll('.editQR').forEach(btn=>{
+    if (modalEl.parentElement !== document.body) {
+        document.body.appendChild(modalEl);
+    }
 
-    btn.addEventListener('click',function(){
+    const modal = window.bootstrap
+        ? window.bootstrap.Modal.getOrCreateInstance(modalEl)
+        : null;
 
-        document.getElementById('transaction_id').value=this.dataset.id;
-        document.getElementById('transaction_id').dataset.updateUrl=this.dataset.updateUrl;
+    const showError = function (message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Save failed',
+            text: message || 'Something went wrong.',
+            confirmButtonText: 'OK'
+        });
+    };
 
-        document.getElementById('qr_code').value=this.dataset.code;
+    document.querySelectorAll('.editQR').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            transactionInput.value = this.dataset.id || '';
+            transactionInput.dataset.updateUrl = this.dataset.updateUrl || '';
+            document.getElementById('qr_code').value = this.dataset.code || '';
+            document.getElementById('egg_size').value = this.dataset.size || '';
+            totalEggsInput.value = this.dataset.eggs || '';
 
-        document.getElementById('egg_size').value=this.dataset.size;
+            if (!modal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Edit unavailable',
+                    text: 'Refresh the page and try the edit again.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
 
-        document.getElementById('total_eggs').value=this.dataset.eggs;
-
-        modal.show();
-
+            modal.show();
+        });
     });
 
-});
+    saveButton.addEventListener('click', function () {
+        const updateUrl = transactionInput.dataset.updateUrl;
 
-document.getElementById('saveQR').addEventListener('click', function () {
-
-    const transactionId = document.getElementById('transaction_id');
-    const saveButton = this;
-
-    saveButton.disabled = true;
-    saveButton.textContent = 'Saving...';
-
-    fetch(transactionId.dataset.updateUrl, {
-
-        method: 'POST',
-
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-
-        body: JSON.stringify({
-            total_eggs: document.getElementById('total_eggs').value
-        })
-
-    })
-
-    .then(async response => {
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Unable to save the edited egg count.');
+        if (!updateUrl) {
+            return;
         }
 
-        return data;
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving...';
 
-    })
+        fetch(updateUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                total_eggs: totalEggsInput.value
+            })
+        })
+        .then(async function (response) {
+            let data = {};
 
-    .then(data => {
+            try {
+                data = await response.json();
+            } catch (error) {
+                throw new Error('Unable to save the edited egg count.');
+            }
 
-        if(data.success){
+            if (!response.ok) {
+                const groups = data.errors ? Object.values(data.errors) : [];
+                const firstError = Array.isArray(groups[0]) ? groups[0][0] : null;
+                throw new Error(firstError || data.message || 'Unable to save the edited egg count.');
+            }
 
-            modal.hide();
+            return data;
+        })
+        .then(function (data) {
+            if (!data.success) {
+                throw new Error(data.message || 'Unable to save the edited egg count.');
+            }
+
+            if (modal) {
+                modal.hide();
+            }
 
             Swal.fire({
                 icon: 'success',
                 title: 'Saved successfully',
                 text: 'The egg count has been updated.',
                 confirmButtonText: 'OK'
-            }).then(() => {
+            }).then(function () {
                 location.reload();
             });
-
-        } else {
-            throw new Error(data.message || 'Unable to save the edited egg count.');
-        }
-
-    })
-
-    .catch(error => {
-
-        console.error(error);
-
-        saveButton.disabled = false;
-        saveButton.textContent = 'Save';
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Save failed',
-            text: error.message || 'Something went wrong.',
-            confirmButtonText: 'OK'
+        })
+        .catch(function (error) {
+            console.error(error);
+            saveButton.disabled = false;
+            saveButton.textContent = 'Save';
+            showError(error.message);
         });
-
     });
 
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+        document.body.removeAttribute('style');
+        document.querySelectorAll('.modal-backdrop').forEach(function (el) {
+            el.remove();
+        });
+    });
 });
-
-document
-.getElementById('editQRModal')
-.addEventListener('hidden.bs.modal',function(){
-
-    document.body.classList.remove('modal-open');
-
-    document.body.removeAttribute('style');
-
-    document
-        .querySelectorAll('.modal-backdrop')
-        .forEach(el=>el.remove());
-
-});
-
 </script>
+@endpush
 
 @endsection

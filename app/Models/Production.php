@@ -51,6 +51,30 @@ class Production extends Model
         );
     }
 
+    /** Rebuild size totals from the batch's QR scans. */
+    public function recalculateEggTotals(): void
+    {
+        $totals = array_fill_keys(array_keys(self::EGG_SIZE_COLUMNS), 0);
+
+        foreach ($this->qrTransactions()->with('qrRecord')->get() as $transaction) {
+            $size = $transaction->qrRecord?->egg_size;
+
+            if (! isset($totals[$size])) {
+                continue;
+            }
+
+            $totals[$size] += (int) $transaction->total_eggs;
+        }
+
+        $columns = [];
+        foreach (self::EGG_SIZE_COLUMNS as $size => $column) {
+            $columns[$column] = $totals[$size];
+        }
+        $columns['eggs_produced'] = array_sum($columns);
+
+        $this->update($columns);
+    }
+
     public function totalEggCount(): int
     {
         return $this->small_eggs
