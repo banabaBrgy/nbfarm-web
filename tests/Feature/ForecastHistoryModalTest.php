@@ -56,6 +56,8 @@ class ForecastHistoryModalTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('id="forecastSummaryModal"', false);
+        $response->assertSee('document.body.appendChild', false);
+        $response->assertSee('col-share', false);
         $response->assertSee('Forecast Summary', false);
         $response->assertSee('id="previousDayModal"', false);
         $response->assertSee('Previous Day', false);

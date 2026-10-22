@@ -438,7 +438,15 @@
 }
 
 @media (max-width: 380px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .revenue-page .stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
 }
 
 /* ===========================

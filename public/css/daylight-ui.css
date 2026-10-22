@@ -1439,3 +1439,86 @@ body,
         background: var(--nb-day-green) !important;
     }
 }
+
+/* Keep the forecast summary inside the phone screen. */
+.modal .forecast-summary-dialog {
+    width: min(640px, calc(100% - 24px));
+    max-width: calc(100% - 24px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.modal .forecast-summary-modal {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.modal .forecast-summary-modal .modal-body {
+    overflow-x: hidden;
+}
+
+.modal .forecast-summary-modal .forecast-summary-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+}
+
+.modal .forecast-summary-modal .forecast-summary-table > thead > tr > th,
+.modal .forecast-summary-modal .forecast-summary-table > tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 12px;
+    line-height: 1.25;
+    letter-spacing: 0;
+    white-space: normal;
+    position: static;
+    overflow-wrap: break-word;
+}
+
+.modal .forecast-summary-modal .forecast-summary-table .col-category { width: 34%; }
+.modal .forecast-summary-modal .forecast-summary-table .col-eggs { width: 24%; }
+.modal .forecast-summary-modal .forecast-summary-table .col-trays { width: 18%; }
+.modal .forecast-summary-modal .forecast-summary-table .col-share { width: 24%; }
+
+@media (max-width: 575.98px) {
+    .modal .forecast-summary-modal .forecast-summary-table > thead > tr > th,
+    .modal .forecast-summary-modal .forecast-summary-table > tbody > tr > td {
+        padding: 8px 3px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid,
+    .stats-grid.stats-grid--five,
+    .stat-grid,
+    .dispatch-stats,
+    .dispatch-page .dispatch-stats,
+    .rpt-stats,
+    .report-summary,
+    .revenue-page .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat-card,
+    .stats-grid.stats-grid--five .stat-card,
+    .inventory-page .stat-card,
+    .revenue-page .stat-card,
+    .dsp-stat,
+    .dispatch-page .dsp-stat,
+    .rpt-stat,
+    .summary-card,
+    .report-summary .summary-card {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        text-align: left;
+        gap: 10px;
+    }
+
+    .stats-grid.stats-grid--five .stat-title,
+    .stats-grid.stats-grid--five .stat-info small,
+    .stat-title,
+    .dsp-stat-label {
+        white-space: normal;
+    }
+}

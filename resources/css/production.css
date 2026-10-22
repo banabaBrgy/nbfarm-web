@@ -108,8 +108,11 @@
     color:#6B7C6E;
 }
 
-.forecast-summary-dialog{
-    max-width:640px;
+.modal .forecast-summary-dialog{
+    width:min(640px, calc(100% - 24px));
+    max-width:calc(100% - 24px);
+    margin-left:auto;
+    margin-right:auto;
 }
 
 .forecast-summary-modal .forecast-summary-note{
@@ -123,8 +126,18 @@
     vertical-align:middle;
 }
 
+.modal .forecast-summary-modal{
+    max-width:100%;
+    overflow:hidden;
+}
+
+.modal .forecast-summary-modal .modal-body{
+    overflow-x:hidden;
+}
+
 .forecast-summary-modal .forecast-summary-table{
     width:100%;
+    min-width:0;
     table-layout:fixed;
 }
 
@@ -165,14 +178,25 @@
     color:#24362A;
 }
 
-@media (max-width:575.98px){
-    .forecast-summary-dialog{
-        max-width:calc(100% - 1rem);
-    }
+.modal .forecast-summary-modal .forecast-summary-table > thead > tr > th,
+.modal .forecast-summary-modal .forecast-summary-table > tbody > tr > td{
+    padding:8px 4px;
+    font-size:12px;
+    line-height:1.25;
+    letter-spacing:0;
+    white-space:normal;
+    position:static;
+    overflow-wrap:break-word;
+}
 
+.modal .forecast-summary-modal .forecast-summary-table .col-category{ width:34%; }
+.modal .forecast-summary-modal .forecast-summary-table .col-eggs{ width:24%; }
+.modal .forecast-summary-modal .forecast-summary-table .col-trays{ width:18%; }
+.modal .forecast-summary-modal .forecast-summary-table .col-share{ width:24%; }
+
+@media (max-width:575.98px){
     .forecast-summary-modal .modal-body{
-        padding:14px;
-        overflow-x:auto;
+        padding:14px 12px;
     }
 
     .forecast-summary-modal .forecast-summary-total{
@@ -183,15 +207,10 @@
         font-size:20px;
     }
 
-    .forecast-summary-modal .forecast-summary-table th,
-    .forecast-summary-modal .forecast-summary-table td{
-        padding:10px 8px;
+    .modal .forecast-summary-modal .forecast-summary-table > thead > tr > th,
+    .modal .forecast-summary-modal .forecast-summary-table > tbody > tr > td{
+        padding:8px 3px;
         font-size:11px;
-    }
-
-    .forecast-summary-modal .forecast-summary-table{
-        min-width:420px;
-        table-layout:auto;
     }
 
     .forecast-summary-modal .modal-footer{

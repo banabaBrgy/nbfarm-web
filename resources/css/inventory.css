@@ -645,8 +645,14 @@
 
     .stat-grid {
 
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
 
+    }
+
+    .inventory-page .stat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
     }
 
     .filter-bar {

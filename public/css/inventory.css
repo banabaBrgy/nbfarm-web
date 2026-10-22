@@ -320,7 +320,8 @@
 }
 
 @media (max-width: 600px) {
-    .stat-grid { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .inventory-page .stat-card { flex-direction: column; align-items: flex-start; text-align: left; }
     .filter-bar { flex-direction: column; align-items: stretch; }
 }
 

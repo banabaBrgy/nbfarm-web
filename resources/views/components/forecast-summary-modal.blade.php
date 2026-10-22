@@ -43,6 +43,12 @@
                 </div>
 
                 <table class="table mb-0 forecast-summary-table">
+                    <colgroup>
+                        <col class="col-category">
+                        <col class="col-eggs">
+                        <col class="col-trays">
+                        <col class="col-share">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
@@ -109,6 +115,12 @@
                 </div>
 
                 <table class="table mb-0 forecast-summary-table">
+                    <colgroup>
+                        <col class="col-category">
+                        <col class="col-eggs">
+                        <col class="col-trays">
+                        <col class="col-share">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
@@ -146,3 +158,16 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    ['forecastSummaryModal', 'previousDayModal'].forEach(function (id) {
+        var modal = document.getElementById(id);
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+    });
+});
+</script>
+@endpush
