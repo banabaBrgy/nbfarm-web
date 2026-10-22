@@ -107,6 +107,7 @@ class DashboardController extends Controller
         $eggForecastLabels = $forecast['labels'];
         $eggForecastData = $forecast['data'];
         $forecastSummary = app(GenerateEggForecast::class)->summary();
+        $previousForecastSummary = app(GenerateEggForecast::class)->previousSummary();
         $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? $forecast['predicted_eggs']);
 
         $productionTrend = app(ProductionYearTrend::class)
@@ -139,6 +140,7 @@ class DashboardController extends Controller
             'eggForecastData',
             'predictedEggs',
             'forecastSummary',
+            'previousForecastSummary',
             'productionTrend',
         ));
     }

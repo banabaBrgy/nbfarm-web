@@ -59,9 +59,8 @@ class ForecastHistoryModalTest extends TestCase
         $response->assertSee('Forecast Summary', false);
         $response->assertSee('id="previousDayModal"', false);
         $response->assertSee('Previous Day', false);
-        $response->assertSee('Yesterday Eggs', false);
-        $response->assertSee("Today's Eggs", false);
-        $response->assertSee("Today's Trays", false);
+        $response->assertSee('Forecast total', false);
+        $response->assertSee('Share', false);
         $response->assertSee('id="forecastHistoryModal"', false);
         $response->assertSee('View forecast history', false);
         $response->assertSee('Back to forecast summary', false);

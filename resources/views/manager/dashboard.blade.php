@@ -312,7 +312,9 @@
 
     </div>
 
-    <x-forecast-summary-modal :forecast-summary="$forecastSummary ?? null" />
+    <x-forecast-summary-modal
+        :forecast-summary="$forecastSummary ?? null"
+        :previous-forecast-summary="$previousForecastSummary ?? null" />
 
 @endsection
 

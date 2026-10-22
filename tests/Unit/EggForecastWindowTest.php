@@ -19,7 +19,6 @@ class EggForecastWindowTest extends TestCase
         Carbon::setTestNow('2026-10-04');
 
         $this->harvestDay('2025-10-05', 6000, 600, 1800, 3000, 600, 0);
-        $this->harvestDay('2026-10-03', 6000, 600, 1800, 3000, 600, 0);
         $this->harvestDay('2026-10-04', 6000, 750, 1950, 2700, 600, 0);
 
         $weather = $this->createMock(WeatherService::class);
@@ -37,7 +36,7 @@ class EggForecastWindowTest extends TestCase
             ): array {
                 return [
                     'predicted_eggs' => 6600,
-                    'forecast_date' => '2026-10-05',
+                    'forecast_date' => $predictDates[0] ?? '2026-10-05',
                     'sample_days' => 3,
                     'temperature' => 26.5,
                     'sizes' => [
@@ -48,7 +47,7 @@ class EggForecastWindowTest extends TestCase
                         'cracked' => 0,
                     ],
                     'series' => [[
-                        'date' => '2026-10-05',
+                        'date' => $predictDates[0] ?? '2026-10-05',
                         'label' => 'Mon',
                         'eggs' => 6600,
                         'temperature' => 26.5,
@@ -73,31 +72,11 @@ class EggForecastWindowTest extends TestCase
         $this->assertSame(26.5, $summary['temperature']);
         $this->assertSame(6600, collect($summary['sizes'])->sum('eggs'));
         $this->assertFalse(collect($summary['sizes'])->contains(fn ($size) => $size['key'] === 'cracked'));
-        $this->assertSame('2026-10-04', $summary['previous_day_date']);
-        $this->assertSame(
-            [
-                'small' => 750,
-                'medium' => 1950,
-                'large' => 2700,
-                'extra_large' => 600,
-            ],
-            collect($summary['sizes'])
-                ->mapWithKeys(fn ($size) => [$size['key'] => $size['previous_eggs']])
-                ->all()
-        );
-        $this->assertSame('2026-10-04', $summary['today_date']);
-        $this->assertSame('2026-10-03', $summary['yesterday_date']);
-        $this->assertSame(
-            [
-                'small' => 600,
-                'medium' => 1800,
-                'large' => 3000,
-                'extra_large' => 600,
-            ],
-            collect($summary['sizes'])
-                ->mapWithKeys(fn ($size) => [$size['key'] => $size['yesterday_eggs']])
-                ->all()
-        );
+
+        $previousSummary = app(GenerateEggForecast::class)->previousSummary();
+        $this->assertSame('2026-10-03', $previousSummary['forecast_date']);
+        $this->assertSame(6600, $previousSummary['predicted_eggs']);
+        $this->assertSame(6600, collect($previousSummary['sizes'])->sum('eggs'));
 
         Carbon::setTestNow();
     }

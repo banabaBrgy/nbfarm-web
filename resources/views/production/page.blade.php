@@ -190,7 +190,10 @@
 
 </div>
 
-<x-forecast-summary-modal :forecast-summary="$forecastSummary ?? null" :show-history="true" />
+<x-forecast-summary-modal
+    :forecast-summary="$forecastSummary ?? null"
+    :previous-forecast-summary="$previousForecastSummary ?? null"
+    :show-history="true" />
 
 <div class="modal fade" id="forecastHistoryModal" tabindex="-1" aria-labelledby="forecastHistoryLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

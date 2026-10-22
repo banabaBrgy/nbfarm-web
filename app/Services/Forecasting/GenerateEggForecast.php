@@ -41,21 +41,63 @@ class GenerateEggForecast
      *     history_end: string,
      *     sample_days: int,
      *     engine: string,
-     *     previous_day_date: string,
-     *     today_date: string,
-     *     yesterday_date: string,
-     *     sizes: list<array{key: string, label: string, eggs: int, previous_eggs: int, today_eggs: int, yesterday_eggs: int, trays: int, share: float}>
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
      * }
      */
     public function summary(): array
     {
         $forecastDate = Carbon::tomorrow()->startOfDay();
+        $summary = $this->forecastSummaryForDate($forecastDate);
+
+        $this->persistForecast($forecastDate->toDateString(), $summary['predicted_eggs'], [
+            [
+                'date' => $forecastDate->toDateString(),
+                'label' => $forecastDate->format('D'),
+                'eggs' => $summary['predicted_eggs'],
+            ],
+        ]);
+
+        return $summary;
+    }
+
+    /**
+     * Forecast for yesterday, shown from the next-day summary.
+     *
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    public function previousSummary(): array
+    {
+        return $this->forecastSummaryForDate(Carbon::yesterday()->startOfDay());
+    }
+
+    /**
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    private function forecastSummaryForDate(Carbon $forecastDate): array
+    {
+        $forecastDate = $forecastDate->copy()->startOfDay();
         $prediction = $this->predictForDate($forecastDate);
         $archive = $this->archiveBounds($forecastDate);
-        $today = $forecastDate->copy()->subDay();
-        $yesterday = $today->copy()->subDay();
-        $todaySizes = $this->recordedSizesForDate($today);
-        $yesterdaySizes = $this->recordedSizesForDate($yesterday);
 
         $labels = [
             'small' => 'Small',
@@ -72,21 +114,10 @@ class GenerateEggForecast
                 'key' => $key,
                 'label' => $label,
                 'eggs' => $eggs,
-                'previous_eggs' => $todaySizes[$key] ?? 0,
-                'today_eggs' => $todaySizes[$key] ?? 0,
-                'yesterday_eggs' => $yesterdaySizes[$key] ?? 0,
                 'trays' => intdiv($eggs, Production::EGGS_PER_TRAY),
                 'share' => $predicted > 0 ? round(($eggs / $predicted) * 100, 1) : 0.0,
             ];
         }
-
-        $this->persistForecast($forecastDate->toDateString(), $predicted, [
-            [
-                'date' => $forecastDate->toDateString(),
-                'label' => $forecastDate->format('D'),
-                'eggs' => $predicted,
-            ],
-        ]);
 
         return [
             'predicted_eggs' => $predicted,
@@ -97,37 +128,7 @@ class GenerateEggForecast
             'history_end' => $archive['end'],
             'sample_days' => (int) $prediction['sample_days'],
             'engine' => (string) ($prediction['engine'] ?? 'php'),
-            'previous_day_date' => $today->toDateString(),
-            'today_date' => $today->toDateString(),
-            'yesterday_date' => $yesterday->toDateString(),
             'sizes' => $sizes,
-        ];
-    }
-
-    /**
-     * Recorded egg counts by size for the day immediately before the forecast.
-     *
-     * @return array{small: int, medium: int, large: int, extra_large: int, cracked: int}
-     */
-    private function recordedSizesForDate(Carbon $date): array
-    {
-        $row = Production::query()
-            ->whereDate('production_date', $date->toDateString())
-            ->selectRaw('
-                COALESCE(SUM(small_eggs), 0) as small_eggs,
-                COALESCE(SUM(medium_eggs), 0) as medium_eggs,
-                COALESCE(SUM(large_eggs), 0) as large_eggs,
-                COALESCE(SUM(extra_large_eggs), 0) as extra_large_eggs,
-                COALESCE(SUM(cracked_eggs), 0) as cracked_eggs
-            ')
-            ->first();
-
-        return [
-            'small' => (int) ($row->small_eggs ?? 0),
-            'medium' => (int) ($row->medium_eggs ?? 0),
-            'large' => (int) ($row->large_eggs ?? 0),
-            'extra_large' => (int) ($row->extra_large_eggs ?? 0),
-            'cracked' => (int) ($row->cracked_eggs ?? 0),
         ];
     }
 

@@ -1,5 +1,6 @@
 @props([
     'forecastSummary' => null,
+    'previousForecastSummary' => null,
     'showHistory' => false,
 ])
 
@@ -13,13 +14,14 @@
         'history_end' => now()->subDay()->toDateString(),
         'sample_days' => 0,
         'engine' => 'python',
-        'previous_day_date' => now()->toDateString(),
-        'today_date' => now()->toDateString(),
-        'yesterday_date' => now()->subDay()->toDateString(),
         'sizes' => [],
     ];
+    $previousForecastSummary = $previousForecastSummary ?? $forecastSummary;
     $tempLabel = $forecastSummary['temperature'] !== null
         ? number_format((float) $forecastSummary['temperature'], 1).'°C'
+        : 'not available';
+    $previousTempLabel = $previousForecastSummary['temperature'] !== null
+        ? number_format((float) $previousForecastSummary['temperature'], 1).'°C'
         : 'not available';
 @endphp
 
@@ -97,30 +99,35 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div class="forecast-summary-total">
+                    <span>Forecast total</span>
+                    <strong>{{ number_format($previousForecastSummary['predicted_eggs']) }} eggs</strong>
+                    <small>
+                        For {{ \Carbon\Carbon::parse($previousForecastSummary['forecast_date'])->format('M j, Y') }}
+                        · {{ $previousTempLabel }}
+                    </small>
+                </div>
+
                 <table class="table mb-0 forecast-summary-table">
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
-                            <th scope="col" class="text-end">Yesterday Eggs</th>
-                            <th scope="col" class="text-end">Today's Eggs</th>
-                            <th scope="col" class="text-end">Today's Trays</th>
+                            <th scope="col" class="text-end">Eggs</th>
+                            <th scope="col" class="text-end">Trays</th>
+                            <th scope="col" class="text-end">Share</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($forecastSummary['sizes'] as $size)
-                            @php
-                                $todayEggs = (int) ($size['today_eggs'] ?? $size['previous_eggs'] ?? 0);
-                                $yesterdayEggs = (int) ($size['yesterday_eggs'] ?? 0);
-                            @endphp
+                        @forelse($previousForecastSummary['sizes'] as $size)
                             <tr>
                                 <td class="forecast-summary-category">{{ $size['label'] }}</td>
-                                <td class="text-end">{{ number_format($yesterdayEggs) }}</td>
-                                <td class="text-end">{{ number_format($todayEggs) }}</td>
-                                <td class="text-end">{{ number_format(intdiv($todayEggs, \App\Models\Production::EGGS_PER_TRAY)) }}</td>
+                                <td class="text-end">{{ number_format($size['eggs']) }}</td>
+                                <td class="text-end">{{ number_format($size['trays']) }}</td>
+                                <td class="text-end">{{ number_format($size['share'], 1) }}%</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-3">No recent production records yet.</td>
+                                <td colspan="4" class="text-center text-muted py-3">No previous forecast summary yet.</td>
                             </tr>
                         @endforelse
                     </tbody>
