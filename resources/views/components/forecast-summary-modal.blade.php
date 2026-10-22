@@ -13,11 +13,13 @@
         'history_end' => now()->subDay()->toDateString(),
         'sample_days' => 0,
         'engine' => 'python',
+        'previous_day_date' => now()->toDateString(),
         'sizes' => [],
     ];
     $tempLabel = $forecastSummary['temperature'] !== null
         ? number_format((float) $forecastSummary['temperature'], 1).'°C'
         : 'not available';
+    $previousDayLabel = \Carbon\Carbon::parse($forecastSummary['previous_day_date'])->format('M j, Y');
 @endphp
 
 <div class="modal fade" id="forecastSummaryModal" tabindex="-1" aria-labelledby="forecastSummaryLabel" aria-hidden="true">
@@ -37,11 +39,16 @@
                     </small>
                 </div>
 
+                <p class="forecast-summary-note">
+                    Previous day recorded by size: {{ $previousDayLabel }}
+                </p>
+
                 <table class="table mb-0 forecast-summary-table">
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
-                            <th scope="col" class="text-end">Eggs</th>
+                            <th scope="col" class="text-end">Forecast Eggs</th>
+                            <th scope="col" class="text-end">Previous Day</th>
                             <th scope="col" class="text-end">Trays</th>
                             <th scope="col" class="text-end">Share</th>
                         </tr>
@@ -51,12 +58,13 @@
                             <tr>
                                 <td class="forecast-summary-category">{{ $size['label'] }}</td>
                                 <td class="text-end">{{ number_format($size['eggs']) }}</td>
+                                <td class="text-end">{{ number_format($size['previous_eggs'] ?? 0) }}</td>
                                 <td class="text-end">{{ number_format($size['trays']) }}</td>
                                 <td class="text-end">{{ number_format($size['share'], 1) }}%</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-3">No forecast summary yet.</td>
+                                <td colspan="5" class="text-center text-muted py-3">No forecast summary yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

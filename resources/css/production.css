@@ -22,9 +22,54 @@
     filter:brightness(0.96);
 }
 
-.forecast-history-pages .pagination{
-    margin-bottom:0;
-    justify-content:flex-end;
+.forecast-history-pagination{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    padding-top:16px;
+    border-top:1px solid #eef2ef;
+}
+
+.forecast-history-pagination-info{
+    font-size:13px;
+    color:#6b7280;
+}
+
+.forecast-history-pagination-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.forecast-history-page-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:7px 14px;
+    border:1px solid #d8e2da;
+    border-radius:8px;
+    background:#fff;
+    color:#374151;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.forecast-history-page-btn:hover{
+    border-color:#34853F;
+    color:#34853F;
+}
+
+.forecast-history-page-btn.disabled{
+    opacity:.45;
+    pointer-events:none;
+}
+
+.forecast-history-page-number{
+    font-size:13px;
+    color:#6b7280;
 }
 
 .stat-card--predicted.stat-card--clickable{

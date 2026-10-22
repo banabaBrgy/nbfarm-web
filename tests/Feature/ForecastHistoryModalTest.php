@@ -59,8 +59,10 @@ class ForecastHistoryModalTest extends TestCase
         $response->assertSee('Forecast Summary', false);
         $response->assertSee('id="forecastHistoryModal"', false);
         $response->assertSee('View forecast history', false);
+        $response->assertSee('Back to forecast summary', false);
         $response->assertSee('Sep 21, 2026', false);
         $response->assertSee('1,300', false);
+        $response->assertDontSee('bootstrap.bundle.min.js', false);
     }
 
     public function test_forecast_history_stays_open_on_every_page(): void

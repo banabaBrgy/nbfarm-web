@@ -222,10 +222,39 @@
                     </tbody>
                 </table>
                 @if($forecastHistory->hasPages())
-                    <div class="forecast-history-pages mt-3">
-                        {{ $forecastHistory->links() }}
+                    <div class="forecast-history-pagination">
+                        <div class="forecast-history-pagination-info">
+                            Showing {{ $forecastHistory->firstItem() }}–{{ $forecastHistory->lastItem() }} of {{ $forecastHistory->total() }}
+                        </div>
+                        <div class="forecast-history-pagination-controls">
+                            @if ($forecastHistory->onFirstPage())
+                                <span class="forecast-history-page-btn disabled">Prev</span>
+                            @else
+                                <a href="{{ $forecastHistory->previousPageUrl() }}" class="forecast-history-page-btn">Prev</a>
+                            @endif
+
+                            <span class="forecast-history-page-number">
+                                Page {{ $forecastHistory->currentPage() }} of {{ $forecastHistory->lastPage() }}
+                            </span>
+
+                            @if ($forecastHistory->hasMorePages())
+                                <a href="{{ $forecastHistory->nextPageUrl() }}" class="forecast-history-page-btn">Next</a>
+                            @else
+                                <span class="forecast-history-page-btn disabled">Next</span>
+                            @endif
+                        </div>
                     </div>
                 @endif
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    data-bs-dismiss="modal"
+                    data-bs-toggle="modal"
+                    data-bs-target="#forecastSummaryModal">
+                    Back to forecast summary
+                </button>
             </div>
         </div>
     </div>

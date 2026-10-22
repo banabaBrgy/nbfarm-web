@@ -41,7 +41,8 @@ class GenerateEggForecast
      *     history_end: string,
      *     sample_days: int,
      *     engine: string,
-     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     *     previous_day_date: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, previous_eggs: int, trays: int, share: float}>
      * }
      */
     public function summary(): array
@@ -49,6 +50,8 @@ class GenerateEggForecast
         $forecastDate = Carbon::tomorrow()->startOfDay();
         $prediction = $this->predictForDate($forecastDate);
         $archive = $this->archiveBounds($forecastDate);
+        $previousDay = $forecastDate->copy()->subDay();
+        $previousSizes = $this->recordedSizesForDate($previousDay);
 
         $labels = [
             'small' => 'Small',
@@ -65,6 +68,7 @@ class GenerateEggForecast
                 'key' => $key,
                 'label' => $label,
                 'eggs' => $eggs,
+                'previous_eggs' => $previousSizes[$key] ?? 0,
                 'trays' => intdiv($eggs, Production::EGGS_PER_TRAY),
                 'share' => $predicted > 0 ? round(($eggs / $predicted) * 100, 1) : 0.0,
             ];
@@ -87,7 +91,35 @@ class GenerateEggForecast
             'history_end' => $archive['end'],
             'sample_days' => (int) $prediction['sample_days'],
             'engine' => (string) ($prediction['engine'] ?? 'php'),
+            'previous_day_date' => $previousDay->toDateString(),
             'sizes' => $sizes,
+        ];
+    }
+
+    /**
+     * Recorded egg counts by size for the day immediately before the forecast.
+     *
+     * @return array{small: int, medium: int, large: int, extra_large: int, cracked: int}
+     */
+    private function recordedSizesForDate(Carbon $date): array
+    {
+        $row = Production::query()
+            ->whereDate('production_date', $date->toDateString())
+            ->selectRaw('
+                COALESCE(SUM(small_eggs), 0) as small_eggs,
+                COALESCE(SUM(medium_eggs), 0) as medium_eggs,
+                COALESCE(SUM(large_eggs), 0) as large_eggs,
+                COALESCE(SUM(extra_large_eggs), 0) as extra_large_eggs,
+                COALESCE(SUM(cracked_eggs), 0) as cracked_eggs
+            ')
+            ->first();
+
+        return [
+            'small' => (int) ($row->small_eggs ?? 0),
+            'medium' => (int) ($row->medium_eggs ?? 0),
+            'large' => (int) ($row->large_eggs ?? 0),
+            'extra_large' => (int) ($row->extra_large_eggs ?? 0),
+            'cracked' => (int) ($row->cracked_eggs ?? 0),
         ];
     }
 
