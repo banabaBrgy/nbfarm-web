@@ -14,16 +14,17 @@
         'sample_days' => 0,
         'engine' => 'python',
         'previous_day_date' => now()->toDateString(),
+        'today_date' => now()->toDateString(),
+        'yesterday_date' => now()->subDay()->toDateString(),
         'sizes' => [],
     ];
     $tempLabel = $forecastSummary['temperature'] !== null
         ? number_format((float) $forecastSummary['temperature'], 1).'°C'
         : 'not available';
-    $previousDayLabel = \Carbon\Carbon::parse($forecastSummary['previous_day_date'])->format('M j, Y');
 @endphp
 
 <div class="modal fade" id="forecastSummaryModal" tabindex="-1" aria-labelledby="forecastSummaryLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered forecast-summary-dialog">
         <div class="modal-content forecast-summary-modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="forecastSummaryLabel">Forecast Summary</h5>
@@ -39,16 +40,11 @@
                     </small>
                 </div>
 
-                <p class="forecast-summary-note">
-                    Previous day recorded by size: {{ $previousDayLabel }}
-                </p>
-
                 <table class="table mb-0 forecast-summary-table">
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
                             <th scope="col" class="text-end">Forecast Eggs</th>
-                            <th scope="col" class="text-end">Previous Day</th>
                             <th scope="col" class="text-end">Trays</th>
                             <th scope="col" class="text-end">Share</th>
                         </tr>
@@ -58,20 +54,27 @@
                             <tr>
                                 <td class="forecast-summary-category">{{ $size['label'] }}</td>
                                 <td class="text-end">{{ number_format($size['eggs']) }}</td>
-                                <td class="text-end">{{ number_format($size['previous_eggs'] ?? 0) }}</td>
                                 <td class="text-end">{{ number_format($size['trays']) }}</td>
                                 <td class="text-end">{{ number_format($size['share'], 1) }}%</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-3">No forecast summary yet.</td>
+                                <td colspan="4" class="text-center text-muted py-3">No forecast summary yet.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            @if($showHistory)
-                <div class="modal-footer">
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm me-auto"
+                    data-bs-dismiss="modal"
+                    data-bs-toggle="modal"
+                    data-bs-target="#previousDayModal">
+                    Previous Day
+                </button>
+                @if($showHistory)
                     <button
                         type="button"
                         class="btn btn-outline-secondary btn-sm"
@@ -80,8 +83,59 @@
                         data-bs-target="#forecastHistoryModal">
                         View forecast history
                     </button>
-                </div>
-            @endif
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="previousDayModal" tabindex="-1" aria-labelledby="previousDayLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered forecast-summary-dialog">
+        <div class="modal-content forecast-summary-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previousDayLabel">Previous Day</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table mb-0 forecast-summary-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col" class="text-end">Yesterday Eggs</th>
+                            <th scope="col" class="text-end">Today's Eggs</th>
+                            <th scope="col" class="text-end">Today's Trays</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($forecastSummary['sizes'] as $size)
+                            @php
+                                $todayEggs = (int) ($size['today_eggs'] ?? $size['previous_eggs'] ?? 0);
+                                $yesterdayEggs = (int) ($size['yesterday_eggs'] ?? 0);
+                            @endphp
+                            <tr>
+                                <td class="forecast-summary-category">{{ $size['label'] }}</td>
+                                <td class="text-end">{{ number_format($yesterdayEggs) }}</td>
+                                <td class="text-end">{{ number_format($todayEggs) }}</td>
+                                <td class="text-end">{{ number_format(intdiv($todayEggs, \App\Models\Production::EGGS_PER_TRAY)) }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">No recent production records yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    data-bs-dismiss="modal"
+                    data-bs-toggle="modal"
+                    data-bs-target="#forecastSummaryModal">
+                    Back to forecast summary
+                </button>
+            </div>
         </div>
     </div>
 </div>

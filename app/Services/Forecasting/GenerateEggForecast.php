@@ -42,7 +42,9 @@ class GenerateEggForecast
      *     sample_days: int,
      *     engine: string,
      *     previous_day_date: string,
-     *     sizes: list<array{key: string, label: string, eggs: int, previous_eggs: int, trays: int, share: float}>
+     *     today_date: string,
+     *     yesterday_date: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, previous_eggs: int, today_eggs: int, yesterday_eggs: int, trays: int, share: float}>
      * }
      */
     public function summary(): array
@@ -50,8 +52,10 @@ class GenerateEggForecast
         $forecastDate = Carbon::tomorrow()->startOfDay();
         $prediction = $this->predictForDate($forecastDate);
         $archive = $this->archiveBounds($forecastDate);
-        $previousDay = $forecastDate->copy()->subDay();
-        $previousSizes = $this->recordedSizesForDate($previousDay);
+        $today = $forecastDate->copy()->subDay();
+        $yesterday = $today->copy()->subDay();
+        $todaySizes = $this->recordedSizesForDate($today);
+        $yesterdaySizes = $this->recordedSizesForDate($yesterday);
 
         $labels = [
             'small' => 'Small',
@@ -68,7 +72,9 @@ class GenerateEggForecast
                 'key' => $key,
                 'label' => $label,
                 'eggs' => $eggs,
-                'previous_eggs' => $previousSizes[$key] ?? 0,
+                'previous_eggs' => $todaySizes[$key] ?? 0,
+                'today_eggs' => $todaySizes[$key] ?? 0,
+                'yesterday_eggs' => $yesterdaySizes[$key] ?? 0,
                 'trays' => intdiv($eggs, Production::EGGS_PER_TRAY),
                 'share' => $predicted > 0 ? round(($eggs / $predicted) * 100, 1) : 0.0,
             ];
@@ -91,7 +97,9 @@ class GenerateEggForecast
             'history_end' => $archive['end'],
             'sample_days' => (int) $prediction['sample_days'],
             'engine' => (string) ($prediction['engine'] ?? 'php'),
-            'previous_day_date' => $previousDay->toDateString(),
+            'previous_day_date' => $today->toDateString(),
+            'today_date' => $today->toDateString(),
+            'yesterday_date' => $yesterday->toDateString(),
             'sizes' => $sizes,
         ];
     }

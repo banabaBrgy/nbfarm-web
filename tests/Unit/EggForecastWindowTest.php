@@ -19,6 +19,7 @@ class EggForecastWindowTest extends TestCase
         Carbon::setTestNow('2026-10-04');
 
         $this->harvestDay('2025-10-05', 6000, 600, 1800, 3000, 600, 0);
+        $this->harvestDay('2026-10-03', 6000, 600, 1800, 3000, 600, 0);
         $this->harvestDay('2026-10-04', 6000, 750, 1950, 2700, 600, 0);
 
         $weather = $this->createMock(WeatherService::class);
@@ -82,6 +83,19 @@ class EggForecastWindowTest extends TestCase
             ],
             collect($summary['sizes'])
                 ->mapWithKeys(fn ($size) => [$size['key'] => $size['previous_eggs']])
+                ->all()
+        );
+        $this->assertSame('2026-10-04', $summary['today_date']);
+        $this->assertSame('2026-10-03', $summary['yesterday_date']);
+        $this->assertSame(
+            [
+                'small' => 600,
+                'medium' => 1800,
+                'large' => 3000,
+                'extra_large' => 600,
+            ],
+            collect($summary['sizes'])
+                ->mapWithKeys(fn ($size) => [$size['key'] => $size['yesterday_eggs']])
                 ->all()
         );
 
