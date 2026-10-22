@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use App\Models\InventoryItemHistory;
 use App\Models\Production;
+use App\Models\User;
 use App\Services\DailyInventory;
 use App\Services\LowStockNotifier;
 use Illuminate\Http\Request;
@@ -69,8 +70,15 @@ class InventoryController extends Controller
             ->whereDate('production_date', today()->subDay())
             ->sum('eggs_produced');
 
+        $yearExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%Y', production_date)"
+            : 'YEAR(production_date)';
+        $monthExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%m', production_date)"
+            : 'MONTH(production_date)';
+
         $availableYears = DB::table('production')
-            ->selectRaw('DISTINCT YEAR(production_date) as year')
+            ->selectRaw("DISTINCT {$yearExpression} as year")
             ->orderByDesc('year')
             ->pluck('year');
 
@@ -97,7 +105,7 @@ class InventoryController extends Controller
 
         $availableMonths = DB::table('production')
             ->whereYear('production_date', $selectedYear)
-            ->selectRaw('DISTINCT YEAR(production_date) as year, MONTH(production_date) as month')
+            ->selectRaw("DISTINCT {$yearExpression} as year, {$monthExpression} as month")
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->get();
@@ -146,6 +154,8 @@ class InventoryController extends Controller
 
     public function addStock(Request $request)
     {
+        abort_unless(User::routeRole() === 'staff', 403);
+
         $validated = $request->validate([
             'item_name'     => ['required', 'string', 'max:255', 'unique:inventory_items,item_name'],
             'unit'          => ['required', 'string', 'max:50'],
@@ -184,6 +194,8 @@ class InventoryController extends Controller
 
     public function increaseStock(Request $request)
     {
+        abort_unless(User::routeRole() === 'staff', 403);
+
         $validated = $request->validate([
             'item_id'  => ['required', 'exists:inventory_items,id'],
             'quantity' => ['required', 'numeric', 'min:0.01'],
@@ -226,6 +238,8 @@ class InventoryController extends Controller
 
     public function deleteItem($id)
     {
+        abort_unless(User::routeRole() === 'owner', 403);
+
         $item = DB::table('inventory_items')->where('id', $id)->first();
 
         if ($item) {

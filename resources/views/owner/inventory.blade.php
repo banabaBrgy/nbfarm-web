@@ -8,6 +8,10 @@
 @endpush
 
 @section('content')
+@php
+    $canEditInventory = \App\Models\User::routeRole() === 'staff';
+    $canDeleteInventory = \App\Models\User::routeRole() === 'owner';
+@endphp
 <div class="inventory-page">
 
     <div class="page-header">
@@ -15,10 +19,12 @@
             <h2>Inventory</h2>
             <p>Monitor stock levels, alerts, and recent updates.</p>
         </div>
-        <button class="btn-update" type="button" onclick="openStockModal()">
-            <i class="fas fa-plus"></i>
-            Add Stock
-        </button>
+        @if($canEditInventory)
+            <button class="btn-update" type="button" onclick="openStockModal()">
+                <i class="fas fa-plus"></i>
+                Add Stock
+            </button>
+        @endif
     </div>
 
    @php
@@ -127,15 +133,20 @@
             </span>
         </td>
         <td class="action-cell">
-    <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, '{{ $item->item_name }}')" title="Add Stock"> <i class="fas fa-pen"></i> </button>
-
-    <form action="{{ route(auth()->user()->role . '.inventory.delete', $item->id) }}" method="POST" style="display:inline;" class="delete-item-form">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="icon-btn icon-btn-delete" title="Delete" data-item-name="{{ $item->item_name }}">
-        <i class="fas fa-trash"></i>
-    </button>
-</form>
+    @if($canEditInventory)
+        <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, @js($item->item_name))" title="Add Stock">
+            <i class="fas fa-pen"></i>
+        </button>
+    @endif
+    @if($canDeleteInventory)
+        <form action="{{ route('owner.inventory.delete', $item->id) }}" method="POST" style="display:inline;" class="delete-item-form">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="icon-btn icon-btn-delete" title="Delete" data-item-name="{{ $item->item_name }}">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+    @endif
     <button type="button" class="icon-btn icon-btn-history" onclick="openHistoryModal({{ $item->id }})" title="History">
         <i class="fas fa-clock"></i>
     </button>
@@ -253,6 +264,7 @@
 
 </div>
 
+@if($canEditInventory)
 <!-- ADD NEW ITEM MODAL -->
 <div class="modal-overlay" id="stockModal">
     <div class="modal-box">
@@ -301,6 +313,7 @@
         </form>
     </div>
 </div>
+@endif
 
 <!-- ITEM HISTORY MODAL -->
 <div class="modal-overlay" id="historyModal">
@@ -393,6 +406,7 @@ function closeHistoryModal() {
     document.getElementById('historyModal').classList.remove('active');
 }
 
+@if($canEditInventory)
 document.getElementById('stockModal').addEventListener('click', function(e) {
     if (e.target === this) closeStockModal();
 });
@@ -400,6 +414,7 @@ document.getElementById('stockModal').addEventListener('click', function(e) {
 document.getElementById('increaseModal').addEventListener('click', function(e) {
     if (e.target === this) closeIncreaseModal();
 });
+@endif
 
 document.getElementById('historyModal').addEventListener('click', function(e) {
     if (e.target === this) closeHistoryModal();

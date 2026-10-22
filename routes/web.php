@@ -118,9 +118,6 @@ Route::prefix('manager')
         // Inventory
         Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
         Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
-        Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
-        Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
-        Route::delete('/inventory/delete/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
 
         // QR Scanner
         Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
@@ -192,9 +189,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
 
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
     Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
-    Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
     Route::delete('/inventory/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
-    Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
 
     Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
 
@@ -253,7 +248,6 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
     Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
     Route::post('/inventory/add-stock', [InventoryController::class, 'addStock'])->name('inventory.addStock');
     Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
-    Route::delete('/inventory/delete/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
 
     // QR Scanner
     Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
