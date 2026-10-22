@@ -44,7 +44,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
-                            <th scope="col" class="text-end">Forecast Eggs</th>
+                            <th scope="col" class="text-end">Eggs</th>
                             <th scope="col" class="text-end">Trays</th>
                             <th scope="col" class="text-end">Share</th>
                         </tr>
