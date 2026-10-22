@@ -9,7 +9,7 @@
 
 @section('content')
 @php
-    $canEditInventory = \App\Models\User::routeRole() === 'staff';
+    $canEditInventory = in_array(\App\Models\User::routeRole(), ['owner', 'manager'], true);
     $canDeleteInventory = \App\Models\User::routeRole() === 'owner';
 @endphp
 <div class="inventory-page">
@@ -55,34 +55,36 @@
             </div>
         </div>
 
-        <div class="stat-card stat-card--feed {{ ($feed->status ?? '') === 'LOW' ? 'stat-card-alert' : (($feed->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
+        <div class="stat-card stat-card--feed {{ ($feed?->status ?? '') === 'LOW' ? 'stat-card-alert' : (($feed?->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
             <div class="stat-icon"><i class="fas fa-wheat-awn"></i></div>
             <div class="stat-info">
                 <span class="stat-title">Feed</span>
-                <h2 class="{{ ($feed->status ?? '') === 'LOW' ? 'text-danger' : (($feed->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
-                    {{ number_format($feed->current_stock ?? 0, 2) }}
+                <h2 class="{{ ($feed?->status ?? '') === 'LOW' ? 'text-danger' : (($feed?->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
+                    {{ number_format($feed?->current_stock ?? 0, 2) }}
                 </h2>
-                <small>{{ $feed->unit ?? 'sacks' }} — Min: {{ number_format($feed->min_level ?? 0, 2) }} — {{ $feed->status ?? 'OK' }}</small>
+                <small>{{ $feed?->unit ?? 'sacks' }} — Min: {{ number_format($feed?->min_level ?? 0, 2) }} — {{ $feed?->status ?? 'OK' }}</small>
             </div>
         </div>
 
-        <div class="stat-card stat-card--vitamins {{ ($vitamins->status ?? '') === 'LOW' ? 'stat-card-alert' : (($vitamins->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
+        <div class="stat-card stat-card--vitamins {{ ($vitamins?->status ?? '') === 'LOW' ? 'stat-card-alert' : (($vitamins?->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
             <div class="stat-icon"><i class="fas fa-capsules"></i></div>
             <div class="stat-info">
                 <span class="stat-title">Vitamins</span>
-                <h2 class="{{ ($vitamins->status ?? '') === 'LOW' ? 'text-danger' : (($vitamins->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
-                    {{ number_format($vitamins->current_stock ?? 0) }}
+                <h2 class="{{ ($vitamins?->status ?? '') === 'LOW' ? 'text-danger' : (($vitamins?->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
+                    {{ number_format($vitamins?->current_stock ?? 0) }}
                 </h2>
-                <small>{{ $vitamins->unit ?? 'bottles' }} — Min: {{ number_format($vitamins->min_level ?? 0, 2) }} — {{ $vitamins->status ?? 'OK' }}</small>
+                <small>{{ $vitamins?->unit ?? 'bottles' }} — Min: {{ number_format($vitamins?->min_level ?? 0, 2) }} — {{ $vitamins?->status ?? 'OK' }}</small>
             </div>
         </div>
 
-        <div class="stat-card stat-card--inventory">
+        <div class="stat-card stat-card--inventory {{ ($eggTrays?->status ?? '') === 'LOW' ? 'stat-card-alert' : (($eggTrays?->status ?? '') === 'WATCH' ? 'stat-card-watch' : '') }}">
             <div class="stat-icon"><i class="fas fa-box"></i></div>
             <div class="stat-info">
                 <span class="stat-title">Egg Trays</span>
-                <h2>{{ number_format($eggTraysDisplay ?? 0) }}</h2>
-                <small>Available trays</small>
+                <h2 class="{{ ($eggTrays?->status ?? '') === 'LOW' ? 'text-danger' : (($eggTrays?->status ?? '') === 'WATCH' ? 'text-watch' : '') }}">
+                    {{ number_format($eggTraysDisplay ?? 0) }}
+                </h2>
+                <small>{{ $eggTrays?->unit ?? 'pcs' }} — Min: {{ number_format($eggTrays?->min_level ?? 0, 2) }} — {{ $eggTrays?->status ?? 'OK' }}</small>
             </div>
         </div>
     </div>
@@ -269,7 +271,7 @@
 <div class="modal-overlay" id="stockModal">
     <div class="modal-box">
         <h3>Add New Item</h3>
-        <form action="{{ route(auth()->user()->role . '.inventory.addStock') }}" method="POST">
+        <form action="{{ route(\App\Models\User::routeRole() . '.inventory.addStock') }}" method="POST">
     @csrf
 
             <label>Item Name</label>
@@ -297,7 +299,7 @@
     <div class="modal-box">
         <h3>Add Stock Quantity</h3>
         <p style="color:#777; font-size:13px; margin:-10px 0 16px;">Item: <strong id="increaseItemName"></strong></p>
-        <form action="{{ route(auth()->user()->role . '.inventory.increaseStock') }}" method="POST">
+        <form action="{{ route(\App\Models\User::routeRole() . '.inventory.increaseStock') }}" method="POST">
     @csrf
   <input type="hidden" name="item_id" id="increaseItemId">
          

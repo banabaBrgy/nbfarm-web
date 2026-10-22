@@ -12,37 +12,39 @@ class InventoryRolePermissionsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_staff_can_edit_and_view_history_but_cannot_delete_inventory(): void
+    public function test_staff_can_view_inventory_and_history_but_cannot_add_or_delete_stock(): void
     {
         $staff = User::factory()->create(['role' => 'staff']);
         $item = InventoryItem::create([
             'item_name' => 'Feeds',
             'unit' => 'sacks',
-            'current_stock' => 10,
+            'current_stock' => 100,
             'min_level' => 2,
         ]);
 
         $this->actingAs($staff)
             ->get(route('staff.inventory'))
             ->assertOk()
-            ->assertSee('icon-btn-edit')
+            ->assertDontSee('id="stockModal"', false)
+            ->assertDontSee('id="increaseModal"', false)
+            ->assertDontSee('icon-btn-edit')
             ->assertDontSee('icon-btn-delete');
 
         $this->actingAs($staff)
-            ->post(route('staff.inventory.addStock'), [
+            ->post('/staff/inventory/add-stock', [
                 'item_name' => 'Vitamins',
                 'unit' => 'bottles',
                 'current_stock' => 5,
                 'min_level' => 1,
             ])
-            ->assertRedirect();
+            ->assertNotFound();
 
         $this->actingAs($staff)
-            ->post(route('staff.inventory.increaseStock'), [
+            ->post('/staff/inventory/increase-stock', [
                 'item_id' => $item->id,
                 'quantity' => 3,
             ])
-            ->assertRedirect();
+            ->assertNotFound();
 
         $this->actingAs($staff)
             ->get(route('staff.inventory.history', $item))
@@ -56,13 +58,13 @@ class InventoryRolePermissionsTest extends TestCase
         $this->assertDatabaseHas('inventory_items', ['id' => $item->id]);
     }
 
-    public function test_owner_can_delete_and_view_history_but_cannot_edit_inventory(): void
+    public function test_owner_can_add_restock_delete_and_view_history(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);
         $item = InventoryItem::create([
             'item_name' => 'Feeds',
             'unit' => 'sacks',
-            'current_stock' => 10,
+            'current_stock' => 100,
             'min_level' => 2,
         ]);
         InventoryItemHistory::record($item->id, 'Feeds', 'Restocked', 2, 8, 10, 'Test history');
@@ -71,7 +73,9 @@ class InventoryRolePermissionsTest extends TestCase
             ->get(route('owner.inventory'))
             ->assertOk()
             ->assertSee('icon-btn-delete')
-            ->assertDontSee('icon-btn-edit');
+            ->assertSee('icon-btn-edit')
+            ->assertSee('id="stockModal"', false)
+            ->assertSee('id="increaseModal"', false);
 
         $this->actingAs($owner)
             ->get(route('owner.inventory.history', $item))
@@ -79,20 +83,31 @@ class InventoryRolePermissionsTest extends TestCase
             ->assertJsonPath('history.0.action', 'Restocked');
 
         $this->actingAs($owner)
-            ->post('/owner/inventory/add-stock', [
+            ->post(route('owner.inventory.addStock'), [
                 'item_name' => 'Vitamins',
                 'unit' => 'bottles',
                 'current_stock' => 5,
                 'min_level' => 1,
             ])
-            ->assertStatus(405);
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('inventory_items', [
+            'item_name' => 'Vitamins',
+            'current_stock' => 5,
+        ]);
+
+        // Inventory page applies the daily -15 feeds use before restock.
+        $this->actingAs($owner)->get(route('owner.inventory'))->assertOk();
+        $this->assertSame(85.0, (float) $item->fresh()->current_stock);
 
         $this->actingAs($owner)
-            ->post('/owner/inventory/increase-stock', [
+            ->post(route('owner.inventory.increaseStock'), [
                 'item_id' => $item->id,
                 'quantity' => 3,
             ])
-            ->assertStatus(405);
+            ->assertRedirect();
+
+        $this->assertSame(88.0, (float) $item->fresh()->current_stock);
 
         $this->actingAs($owner)
             ->delete(route('owner.inventory.delete', $item))
@@ -101,44 +116,58 @@ class InventoryRolePermissionsTest extends TestCase
         $this->assertDatabaseMissing('inventory_items', ['id' => $item->id]);
     }
 
-    public function test_manager_can_view_inventory_and_history_but_cannot_mutate_inventory(): void
+    public function test_manager_can_add_and_restock_but_cannot_delete_inventory(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
         $item = InventoryItem::create([
             'item_name' => 'Feeds',
             'unit' => 'sacks',
-            'current_stock' => 10,
+            'current_stock' => 100,
             'min_level' => 2,
         ]);
 
         $this->actingAs($manager)
             ->get(route('manager.inventory'))
             ->assertOk()
-            ->assertDontSee('icon-btn-edit')
-            ->assertDontSee('icon-btn-delete');
+            ->assertSee('icon-btn-edit')
+            ->assertDontSee('icon-btn-delete')
+            ->assertSee('id="stockModal"', false)
+            ->assertSee('id="increaseModal"', false);
 
         $this->actingAs($manager)
             ->get(route('manager.inventory.history', $item))
             ->assertOk();
 
         $this->actingAs($manager)
-            ->post('/manager/inventory/add-stock', [
+            ->post(route('manager.inventory.addStock'), [
                 'item_name' => 'Vitamins',
                 'unit' => 'bottles',
                 'current_stock' => 5,
                 'min_level' => 1,
             ])
-            ->assertNotFound();
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('inventory_items', [
+            'item_name' => 'Vitamins',
+            'current_stock' => 5,
+        ]);
+
+        $this->actingAs($manager)->get(route('manager.inventory'))->assertOk();
+        $this->assertSame(85.0, (float) $item->fresh()->current_stock);
 
         $this->actingAs($manager)
-            ->post('/manager/inventory/increase-stock', [
+            ->post(route('manager.inventory.increaseStock'), [
                 'item_id' => $item->id,
                 'quantity' => 3,
             ])
-            ->assertNotFound();
+            ->assertRedirect();
+
+        $this->assertSame(88.0, (float) $item->fresh()->current_stock);
 
         $this->actingAs($manager)
             ->delete("/manager/inventory/delete/{$item->id}")
             ->assertNotFound();
+
+        $this->assertDatabaseHas('inventory_items', ['id' => $item->id]);
     }
 }

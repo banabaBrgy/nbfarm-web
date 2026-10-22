@@ -29,12 +29,8 @@ class InventoryController extends Controller
         $items = $itemsQuery->paginate(5, ['*'], 'page')->withQueryString();
 
         $eggsStock = Production::leftoverStock();
-        $eggTraysDisplay = Production::leftoverTrays();
 
-        $items->getCollection()->transform(function ($item) use ($eggTraysDisplay) {
-            if ($item->item_name === 'Egg Trays') {
-                $item->current_stock = $eggTraysDisplay;
-            }
+        $items->getCollection()->transform(function ($item) {
             $item->status = $this->computeStatus($item->current_stock, $item->min_level);
             return $item;
         });
@@ -54,13 +50,15 @@ class InventoryController extends Controller
         }
 
         if ($eggTrays) {
-            $eggTrays->current_stock = $eggTraysDisplay;
             $eggTrays->status = $this->computeStatus($eggTrays->current_stock, $eggTrays->min_level);
         }
 
         if ($vitamins) {
             $vitamins->status = $this->computeStatus($vitamins->current_stock, $vitamins->min_level);
         }
+
+        // Egg Trays card/table use inventory stock so restocks are visible.
+        $eggTraysDisplay = (float) ($eggTrays?->current_stock ?? 0);
 
         $eggsToday = (int) DB::table('production')
             ->whereDate('production_date', today())
@@ -129,7 +127,7 @@ class InventoryController extends Controller
             ->limit(5)
             ->get();
 
-        $role = auth()->user()->role ?? '';
+        $role = User::routeRole();
 
         return view($role . '.inventory', compact(
             'items',
@@ -154,7 +152,7 @@ class InventoryController extends Controller
 
     public function addStock(Request $request)
     {
-        abort_unless(User::routeRole() === 'staff', 403);
+        abort_unless(in_array(User::routeRole(), ['owner', 'manager'], true), 403);
 
         $validated = $request->validate([
             'item_name'     => ['required', 'string', 'max:255', 'unique:inventory_items,item_name'],
@@ -194,7 +192,7 @@ class InventoryController extends Controller
 
     public function increaseStock(Request $request)
     {
-        abort_unless(User::routeRole() === 'staff', 403);
+        abort_unless(in_array(User::routeRole(), ['owner', 'manager'], true), 403);
 
         $validated = $request->validate([
             'item_id'  => ['required', 'exists:inventory_items,id'],
@@ -270,6 +268,7 @@ class InventoryController extends Controller
         }
 
         $history = InventoryItemHistory::where('inventory_item_id', $id)
+            ->where('action', '!=', 'Checked')
             ->orderByDesc('created_at')
             ->limit(50)
             ->get()

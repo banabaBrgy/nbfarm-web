@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\InventoryItem;
-use App\Models\Production;
 use App\Models\StockNotification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -98,14 +97,6 @@ class LowStockNotifier
 
     private function effectiveStock(InventoryItem $item): float
     {
-        if ($item->item_name === 'Egg Trays') {
-            try {
-                return (float) Production::leftoverTrays();
-            } catch (\Throwable) {
-                return (float) $item->current_stock;
-            }
-        }
-
         return (float) $item->current_stock;
     }
 

@@ -51,7 +51,7 @@ class DashboardController extends Controller
         $vitaminLow = $vitamins <= $vitaminMin;
 
         $eggsTotal = Production::leftoverStock();
-        $eggTrays = Production::leftoverTrays();
+        $eggTrays = (float) (InventoryItem::where('item_name', 'Egg Trays')->value('current_stock') ?? 0);
 
         $lowStockAlert = InventoryItem::whereColumn(
             'current_stock',

@@ -80,31 +80,45 @@ class DailyInventory
             return;
         }
 
-        $before = (float) $item->current_stock;
-        $after = (float) ($item->daily_stock ?? self::TRAY_DAILY_STOCK);
+        // Only the first daily restock should run; later page loads must keep
+        // restocks and harvest deductions for the day.
+        $alreadyReset = InventoryItemHistory::query()
+            ->where('inventory_item_id', $item->id)
+            ->whereDate('created_at', today())
+            ->where('note', 'Daily tray restock')
+            ->exists();
 
-        if ($before === $after) {
+        if ($alreadyReset) {
             return;
         }
 
-        $item->update(['current_stock' => $after]);
-        $item->current_stock = $after;
+        $before = (float) $item->current_stock;
+        $after = (float) ($item->daily_stock ?? self::TRAY_DAILY_STOCK);
 
-        Inventory::where('item_type', 'Egg Tray')->update([
-            'quantity' => (int) $after,
-        ]);
+        if ($before !== $after) {
+            $item->update(['current_stock' => $after]);
+            $item->current_stock = $after;
 
+            Inventory::where('item_type', 'Egg Tray')->update([
+                'quantity' => (int) $after,
+            ]);
+        }
+
+        // Always latch the daily restock, even when stock already matches,
+        // so later page loads keep harvest deductions and manual restocks.
         InventoryItemHistory::record(
             $item->id,
             $item->item_name,
-            'Reset',
+            $before === $after ? 'Checked' : 'Reset',
             $after - $before,
             $before,
             $after,
             'Daily tray restock'
         );
 
-        app(LowStockNotifier::class)->check($item);
+        if ($before !== $after) {
+            app(LowStockNotifier::class)->check($item);
+        }
     }
 
     private function decrementSupply(string $itemName, float $qty, string $note): void
