@@ -134,26 +134,26 @@
                     <div class="thesis-team-carousel swiper" data-researchers-carousel role="region" aria-roledescription="carousel" aria-label="Researchers">
                         <div class="swiper-wrapper thesis-team">
                             <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 1 of 4">
-                                <b>Alex Rivera</b>
+                                <b>Gawaran Louise</b>
                                 <span>Researcher</span>
                             </div>
                             <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 2 of 4">
-                                <b>Jamie Cruz</b>
+                                <b>Laqui Charisse</b>
                                 <span>Researcher</span>
                             </div>
                             <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 3 of 4">
-                                <b>Morgan Reyes</b>
+                                <b>Medrazo Klyzza</b>
                                 <span>Researcher</span>
                             </div>
                             <div class="swiper-slide thesis-person" role="group" aria-roledescription="slide" aria-label="Researcher 4 of 4">
-                                <b>Taylor Santos</b>
+                                <b>Saclao Ma.Jaira</b>
                                 <span>Researcher</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="thesis-info">
-                        <div><small>Adviser Name</small><b>Casey Mendoza</b></div>
+                        <div><small>Adviser Name</small><b>Zymon Andre Maquinto</b></div>
                         <div><small>College</small><b>College of Informatics and Computing Sciences</b></div>
                         <div><small>University</small><b>Batangas State University, Lipa Campus</b></div>
                         <div><small>Academic year</small><b>2026</b></div>
