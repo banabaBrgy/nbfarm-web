@@ -609,3 +609,27 @@
         width: 132px;
     }
 }
+
+.inventory-forecast {
+    margin: 22px 0 8px;
+}
+
+.inventory-forecast h3 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1b3d2f;
+}
+
+.inventory-forecast p {
+    margin: 0 0 14px;
+    color: #5c6b63;
+    font-size: 14px;
+}
+
+.forecast-flag {
+    margin-top: 4px;
+    color: #7a5b1a;
+    font-size: 13px;
+    font-weight: 600;
+}

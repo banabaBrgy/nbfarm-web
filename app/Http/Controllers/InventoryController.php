@@ -7,6 +7,7 @@ use App\Models\InventoryItemHistory;
 use App\Models\Production;
 use App\Models\User;
 use App\Services\DailyInventory;
+use App\Services\InventoryForecast;
 use App\Services\LowStockNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,6 +130,8 @@ class InventoryController extends Controller
 
         $role = User::routeRole();
 
+        $inventoryForecast = app(InventoryForecast::class)->summary($feed, $vitamins, $eggTrays);
+
         return view($role . '.inventory', compact(
             'items',
             'feed',
@@ -146,7 +149,8 @@ class InventoryController extends Controller
             'selectedMonth',
             'selectedYear',
             'availableYears',
-            'availableMonths'
+            'availableMonths',
+            'inventoryForecast'
         ));
     }
 

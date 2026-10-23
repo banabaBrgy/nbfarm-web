@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 Schedule::command('forecast:daily')
     ->dailyAt('00:01');
+
+Schedule::command('alerts:production-drop')
+    ->dailyAt('00:05');

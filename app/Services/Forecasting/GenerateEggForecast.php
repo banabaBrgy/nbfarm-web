@@ -81,6 +81,42 @@ class GenerateEggForecast
     }
 
     /**
+     * Egg totals for the next N days starting tomorrow.
+     * Read-only: does not write forecast rows. The saved row for a date
+     * stays the expected number the production-drop alert compares later.
+     *
+     * @return list<array{date: string, eggs: int}>
+     */
+    public function upcomingDays(int $days = 7): array
+    {
+        $days = max(1, $days);
+        $dates = [];
+        $cursor = Carbon::tomorrow()->startOfDay();
+
+        for ($i = 0; $i < $days; $i++) {
+            $dates[] = $cursor->toDateString();
+            $cursor->addDay();
+        }
+
+        try {
+            $byDate = $this->predictDates($dates);
+        } catch (Throwable $e) {
+            Log::warning('Upcoming egg forecast failed', ['message' => $e->getMessage()]);
+            $byDate = [];
+        }
+
+        $rows = [];
+        foreach ($dates as $date) {
+            $rows[] = [
+                'date' => $date,
+                'eggs' => (int) ($byDate[$date]['eggs'] ?? 0),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
      * @return array{
      *     predicted_eggs: int,
      *     forecast_date: string,

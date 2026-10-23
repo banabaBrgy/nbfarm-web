@@ -7,6 +7,8 @@ use App\Models\InventoryItemHistory;
 use App\Models\Production;
 use App\Services\DailyInventory;
 use App\Services\LowStockNotifier;
+use App\Services\ProductionDropNotifier;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class ProductionObserver
@@ -23,13 +25,24 @@ class ProductionObserver
         if ($traysUsed > 0) {
             $this->deductTrays($traysUsed);
         }
+
+        $this->recheckPastDrop($production->production_date);
     }
 
     public function updated(Production $production): void
     {
         app(DailyInventory::class)->applyForToday();
 
-        if (! $production->isDirty('eggs_produced')) {
+        $eggsChanged = $production->isDirty('eggs_produced');
+
+        if (! $eggsChanged && ! $production->isDirty('production_date')) {
+            return;
+        }
+
+        if (! $eggsChanged) {
+            $this->recheckPastDrop($production->getOriginal('production_date'));
+            $this->recheckPastDrop($production->production_date);
+
             return;
         }
 
@@ -40,6 +53,11 @@ class ProductionObserver
         if ($diff !== 0) {
             $this->adjustTrays($diff);
         }
+
+        if ($eggsChanged || $production->isDirty('production_date')) {
+            $this->recheckPastDrop($production->getOriginal('production_date'));
+            $this->recheckPastDrop($production->production_date);
+        }
     }
 
     public function deleted(Production $production): void
@@ -49,6 +67,23 @@ class ProductionObserver
         if ($traysToReturn > 0) {
             $this->returnTrays($traysToReturn);
         }
+
+        $this->recheckPastDrop($production->production_date);
+    }
+
+    private function recheckPastDrop(mixed $date): void
+    {
+        if ($date === null || $date === '') {
+            return;
+        }
+
+        $day = Carbon::parse($date)->startOfDay();
+
+        if ($day->greaterThanOrEqualTo(Carbon::today())) {
+            return;
+        }
+
+        app(ProductionDropNotifier::class)->check($day);
     }
 
     private function deductTrays(int $trays): void

@@ -89,6 +89,8 @@
         </div>
     </div>
 
+    @include('components.inventory-forecast')
+
 <!-- FILTER BAR (aligned right) -->
     <form method="GET" class="filter-bar">
         <input type="text" name="search" placeholder="Search item..." value="{{ $search }}">

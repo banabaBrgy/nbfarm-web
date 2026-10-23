@@ -10,6 +10,7 @@ class StockNotification extends Model
     protected $fillable = [
         'user_id',
         'type',
+        'alert_date',
         'inventory_item_id',
         'report_id',
         'item_name',
@@ -26,6 +27,7 @@ class StockNotification extends Model
     protected function casts(): array
     {
         return [
+            'alert_date' => 'date',
             'current_stock' => 'float',
             'min_level' => 'float',
             'read_at' => 'datetime',

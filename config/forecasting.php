@@ -40,4 +40,10 @@ return [
     /** Cap on the Small/Large temperature shift (0–1). */
     'temp_shift_cap' => (float) env('FORECAST_TEMP_SHIFT_CAP', 0.20),
 
+    /**
+     * Egg-drop alert fires when actual eggs are at least this far under
+     * the saved forecast (0.20 = 20%).
+     */
+    'drop_alert_percent' => (float) env('FORECAST_DROP_ALERT_PERCENT', 0.20),
+
 ];
