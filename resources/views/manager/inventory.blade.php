@@ -27,7 +27,7 @@
             @if($canEditInventory)
                 <button class="btn-update" type="button" onclick="openStockModal()">
                     <i class="fas fa-plus"></i>
-                    Add Stock
+                    Add Item
                 </button>
             @endif
         </div>
