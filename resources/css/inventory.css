@@ -14,7 +14,44 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
     margin-bottom: 28px;
+}
+
+.page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.page-header-actions .btn-forecast,
+.page-header-actions .btn-update {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.page-header-actions .btn-forecast {
+    background: #fff;
+    color: #3B8F47;
+    border: 1px solid #3B8F47;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+
+.page-header-actions .btn-forecast:hover {
+    background: #3B8F47;
+    color: #fff;
+    transform: translateY(-1px);
 }
 
 .inventory-page .page-header h1,
@@ -705,4 +742,160 @@
         width: 132px;
     }
 
+}
+
+body.inventory-forecast-open {
+    overflow: hidden;
+}
+
+#inventoryForecastModal.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    place-items: center;
+    overflow: auto;
+    padding: 20px 12px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+#inventoryForecastModal.modal-overlay.active {
+    display: grid;
+}
+
+.modal-box.inventory-forecast-modal {
+    width: min(640px, calc(100vw - 40px));
+    max-width: calc(100vw - 40px);
+    max-height: min(72vh, 620px);
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+.inventory-forecast-scroll {
+    overflow: auto;
+    min-height: 0;
+    padding: 2px 18px 16px;
+}
+
+.modal-box.inventory-forecast-modal .inventory-table-wrapper {
+    overflow: visible;
+    box-shadow: none;
+    border: 1px solid #e6ece8;
+    margin-bottom: 16px;
+}
+
+.modal-box.inventory-forecast-modal .inventory-table {
+    width: 100%;
+    table-layout: auto;
+}
+
+.modal-box.inventory-forecast-modal .inventory-table th,
+.modal-box.inventory-forecast-modal .inventory-table td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.modal-box.inventory-forecast-modal .inventory-table th:last-child,
+.modal-box.inventory-forecast-modal .inventory-table td:last-child {
+    white-space: normal;
+    min-width: 0;
+}
+
+.modal-box.inventory-forecast-modal .forecast-flag {
+    max-width: 260px;
+    line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+    .modal-box.inventory-forecast-modal {
+        width: calc(100vw - 32px);
+        max-width: calc(100vw - 32px);
+        padding: 0;
+    }
+
+    .inventory-forecast-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modal-box.inventory-forecast-modal .inventory-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .page-header-actions {
+        width: 100%;
+    }
+
+    .page-header-actions .btn-forecast,
+    .page-header-actions .btn-update {
+        flex: 1 1 0;
+    }
+}
+
+.inventory-forecast-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 16px 18px 8px;
+}
+
+.modal-box.inventory-forecast-modal .forecast-close {
+    flex-shrink: 0;
+    align-self: flex-start;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 9px;
+    border: 1px solid #c9d8ce;
+    background: #fff;
+    color: #3d4a44;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.modal-box.inventory-forecast-modal .forecast-close:hover {
+    background: #f3f8f4;
+    border-color: #3B8F47;
+    color: #3B8F47;
+}
+
+.modal-box.inventory-forecast-modal .forecast-close:focus {
+    outline: none;
+    border-color: #3B8F47;
+    box-shadow: inset 0 0 0 2px rgba(59, 143, 71, 0.28);
+}
+
+.inventory-forecast-head h3 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1b3d2f;
+}
+
+.inventory-forecast-head p {
+    margin: 0;
+    color: #5c6b63;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.modal-box.inventory-forecast-modal .inventory-table th,
+.modal-box.inventory-forecast-modal .inventory-table td {
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+.forecast-flag {
+    margin-top: 4px;
+    color: #7a5b1a;
+    font-size: 13px;
+    font-weight: 600;
 }

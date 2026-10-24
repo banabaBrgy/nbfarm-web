@@ -108,11 +108,74 @@
     color:#6B7C6E;
 }
 
+/* Pin dialog dead-center from the first frame. Bootstrap's default
+   fade uses translate(0,-50px) which makes it fly in from the top. */
+#forecastSummaryModal .modal-dialog,
+#previousDayModal .modal-dialog,
+#forecastHistoryModal .modal-dialog{
+    position:fixed;
+    top:50%;
+    left:50%;
+    width:min(560px, calc(100vw - 32px));
+    max-width:calc(100vw - 32px);
+    max-height:calc(100vh - 32px);
+    margin:0;
+    min-height:0;
+    transform:translate(-50%, -50%);
+}
+
+#forecastSummaryModal.fade .modal-dialog,
+#previousDayModal.fade .modal-dialog,
+#forecastHistoryModal.fade .modal-dialog,
+#forecastSummaryModal.show .modal-dialog,
+#previousDayModal.show .modal-dialog,
+#forecastHistoryModal.show .modal-dialog{
+    transform:translate(-50%, -50%);
+}
+
+#forecastHistoryModal .modal-content,
+#forecastSummaryModal .modal-content,
+#previousDayModal .modal-content{
+    max-height:calc(100vh - 32px);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+#forecastHistoryModal .modal-body,
+#forecastSummaryModal .modal-body,
+#previousDayModal .modal-body{
+    overflow:auto;
+    min-height:0;
+}
+
+#forecastHistoryModal .table thead,
+#forecastHistoryModal .table thead th{
+    background:#2f8158;
+    color:#fff;
+}
+
+/* Same sticky-header trap as Forecast History — keep headers in-flow in dialogs. */
+.modal .table thead th,
+.modal-overlay .inventory-table thead th,
+.modal-box .inventory-table thead th{
+    position:static;
+    top:auto;
+    z-index:auto;
+}
+
 .modal .forecast-summary-dialog{
-    width:min(640px, calc(100% - 24px));
-    max-width:calc(100% - 24px);
-    margin-left:auto;
-    margin-right:auto;
+    width:min(560px, calc(100vw - 32px));
+    max-width:calc(100vw - 32px);
+    margin:0;
+    min-height:0;
+}
+
+.modal.show .forecast-summary-dialog.modal-dialog-centered{
+    display:block;
+    align-items:initial;
+    min-height:0;
+    margin:0;
 }
 
 .forecast-summary-modal .forecast-summary-note{

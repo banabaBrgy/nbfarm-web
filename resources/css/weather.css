@@ -152,23 +152,25 @@ body.farm-weather-open {
     inset: 0;
     z-index: 1200;
     display: none;
-    align-items: center;
-    justify-content: center;
+    place-items: center;
     padding: 24px 16px;
     background: rgba(17, 24, 39, 0.45);
     overflow: auto;
 }
 
+/* Body class keeps the overlay centered even when it is portaled to <body>. */
+body.farm-weather-open .farm-weather__overlay,
 .farm-weather.is-open .farm-weather__overlay {
-    display: flex;
+    display: grid;
     animation: farm-weather-overlay-in 0.28s ease-out both;
 }
 
 .farm-weather__dialog {
     container-type: inline-size;
     width: min(760px, 100%);
-    margin: auto 0;
-    overflow: hidden;
+    max-height: min(90vh, 100%);
+    margin: 0;
+    overflow: auto;
     border: 1px solid #dbe8de;
     border-radius: 18px;
     background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
@@ -176,6 +178,7 @@ body.farm-weather-open {
     outline: none;
 }
 
+body.farm-weather-open .farm-weather__dialog,
 .farm-weather.is-open .farm-weather__dialog {
     animation: farm-weather-dialog-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -203,6 +206,8 @@ body.farm-weather-open {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    body.farm-weather-open .farm-weather__overlay,
+    body.farm-weather-open .farm-weather__dialog,
     .farm-weather.is-open .farm-weather__overlay,
     .farm-weather.is-open .farm-weather__dialog {
         animation: none;

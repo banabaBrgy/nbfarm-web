@@ -104,14 +104,40 @@
 
 @push('scripts')
 <script>
+function ensureInventoryForecastOnBody() {
+    var modal = document.getElementById('inventoryForecastModal');
+    if (modal && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+    return modal;
+}
+
 function openInventoryForecast() {
-    document.getElementById('inventoryForecastModal').classList.add('active');
+    var modal = ensureInventoryForecastOnBody();
+    if (!modal) {
+        return;
+    }
+    modal.classList.add('active');
     document.body.classList.add('inventory-forecast-open');
 }
 
 function closeInventoryForecast() {
-    document.getElementById('inventoryForecastModal').classList.remove('active');
+    var modal = document.getElementById('inventoryForecastModal');
+    if (!modal) {
+        return;
+    }
+    modal.classList.remove('active');
     document.body.classList.remove('inventory-forecast-open');
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    ensureInventoryForecastOnBody();
+});
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeInventoryForecast();
+    }
+});
 </script>
 @endpush

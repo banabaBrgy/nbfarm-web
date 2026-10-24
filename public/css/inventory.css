@@ -653,14 +653,25 @@ body.inventory-forecast-open {
 }
 
 #inventoryForecastModal.modal-overlay {
-    overflow: hidden;
-    padding: 24px;
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    place-items: center;
+    overflow: auto;
+    padding: 20px 12px;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+#inventoryForecastModal.modal-overlay.active {
+    display: grid;
 }
 
 .modal-box.inventory-forecast-modal {
-    width: min(1180px, calc(100vw - 80px));
-    max-width: calc(100vw - 80px);
-    max-height: min(88vh, 900px);
+    width: min(640px, calc(100vw - 40px));
+    max-width: calc(100vw - 40px);
+    max-height: min(72vh, 620px);
+    margin: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -670,7 +681,7 @@ body.inventory-forecast-open {
 .inventory-forecast-scroll {
     overflow: auto;
     min-height: 0;
-    padding: 4px 28px 24px;
+    padding: 2px 18px 16px;
 }
 
 .modal-box.inventory-forecast-modal .inventory-table-wrapper {
@@ -694,11 +705,11 @@ body.inventory-forecast-open {
 .modal-box.inventory-forecast-modal .inventory-table th:last-child,
 .modal-box.inventory-forecast-modal .inventory-table td:last-child {
     white-space: normal;
-    min-width: 240px;
+    min-width: 0;
 }
 
 .modal-box.inventory-forecast-modal .forecast-flag {
-    max-width: 320px;
+    max-width: 260px;
     line-height: 1.35;
 }
 
@@ -706,7 +717,7 @@ body.inventory-forecast-open {
     .modal-box.inventory-forecast-modal {
         width: calc(100vw - 32px);
         max-width: calc(100vw - 32px);
-        padding: 18px 16px 16px;
+        padding: 0;
     }
 
     .inventory-forecast-head {
@@ -737,10 +748,10 @@ body.inventory-forecast-open {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
     flex-shrink: 0;
     margin: 0;
-    padding: 24px 28px 12px;
+    padding: 16px 18px 8px;
 }
 
 .modal-box.inventory-forecast-modal .forecast-close {
@@ -772,8 +783,8 @@ body.inventory-forecast-open {
 }
 
 .inventory-forecast-head h3 {
-    margin: 0 0 6px;
-    font-size: 20px;
+    margin: 0 0 4px;
+    font-size: 17px;
     font-weight: 700;
     color: #1b3d2f;
 }
@@ -781,7 +792,14 @@ body.inventory-forecast-open {
 .inventory-forecast-head p {
     margin: 0;
     color: #5c6b63;
-    font-size: 14px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.modal-box.inventory-forecast-modal .inventory-table th,
+.modal-box.inventory-forecast-modal .inventory-table td {
+    padding: 8px 10px;
+    font-size: 12px;
 }
 
 .forecast-flag {

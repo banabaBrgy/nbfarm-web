@@ -162,7 +162,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    ['forecastSummaryModal', 'previousDayModal'].forEach(function (id) {
+    ['forecastSummaryModal', 'previousDayModal', 'forecastHistoryModal'].forEach(function (id) {
         var modal = document.getElementById(id);
         if (modal && modal.parentElement !== document.body) {
             document.body.appendChild(modal);
