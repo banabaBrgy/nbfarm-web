@@ -12,7 +12,7 @@ class InventoryRolePermissionsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_staff_can_view_inventory_and_history_but_cannot_add_or_delete_stock(): void
+    public function test_staff_can_restock_existing_items_but_cannot_add_new_or_delete(): void
     {
         $staff = User::factory()->create(['role' => 'staff']);
         $item = InventoryItem::create([
@@ -26,8 +26,10 @@ class InventoryRolePermissionsTest extends TestCase
             ->get(route('staff.inventory'))
             ->assertOk()
             ->assertDontSee('id="stockModal"', false)
-            ->assertDontSee('id="increaseModal"', false)
-            ->assertDontSee('icon-btn-edit')
+            ->assertDontSee('Add New Item')
+            ->assertDontSee('openStockModal')
+            ->assertSee('id="increaseModal"', false)
+            ->assertSee('icon-btn-edit')
             ->assertDontSee('icon-btn-delete');
 
         $this->actingAs($staff)
@@ -39,12 +41,18 @@ class InventoryRolePermissionsTest extends TestCase
             ])
             ->assertNotFound();
 
+        // Inventory page applies the daily -15 feeds use before restock.
+        $this->actingAs($staff)->get(route('staff.inventory'))->assertOk();
+        $this->assertSame(85.0, (float) $item->fresh()->current_stock);
+
         $this->actingAs($staff)
-            ->post('/staff/inventory/increase-stock', [
+            ->post(route('staff.inventory.increaseStock'), [
                 'item_id' => $item->id,
                 'quantity' => 3,
             ])
-            ->assertNotFound();
+            ->assertRedirect();
+
+        $this->assertSame(88.0, (float) $item->fresh()->current_stock);
 
         $this->actingAs($staff)
             ->get(route('staff.inventory.history', $item))

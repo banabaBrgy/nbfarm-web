@@ -9,8 +9,9 @@
 
 @section('content')
 @php
-    // Client: remove Add Stock from staff inventory (view/history only).
-    $canEditInventory = false;
+    // Client: staff can restock existing items (row Edit), but not add brand-new items (top Add Stock).
+    $canAddNewItem = false;
+    $canRestockInventory = true;
     $canDeleteInventory = \App\Models\User::routeRole() === 'owner';
 @endphp
 <div class="inventory-page">
@@ -138,8 +139,8 @@
             </span>
         </td>
         <td class="action-cell">
-    @if($canEditInventory)
-        <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, @js($item->item_name))" title="Add Stock">
+    @if($canRestockInventory)
+        <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, @js($item->item_name))" title="Edit / Add Stock">
             <i class="fas fa-pen"></i>
         </button>
     @endif
@@ -269,7 +270,7 @@
 
 </div>
 
-@if($canEditInventory)
+@if($canAddNewItem)
 <!-- ADD NEW ITEM MODAL -->
 <div class="modal-overlay" id="stockModal">
     <div class="modal-box">
@@ -296,7 +297,9 @@
         </form>
     </div>
 </div>
+@endif
 
+@if($canRestockInventory)
 <!-- ADD STOCK QUANTITY MODAL -->
 <div class="modal-overlay" id="increaseModal">
     <div class="modal-box">
@@ -351,7 +354,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
-@if($canEditInventory)
+@if($canAddNewItem)
 function openStockModal() {
     document.getElementById('stockModal').classList.add('active');
 }
@@ -359,7 +362,9 @@ function openStockModal() {
 function closeStockModal() {
     document.getElementById('stockModal').classList.remove('active');
 }
+@endif
 
+@if($canRestockInventory)
 function openIncreaseModal(itemId, itemName) {
     document.getElementById('increaseItemId').value = itemId;
     document.getElementById('increaseItemName').textContent = itemName;
@@ -413,11 +418,13 @@ function closeHistoryModal() {
     document.getElementById('historyModal').classList.remove('active');
 }
 
-@if($canEditInventory)
+@if($canAddNewItem)
 document.getElementById('stockModal').addEventListener('click', function(e) {
     if (e.target === this) closeStockModal();
 });
+@endif
 
+@if($canRestockInventory)
 document.getElementById('increaseModal').addEventListener('click', function(e) {
     if (e.target === this) closeIncreaseModal();
 });

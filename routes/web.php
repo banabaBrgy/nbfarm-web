@@ -247,9 +247,10 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
     Route::get('/production/batch/{batch}', [BatchController::class, 'show'])
         ->name('batch.details');
 
-    // Inventory — staff view/history only (Add Stock removed per client)
+    // Inventory — staff can restock existing items; Add New Item stays owner/manager only
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
     Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');
+    Route::post('/inventory/increase-stock', [InventoryController::class, 'increaseStock'])->name('inventory.increaseStock');
 
     // QR Scanner
     Route::get('/production/scan-qr', [QrScannerController::class, 'index'])
