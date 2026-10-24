@@ -147,7 +147,7 @@
     line-height:1.25;
 }
 
-.forecast-summary-modal .forecast-summary-table td.text-end{
+.forecast-summary-modal .forecast-summary-table td.text-center{
     white-space:nowrap;
 }
 
@@ -364,13 +364,13 @@
 }
 
 .production-page .production-table .col-batch{
-    text-align:left !important;
+    text-align:center;
     white-space:nowrap;
     padding-left:16px;
 }
 
 .production-page .production-table .col-num{
-    text-align:right !important;
+    text-align:center;
     font-variant-numeric:tabular-nums;
     white-space:nowrap;
 }
@@ -380,7 +380,7 @@
 }
 
 .production-page .production-table .col-action{
-    text-align:right !important;
+    text-align:center;
     white-space:nowrap;
     padding-right:14px;
 }

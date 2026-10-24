@@ -337,6 +337,8 @@
 
     font-weight: 700;
 
+    text-align: center;
+
 }
 
 .inventory-table td {
@@ -348,6 +350,8 @@
     font-size: 14px;
 
     color: #374151;
+
+    text-align: center;
 
 }
 
@@ -418,6 +422,10 @@
     display: flex;
 
     gap: 8px;
+
+    justify-content: center;
+
+    align-items: center;
 
 }
 

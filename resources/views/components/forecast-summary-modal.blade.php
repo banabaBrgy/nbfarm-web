@@ -52,18 +52,18 @@
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
-                            <th scope="col" class="text-end">Eggs</th>
-                            <th scope="col" class="text-end">Trays</th>
-                            <th scope="col" class="text-end">Share</th>
+                            <th scope="col" class="text-center">Eggs</th>
+                            <th scope="col" class="text-center">Trays</th>
+                            <th scope="col" class="text-center">Share</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($forecastSummary['sizes'] as $size)
                             <tr>
                                 <td class="forecast-summary-category">{{ $size['label'] }}</td>
-                                <td class="text-end">{{ number_format($size['eggs']) }}</td>
-                                <td class="text-end">{{ number_format($size['trays']) }}</td>
-                                <td class="text-end">{{ number_format($size['share'], 1) }}%</td>
+                                <td class="text-center">{{ number_format($size['eggs']) }}</td>
+                                <td class="text-center">{{ number_format($size['trays']) }}</td>
+                                <td class="text-center">{{ number_format($size['share'], 1) }}%</td>
                             </tr>
                         @empty
                             <tr>
@@ -124,18 +124,18 @@
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
-                            <th scope="col" class="text-end">Eggs</th>
-                            <th scope="col" class="text-end">Trays</th>
-                            <th scope="col" class="text-end">Share</th>
+                            <th scope="col" class="text-center">Eggs</th>
+                            <th scope="col" class="text-center">Trays</th>
+                            <th scope="col" class="text-center">Share</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($previousForecastSummary['sizes'] as $size)
                             <tr>
                                 <td class="forecast-summary-category">{{ $size['label'] }}</td>
-                                <td class="text-end">{{ number_format($size['eggs']) }}</td>
-                                <td class="text-end">{{ number_format($size['trays']) }}</td>
-                                <td class="text-end">{{ number_format($size['share'], 1) }}%</td>
+                                <td class="text-center">{{ number_format($size['eggs']) }}</td>
+                                <td class="text-center">{{ number_format($size['trays']) }}</td>
+                                <td class="text-center">{{ number_format($size['share'], 1) }}%</td>
                             </tr>
                         @empty
                             <tr>

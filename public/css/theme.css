@@ -263,6 +263,8 @@ small{
 
     font-size:14px;
 
+    text-align:center;
+
 }
 
 .table tbody td{
@@ -270,6 +272,8 @@ small{
     padding:14px;
 
     vertical-align:middle;
+
+    text-align:center;
 
 }
 

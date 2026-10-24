@@ -558,13 +558,13 @@
     width: 42%;
     color: #6b7280;
     font-weight: 600;
-    text-align: left;
+    text-align: center;
 }
 
 .scan-result-table td {
     color: #1f2937;
     font-weight: 600;
-    text-align: right;
+    text-align: center;
     overflow-wrap: break-word;
     word-break: break-word;
 }

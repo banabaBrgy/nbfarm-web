@@ -203,14 +203,14 @@
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th class="text-end">Predicted Eggs</th>
+                            <th class="text-center">Predicted Eggs</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($forecastHistory as $forecast)
                             <tr>
                                 <td>{{ $forecast->forecast_date->format('M j, Y') }}</td>
-                                <td class="text-end">{{ number_format($forecast->predicted_eggs) }}</td>
+                                <td class="text-center">{{ number_format($forecast->predicted_eggs) }}</td>
                             </tr>
                         @empty
                             <tr>

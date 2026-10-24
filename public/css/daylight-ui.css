@@ -762,6 +762,32 @@ textarea,
     top: 0;
     z-index: 2;
     padding: 11px 14px;
+    text-align: center;
+}
+
+.table th,
+.table td,
+.inventory-table th,
+.inventory-table td,
+.user-table th,
+.user-table td,
+.dsp-table th,
+.dsp-table td,
+.rpt-table th,
+.rpt-table td,
+.transactions-table th,
+.transactions-table td,
+.production-table th,
+.production-table td,
+.sales-history-table th,
+.sales-history-table td,
+.forecast-summary-table th,
+.forecast-summary-table td,
+.records-card table th,
+.records-card table td,
+.history-table th,
+.history-table td {
+    text-align: center;
 }
 
 .forecast-summary-modal .table thead,
@@ -783,6 +809,7 @@ textarea,
 .rpt-table tbody td,
 .transactions-table tbody td {
     padding: 11px 14px;
+    text-align: center;
 }
 
 .production-page .table-container,

@@ -477,6 +477,34 @@ button.stat-icon:hover {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.table th,
+.table td,
+.inventory-table th,
+.inventory-table td,
+.user-table th,
+.user-table td,
+.dsp-table th,
+.dsp-table td,
+.rpt-table th,
+.rpt-table td,
+.transactions-table th,
+.transactions-table td,
+.production-table th,
+.production-table td,
+.sales-history-table th,
+.sales-history-table td,
+.forecast-summary-table th,
+.forecast-summary-table td,
+.scan-result-table th,
+.scan-result-table td,
+.records-card table th,
+.records-card table td,
+.history-table th,
+.history-table td {
+    text-align: center;
 }
 
 /* Forecast summary sits on a light table — keep labels dark. */

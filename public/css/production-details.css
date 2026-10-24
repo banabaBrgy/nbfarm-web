@@ -122,6 +122,7 @@
     text-transform:uppercase;
     letter-spacing:.5px;
     background:var(--nb-day-green, #2f8158);
+    text-align:center;
 }
 
 .records-card tbody td{
@@ -130,6 +131,7 @@
     color:#21352c;
     font-size:15px;
     font-weight:500;
+    text-align:center;
 }
 
 .records-card tbody tr:hover{

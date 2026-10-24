@@ -242,7 +242,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.55px;
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
     border: none;
     vertical-align: middle;
@@ -255,6 +255,7 @@
     color: #374151;
     vertical-align: middle;
     background: #fff;
+    text-align: center;
 }
 
 .rpt-table tbody tr {

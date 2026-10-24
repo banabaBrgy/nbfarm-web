@@ -534,6 +534,8 @@
 
     letter-spacing:.6px;
 
+    text-align:center;
+
 }
 
 .inventory-table td{
@@ -541,6 +543,8 @@
     padding:16px 18px;
 
     border-top:1px solid #EEF2F7;
+
+    text-align:center;
 
     font-size:14px;
 

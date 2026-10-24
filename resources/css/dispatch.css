@@ -388,7 +388,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.55px;
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
 }
 
@@ -398,6 +398,7 @@
     font-size: 14px;
     color: #374151;
     vertical-align: middle;
+    text-align: center;
 }
 
 .dsp-table tbody tr {
@@ -524,6 +525,7 @@
 .dsp-actions {
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-wrap: nowrap;
     gap: 8px;
 }

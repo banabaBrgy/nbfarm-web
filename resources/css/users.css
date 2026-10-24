@@ -99,7 +99,7 @@
 .user-table th,
 .user-table td{
     padding:18px 16px;
-    text-align:left;
+    text-align:center;
     vertical-align:middle;
 }
 
@@ -155,7 +155,7 @@
 .status-inactive { color: #999; }
 .status-inactive i { color: #ccc; }
 
-.actions-cell { display: flex; gap: 14px; }
+.actions-cell { display: flex; gap: 14px; justify-content: center; }
 
 .action-link {
     background: none;

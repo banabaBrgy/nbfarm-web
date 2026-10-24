@@ -148,7 +148,7 @@
 .sales-history-table th,
 .sales-history-table td {
     padding: 14px 16px;
-    text-align: left;
+    text-align: center;
     border-bottom: 1px solid #eef2ef;
     font-size: 14px;
     color: #374151;
@@ -164,7 +164,7 @@
 }
 
 .sales-history-table .num {
-    text-align: right;
+    text-align: center;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
