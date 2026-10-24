@@ -28,8 +28,8 @@ class InventoryEggTraysStockTest extends TestCase
             ->assertOk()
             ->assertSee('stat-card--inventory stat-card-alert', false)
             ->assertSee('pcs — Min: 100.00 — LOW', false)
-            ->assertDontSee('icon-btn-edit')
-            ->assertDontSee('id="increaseModal"', false)
+            ->assertSee('icon-btn-edit')
+            ->assertSee('id="increaseModal"', false)
             ->assertDontSee('id="stockModal"', false);
     }
 
