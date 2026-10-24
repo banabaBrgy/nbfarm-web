@@ -33,7 +33,7 @@ class ProductionDetailsController extends Controller
         return view('production-details', [
             'production' => $production,
             'transactions' => $transactions,
-            'latestTransactionId' => QrTransaction::latestIdForProduction((int) $production->production_id),
+            'editableTransactionIds' => QrTransaction::latestIdsBySizeForProduction((int) $production->production_id),
         ]);
     }
 }

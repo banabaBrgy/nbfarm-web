@@ -83,7 +83,7 @@
 
                         <td>
 
-                            @if((int) $transaction->id === (int) $latestTransactionId)
+                            @if(in_array((int) $transaction->id, $editableTransactionIds, true))
                                 <button
                                     type="button"
                                     class="btn-edit editQR"

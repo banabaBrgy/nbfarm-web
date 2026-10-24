@@ -20,7 +20,7 @@ class QrTransactionController extends Controller
         if (! $transaction->isLastRecordedTray()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only the last recorded tray can be edited.',
+                'message' => 'Only the last recorded tray for this size can be edited.',
             ], 422);
         }
 

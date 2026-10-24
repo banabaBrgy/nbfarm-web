@@ -36,20 +36,42 @@ class QrTransaction extends Model
         );
     }
 
-    /** Newest scan for a harvest. Earlier trays stay locked. */
-    public static function latestIdForProduction(int $productionId): ?int
+    /**
+     * Newest scan for each egg size in a harvest.
+     * Earlier trays of that size stay locked.
+     *
+     * @return array<int, int>
+     */
+    public static function latestIdsBySizeForProduction(int $productionId): array
     {
-        $id = static::query()
+        $latest = [];
+
+        $transactions = static::query()
+            ->with('qrRecord:id,egg_size')
             ->where('production_id', $productionId)
             ->orderByDesc('scanned_at')
             ->orderByDesc('id')
-            ->value('id');
+            ->get(['id', 'qr_record_id']);
 
-        return $id === null ? null : (int) $id;
+        foreach ($transactions as $transaction) {
+            $size = $transaction->qrRecord?->egg_size;
+
+            if (! is_string($size) || $size === '' || isset($latest[$size])) {
+                continue;
+            }
+
+            $latest[$size] = (int) $transaction->id;
+        }
+
+        return array_values($latest);
     }
 
     public function isLastRecordedTray(): bool
     {
-        return (int) $this->id === (int) static::latestIdForProduction((int) $this->production_id);
+        return in_array(
+            (int) $this->id,
+            static::latestIdsBySizeForProduction((int) $this->production_id),
+            true
+        );
     }
 }
