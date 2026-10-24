@@ -25,7 +25,7 @@
                     <tr>
                         <th>Item</th>
                         <th>Daily use</th>
-                        <th>7-day consumption</th>
+                        <th>7-day<br>consumption</th>
                         <th>Stock after 7 days</th>
                     </tr>
                 </thead>
