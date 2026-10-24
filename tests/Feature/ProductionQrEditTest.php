@@ -31,7 +31,9 @@ class ProductionQrEditTest extends TestCase
             ->assertSee('DOMContentLoaded', false)
             ->assertSee('window.bootstrap', false)
             ->assertDontSee('new bootstrap.Modal', false)
-            ->assertSee('Edit', false)
+            ->assertSee('title="Edit"', false)
+            ->assertSee('fa-pen', false)
+            ->assertDontSee('>Edit<', false)
             ->assertSee('Recorded', false);
     }
 

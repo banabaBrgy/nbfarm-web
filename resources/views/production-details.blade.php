@@ -87,13 +87,15 @@
                                 <button
                                     type="button"
                                     class="btn-edit editQR"
+                                    title="Edit"
+                                    aria-label="Edit"
                                     data-id="{{ $transaction->id }}"
                                     data-code="{{ $transaction->qrRecord?->qr_code ?? '' }}"
                                     data-size="{{ $transaction->qrRecord?->egg_size ?? '' }}"
                                     data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
                                     data-eggs="{{ $transaction->total_eggs }}">
 
-                                    Edit
+                                    <i class="fas fa-pen" aria-hidden="true"></i>
 
                                 </button>
                             @else
