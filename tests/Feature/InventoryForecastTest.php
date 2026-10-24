@@ -128,6 +128,8 @@ class InventoryForecastTest extends TestCase
         $this->actingAs($owner)
             ->get(route('owner.inventory'))
             ->assertOk()
+            ->assertSee('Inventory Forecast')
+            ->assertSee('id="inventoryForecastModal"', false)
             ->assertSee('Next 7 days')
             ->assertSee('105')
             ->assertSee('35')
@@ -138,6 +140,8 @@ class InventoryForecastTest extends TestCase
         $this->actingAs($staff)
             ->get(route('staff.inventory'))
             ->assertOk()
+            ->assertSee('Inventory Forecast')
+            ->assertSee('id="inventoryForecastModal"', false)
             ->assertSee('Next 7 days')
             ->assertSee('15,000');
     }

@@ -19,12 +19,18 @@
             <h2>Inventory</h2>
             <p>Monitor stock levels, alerts, and recent updates.</p>
         </div>
-        @if($canEditInventory)
-            <button class="btn-update" type="button" onclick="openStockModal()">
-                <i class="fas fa-plus"></i>
-                Add Stock
+        <div class="page-header-actions">
+            <button class="btn-forecast" type="button" onclick="openInventoryForecast()">
+                <i class="fas fa-chart-line"></i>
+                Inventory Forecast
             </button>
-        @endif
+            @if($canEditInventory)
+                <button class="btn-update" type="button" onclick="openStockModal()">
+                    <i class="fas fa-plus"></i>
+                    Add Stock
+                </button>
+            @endif
+        </div>
     </div>
 
    @php
