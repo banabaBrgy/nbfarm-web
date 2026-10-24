@@ -18,10 +18,6 @@ trait SplitsEggSizes
             ];
         }
 
-        $cracked = (int) (round($total * 0.03 / 30) * 30);
-        $cracked = max(30, min($cracked, $total - 120));
-        $good = $total - $cracked;
-
         $weights = [
             'small' => 0.22,
             'medium' => 0.32,
@@ -36,10 +32,10 @@ trait SplitsEggSizes
 
         foreach ($weights as $size => $weight) {
             if ($size === $last) {
-                $sizes[$size] = $good - $allocated;
+                $sizes[$size] = $total - $allocated;
                 break;
             }
-            $part = (int) (round($good * $weight / 30) * 30);
+            $part = (int) (round($total * $weight / 30) * 30);
             $sizes[$size] = $part;
             $allocated += $part;
         }
@@ -49,7 +45,7 @@ trait SplitsEggSizes
             'medium' => $sizes['medium'],
             'large' => $sizes['large'],
             'extra_large' => $sizes['extra_large'],
-            'cracked' => $cracked,
+            'cracked' => 0,
             'produced' => $total,
         ];
     }

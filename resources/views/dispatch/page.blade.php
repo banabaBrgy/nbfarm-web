@@ -2,7 +2,7 @@
     $rolePrefix = \App\Models\User::routeRole();
     $canManage = $canManage ?? ($rolePrefix === 'manager');
     $indexRoute = $rolePrefix . '.dispatch';
-    $sizes = ['Small', 'Medium', 'Large', 'Extra Large', 'Cracked'];
+    $sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
     $hasFilters = request()->filled('search') || request()->filled('status') || request()->filled('size');
     $availableDispatchTrays = array_sum(
         \App\Models\Production::availableDispatchTraysBySize()

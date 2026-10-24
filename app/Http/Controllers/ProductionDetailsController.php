@@ -22,7 +22,7 @@ class ProductionDetailsController extends Controller
                     WHEN 'Medium' THEN 2
                     WHEN 'Large' THEN 3
                     WHEN 'Extra Large' THEN 4
-                    WHEN 'Cracked' THEN 5
+                    ELSE 5
                 END
             ")
             ->orderBy('qr_records.qr_code')

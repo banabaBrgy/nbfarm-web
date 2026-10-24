@@ -51,6 +51,13 @@ class QrScannerController extends Controller
             ]);
         }
 
+        if ($qr->egg_size === 'Cracked' || str_starts_with($qr->qr_code, 'QRC-')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cracked QR codes are no longer used.',
+            ]);
+        }
+
         /*
         ---------------------------------------
         Hanapin ang Production ngayong araw

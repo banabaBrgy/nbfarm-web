@@ -16,7 +16,6 @@ class QrRecord extends Model
         'Medium' => 'QRM',
         'Large' => 'QRL',
         'Extra Large' => 'QRXL',
-        'Cracked' => 'QRC',
     ];
 
     protected $fillable = [
@@ -46,10 +45,10 @@ class QrRecord extends Model
 
     public static function isClientCode(string $qrCode): bool
     {
-        return (bool) preg_match('/^(QRS|QRM|QRL|QRXL|QRC)-B\d+-\d{3}$/', $qrCode);
+        return (bool) preg_match('/^(QRS|QRM|QRL|QRXL)-B\d+-\d{3}$/', $qrCode);
     }
 
-    /** Create QRS/QRM/QRL/QRXL/QRC-B{n}-001 … 010 for the farm batches. */
+    /** Create QRS/QRM/QRL/QRXL-B{n}-001 … 010 for the farm batches. */
     public static function ensurePrintedCodes(?int $batchId = null, ?int $productionId = null): void
     {
         $batches = $batchId ? [$batchId] : self::BATCH_IDS;
@@ -86,9 +85,9 @@ class QrRecord extends Model
     {
         return $query
             ->whereIn('batch_id', self::BATCH_IDS)
-            ->whereRaw("qr_code REGEXP '^(QRS|QRM|QRL|QRXL|QRC)-B[0-9]+-[0-9]{3}$'")
+            ->whereRaw("qr_code REGEXP '^(QRS|QRM|QRL|QRXL)-B[0-9]+-[0-9]{3}$'")
             ->orderBy('batch_id')
-            ->orderByRaw("FIELD(egg_size, 'Small', 'Medium', 'Large', 'Extra Large', 'Cracked')")
+            ->orderByRaw("FIELD(egg_size, 'Small', 'Medium', 'Large', 'Extra Large')")
             ->orderBy('qr_code');
     }
 }

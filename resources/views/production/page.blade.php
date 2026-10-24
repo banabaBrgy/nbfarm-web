@@ -116,7 +116,6 @@
                     <th class="col-num">Medium</th>
                     <th class="col-num">Large</th>
                     <th class="col-num" title="Extra Large">XL</th>
-                    <th class="col-num">Cracked</th>
                     <th class="col-num col-total">Total</th>
                     <th class="col-action">Action</th>
                 </tr>
@@ -127,7 +126,6 @@
                     $medium = 0;
                     $large = 0;
                     $xl = 0;
-                    $cracked = 0;
                     $total = 0;
                 @endphp
 
@@ -137,7 +135,6 @@
                         $medium += $production->medium_eggs;
                         $large += $production->large_eggs;
                         $xl += $production->extra_large_eggs;
-                        $cracked += $production->cracked_eggs;
                         $total += $production->totalEggCount();
                     @endphp
                     <tr>
@@ -148,7 +145,6 @@
                         <td class="col-num"><x-egg-count :value="$production->medium_eggs" /></td>
                         <td class="col-num"><x-egg-count :value="$production->large_eggs" /></td>
                         <td class="col-num"><x-egg-count :value="$production->extra_large_eggs" /></td>
-                        <td class="col-num"><x-egg-count :value="$production->cracked_eggs" /></td>
                         <td class="col-num col-total">
                             <strong>
                                 <x-egg-count :value="$production->totalEggCount()" />
@@ -165,7 +161,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="production-table-empty">
+                        <td colspan="7" class="production-table-empty">
                             No harvest records for this date.
                         </td>
                     </tr>
@@ -179,7 +175,6 @@
                         <th class="col-num"><x-egg-count :value="$medium" /></th>
                         <th class="col-num"><x-egg-count :value="$large" /></th>
                         <th class="col-num"><x-egg-count :value="$xl" /></th>
-                        <th class="col-num"><x-egg-count :value="$cracked" /></th>
                         <th class="col-num col-total"><x-egg-count :value="$total" /></th>
                         <th class="col-action"></th>
                     </tr>

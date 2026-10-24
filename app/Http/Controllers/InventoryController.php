@@ -98,8 +98,7 @@ class InventoryController extends Controller
                 SUM(small_eggs) as small,
                 SUM(medium_eggs) as medium,
                 SUM(large_eggs) as large,
-                SUM(extra_large_eggs) as extra_large,
-                SUM(cracked_eggs) as cracked
+                SUM(extra_large_eggs) as extra_large
             ')->first();
 
         $availableMonths = DB::table('production')
@@ -119,8 +118,7 @@ class InventoryController extends Controller
         $grandTotal = ($eggTotals->small ?? 0)
             + ($eggTotals->medium ?? 0)
             + ($eggTotals->large ?? 0)
-            + ($eggTotals->extra_large ?? 0)
-            + ($eggTotals->cracked ?? 0);
+            + ($eggTotals->extra_large ?? 0);
 
         // Recent stock movements (simple log base sa updated_at ng inventory_items)
         $recentMovements = DB::table('inventory_items')

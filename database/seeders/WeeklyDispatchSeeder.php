@@ -33,12 +33,11 @@ class WeeklyDispatchSeeder extends Seeder
             $harvest = Production::query()
                 ->whereDate('production_date', $date)
                 ->selectRaw('
-                    COALESCE(SUM(eggs_produced), 0) as eggs,
+                    COALESCE(SUM(small_eggs + medium_eggs + large_eggs + extra_large_eggs), 0) as eggs,
                     COALESCE(SUM(small_eggs), 0) as small,
                     COALESCE(SUM(medium_eggs), 0) as medium,
                     COALESCE(SUM(large_eggs), 0) as large,
-                    COALESCE(SUM(extra_large_eggs), 0) as extra_large,
-                    COALESCE(SUM(cracked_eggs), 0) as cracked
+                    COALESCE(SUM(extra_large_eggs), 0) as extra_large
                 ')
                 ->first();
 
@@ -114,7 +113,6 @@ class WeeklyDispatchSeeder extends Seeder
             'Medium' => intdiv((int) $harvest->medium, Production::EGGS_PER_TRAY),
             'Large' => intdiv((int) $harvest->large, Production::EGGS_PER_TRAY),
             'Extra Large' => intdiv((int) $harvest->extra_large, Production::EGGS_PER_TRAY),
-            'Cracked' => intdiv((int) $harvest->cracked, Production::EGGS_PER_TRAY),
         ];
         $parts = array_filter($parts, fn (int $trays) => $trays > 0);
         $sum = array_sum($parts);

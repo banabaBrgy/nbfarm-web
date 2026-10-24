@@ -220,7 +220,6 @@
                             'Medium' => $eggTotals->medium ?? 0,
                             'Large' => $eggTotals->large ?? 0,
                             'Extra Large' => $eggTotals->extra_large ?? 0,
-                            'Cracked' => $eggTotals->cracked ?? 0,
                         ];
                     @endphp
 

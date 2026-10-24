@@ -25,7 +25,6 @@ class Production extends Model
         'Medium' => 'medium_eggs',
         'Large' => 'large_eggs',
         'Extra Large' => 'extra_large_eggs',
-        'Cracked' => 'cracked_eggs',
     ];
 
     /** Tray pool used for the Inventory Overview Egg Trays card. */
@@ -80,8 +79,7 @@ class Production extends Model
         return $this->small_eggs
             + $this->medium_eggs
             + $this->large_eggs
-            + $this->extra_large_eggs
-            + $this->cracked_eggs;
+            + $this->extra_large_eggs;
     }
 
     public static function sampleStartDate(): string

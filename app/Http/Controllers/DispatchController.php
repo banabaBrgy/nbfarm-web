@@ -123,7 +123,7 @@ class DispatchController extends Controller
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:Pending,On Transit,Delivered',
             'size' => 'required|array|min:1',
-            'size.*' => 'required|in:Small,Medium,Large,Extra Large,Cracked',
+            'size.*' => 'required|in:Small,Medium,Large,Extra Large',
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required|integer|min:1',
         ]);

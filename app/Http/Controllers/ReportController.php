@@ -217,7 +217,6 @@ class ReportController extends Controller
             $this->line('Medium Eggs', $this->qty($p['medium'])).
             $this->line('Large Eggs', $this->qty($p['large'])).
             $this->line('Extra Large Eggs', $this->qty($p['xl'])).
-            $this->line('Cracked Eggs', $this->qty($p['cracked'])).
             $this->line('TOTAL HARVEST', $this->qty($p['total']));
     }
 
@@ -291,7 +290,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @return array{small: int, medium: int, large: int, xl: int, cracked: int, total: int}
+     * @return array{small: int, medium: int, large: int, xl: int, total: int}
      */
     private function productionTotals(Carbon $date): array
     {
@@ -302,8 +301,7 @@ class ReportController extends Controller
                 COALESCE(SUM(medium_eggs), 0) as medium,
                 COALESCE(SUM(large_eggs), 0) as large,
                 COALESCE(SUM(extra_large_eggs), 0) as xl,
-                COALESCE(SUM(cracked_eggs), 0) as cracked,
-                COALESCE(SUM(eggs_produced), 0) as total
+                COALESCE(SUM(small_eggs + medium_eggs + large_eggs + extra_large_eggs), 0) as total
             ')
             ->first();
 
@@ -312,7 +310,6 @@ class ReportController extends Controller
             'medium' => (int) ($row->medium ?? 0),
             'large' => (int) ($row->large ?? 0),
             'xl' => (int) ($row->xl ?? 0),
-            'cracked' => (int) ($row->cracked ?? 0),
             'total' => (int) ($row->total ?? 0),
         ];
     }

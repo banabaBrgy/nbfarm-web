@@ -215,7 +215,6 @@ trait SeedsHarvestQr
             'Medium' => (int) $production->medium_eggs,
             'Large' => (int) $production->large_eggs,
             'Extra Large' => (int) $production->extra_large_eggs,
-            'Cracked' => (int) $production->cracked_eggs,
         ];
 
         $batchId = (int) $production->batch_id;
