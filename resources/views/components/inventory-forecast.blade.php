@@ -74,7 +74,7 @@
                         <th>Date</th>
                         <th>Predicted eggs</th>
                         <th>Trays needed</th>
-                        <th>Trays left that day</th>
+                        <th>Tray left</th>
                     </tr>
                 </thead>
                 <tbody>
