@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Production;
+use App\Models\QrTransaction;
 
 class ProductionDetailsController extends Controller
 {
@@ -32,6 +33,7 @@ class ProductionDetailsController extends Controller
         return view('production-details', [
             'production' => $production,
             'transactions' => $transactions,
+            'latestTransactionId' => QrTransaction::latestIdForProduction((int) $production->production_id),
         ]);
     }
 }

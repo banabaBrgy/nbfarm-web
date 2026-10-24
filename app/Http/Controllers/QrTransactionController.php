@@ -17,6 +17,13 @@ class QrTransactionController extends Controller
 
         $transaction = QrTransaction::query()->findOrFail($id);
 
+        if (! $transaction->isLastRecordedTray()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only the last recorded tray can be edited.',
+            ], 422);
+        }
+
         DB::transaction(function () use ($transaction, $validated) {
             $transaction->update([
                 'total_eggs' => (int) $validated['total_eggs'],

@@ -35,4 +35,21 @@ class QrTransaction extends Model
             'production_id'
         );
     }
+
+    /** Newest scan for a harvest. Earlier trays stay locked. */
+    public static function latestIdForProduction(int $productionId): ?int
+    {
+        $id = static::query()
+            ->where('production_id', $productionId)
+            ->orderByDesc('scanned_at')
+            ->orderByDesc('id')
+            ->value('id');
+
+        return $id === null ? null : (int) $id;
+    }
+
+    public function isLastRecordedTray(): bool
+    {
+        return (int) $this->id === (int) static::latestIdForProduction((int) $this->production_id);
+    }
 }

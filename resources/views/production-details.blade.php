@@ -83,18 +83,22 @@
 
                         <td>
 
-                            <button
-                                type="button"
-                                class="btn-edit editQR"
-                                data-id="{{ $transaction->id }}"
-                                data-code="{{ $transaction->qrRecord?->qr_code ?? '' }}"
-                                data-size="{{ $transaction->qrRecord?->egg_size ?? '' }}"
-                                data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
-                                data-eggs="{{ $transaction->total_eggs }}">
+                            @if((int) $transaction->id === (int) $latestTransactionId)
+                                <button
+                                    type="button"
+                                    class="btn-edit editQR"
+                                    data-id="{{ $transaction->id }}"
+                                    data-code="{{ $transaction->qrRecord?->qr_code ?? '' }}"
+                                    data-size="{{ $transaction->qrRecord?->egg_size ?? '' }}"
+                                    data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
+                                    data-eggs="{{ $transaction->total_eggs }}">
 
-                                Edit
+                                    Edit
 
-                            </button>
+                                </button>
+                            @else
+                                <span class="tray-locked">Recorded</span>
+                            @endif
 
                         </td>
 
