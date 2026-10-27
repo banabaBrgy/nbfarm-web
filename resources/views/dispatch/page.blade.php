@@ -209,6 +209,16 @@
                                             data-bs-target="#editDispatchModal{{ $dispatch->id }}">
                                             <i class="fas fa-pen"></i>
                                         </button>
+                                        @if(!$canManage)
+                                            <button
+                                                type="button"
+                                                class="dsp-icon-btn dsp-icon-view"
+                                                title="View"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewDispatchModal{{ $dispatch->id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        @endif
                                         @if($canManage)
                                             <form
                                                 action="{{ route($rolePrefix . '.dispatch.destroy', $dispatch->id) }}"
@@ -416,7 +426,9 @@
                 </form>
             </div>
         </div>
-    @else
+    @endif
+
+    @if(!$canManage)
         <div class="modal fade dispatch-modal" id="viewDispatchModal{{ $dispatch->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">

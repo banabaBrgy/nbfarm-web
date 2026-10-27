@@ -105,6 +105,30 @@ class DispatchStockTest extends TestCase
         ]);
     }
 
+    public function test_owner_dispatch_page_keeps_view_and_edit_controls(): void
+    {
+        $dispatch = Dispatch::create([
+            'recipient' => 'Test Store',
+            'address' => 'Test Address',
+            'dispatch_date' => today()->toDateString(),
+            'price' => 100,
+            'status' => 'Pending',
+        ]);
+        DispatchItem::create([
+            'dispatch_id' => $dispatch->id,
+            'size' => 'Large',
+            'quantity' => 1,
+        ]);
+
+        $this->actingAs($this->owner())
+            ->get(route('owner.dispatch'))
+            ->assertOk()
+            ->assertSee('title="Edit"', false)
+            ->assertSee('title="View"', false)
+            ->assertSee('Edit Dispatch')
+            ->assertSee('Dispatch Details');
+    }
+
     private function manager(): User
     {
         return User::factory()->create(['role' => 'manager']);
