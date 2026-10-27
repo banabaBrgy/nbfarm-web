@@ -196,6 +196,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::delete('/inventory/{id}', [InventoryController::class, 'deleteItem'])->name('inventory.delete');
 
     Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
+    Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])->name('dispatch.update');
 
     Route::view('/forecast', 'forecast')->name('forecast');
     Route::get('/users', [UserController::class, 'index'])->name('users');

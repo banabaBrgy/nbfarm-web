@@ -8,5 +8,5 @@
 @endpush
 
 @section('content')
-    @include('dispatch.page', ['canManage' => false])
+    @include('dispatch.page', ['canManage' => false, 'canEdit' => true])
 @endsection

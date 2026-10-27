@@ -1,6 +1,7 @@
 @php
     $rolePrefix = \App\Models\User::routeRole();
     $canManage = $canManage ?? ($rolePrefix === 'manager');
+    $canEdit = $canEdit ?? $canManage;
     $indexRoute = $rolePrefix . '.dispatch';
     $sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
     $hasFilters = request()->filled('search') || request()->filled('status') || request()->filled('size');
@@ -146,7 +147,7 @@
                         <th>Items</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th class="dsp-action-col">{{ $canManage ? 'Action' : 'View' }}</th>
+                        <th class="dsp-action-col">{{ $canManage || $canEdit ? 'Action' : 'View' }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -199,7 +200,7 @@
                             </td>
                             <td class="dsp-action-col">
                                 <div class="dsp-actions">
-                                    @if($canManage)
+                                    @if($canManage || $canEdit)
                                         <button
                                             type="button"
                                             class="dsp-icon-btn dsp-icon-edit"
@@ -208,16 +209,18 @@
                                             data-bs-target="#editDispatchModal{{ $dispatch->id }}">
                                             <i class="fas fa-pen"></i>
                                         </button>
-                                        <form
-                                            action="{{ route($rolePrefix . '.dispatch.destroy', $dispatch->id) }}"
-                                            method="POST"
-                                            class="delete-dispatch-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="dsp-icon-btn dsp-icon-delete btn-delete-dispatch" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        @if($canManage)
+                                            <form
+                                                action="{{ route($rolePrefix . '.dispatch.destroy', $dispatch->id) }}"
+                                                method="POST"
+                                                class="delete-dispatch-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="dsp-icon-btn dsp-icon-delete btn-delete-dispatch" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     @else
                                         <button
                                             type="button"
@@ -344,7 +347,7 @@
 @endif
 
 @foreach($dispatches as $dispatch)
-    @if($canManage)
+    @if($canManage || $canEdit)
         <div class="modal fade dispatch-modal" id="editDispatchModal{{ $dispatch->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <form action="{{ route($rolePrefix . '.dispatch.update', $dispatch->id) }}" method="POST">

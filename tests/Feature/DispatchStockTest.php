@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Dispatch;
+use App\Models\DispatchItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -72,7 +74,35 @@ class DispatchStockTest extends TestCase
         $response = $this->actingAs($this->owner())
             ->post('/owner/dispatch/store', $this->payload());
 
-        $response->assertNotFound();
+        $response->assertStatus(405);
+    }
+
+    public function test_owner_can_edit_dispatch_date_and_status(): void
+    {
+        $dispatch = Dispatch::create([
+            'recipient' => 'Test Store',
+            'address' => 'Test Address',
+            'dispatch_date' => today()->toDateString(),
+            'price' => 100,
+            'status' => 'Pending',
+        ]);
+        DispatchItem::create([
+            'dispatch_id' => $dispatch->id,
+            'size' => 'Large',
+            'quantity' => 1,
+        ]);
+
+        $response = $this->actingAs($this->owner())
+            ->put(route('owner.dispatch.update', $dispatch), [
+                'dispatch_date' => today()->toDateString(),
+                'status' => 'Delivered',
+            ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('dispatches', [
+            'id' => $dispatch->id,
+            'status' => 'Delivered',
+        ]);
     }
 
     private function manager(): User
