@@ -351,14 +351,15 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 990px;
+    min-width: 1140px;
     table-layout: fixed;
 }
 
 .dsp-col-check { width: 46px; }
-.dsp-col-date { width: 104px; }
-.dsp-col-recipient { width: 160px; }
-.dsp-col-address { width: 190px; }
+.dsp-col-date { width: 118px; }
+.dsp-col-recipient { width: 150px; }
+.dsp-col-contact { width: 132px; }
+.dsp-col-address { width: 180px; }
 .dsp-col-items { width: 160px; }
 .dsp-col-price { width: 92px; }
 .dsp-col-status { width: 122px; }
@@ -435,6 +436,12 @@
     color: #34853F;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dsp-contact {
+    color: #374151;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 

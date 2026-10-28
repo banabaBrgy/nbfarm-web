@@ -13,6 +13,7 @@ return new class extends Migration
             Schema::create('dispatches', function (Blueprint $table) {
                 $table->id();
                 $table->string('recipient');
+                $table->string('contact', 30)->nullable();
                 $table->string('address');
                 $table->date('dispatch_date');
                 $table->decimal('price', 12, 2);

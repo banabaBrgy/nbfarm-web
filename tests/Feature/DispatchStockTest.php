@@ -69,6 +69,27 @@ class DispatchStockTest extends TestCase
         $this->assertDatabaseCount('dispatches', 0);
     }
 
+    public function test_new_dispatch_requires_a_contact_number(): void
+    {
+        $this->production(['large_eggs' => 30]);
+        $payload = $this->payload('Large');
+        unset($payload['contact']);
+
+        $response = $this->actingAs($this->manager())
+            ->from(route('manager.dispatch'))
+            ->post(route('manager.dispatch.store'), $payload);
+
+        $response->assertRedirect(route('manager.dispatch'));
+        $response->assertSessionHasErrors('contact');
+        $this->assertDatabaseCount('dispatches', 0);
+
+        $this->actingAs($this->manager())
+            ->get(route('manager.dispatch'))
+            ->assertOk()
+            ->assertSee('name="contact"', false)
+            ->assertSee('placeholder="09XX XXX XXXX"', false);
+    }
+
     public function test_owner_cannot_create_dispatches(): void
     {
         $response = $this->actingAs($this->owner())
@@ -237,6 +258,7 @@ class DispatchStockTest extends TestCase
     {
         return [
             'recipient' => 'Test Store',
+            'contact' => '09171234567',
             'address' => 'Test Address',
             'dispatch_date' => today()->toDateString(),
             'price' => 100,

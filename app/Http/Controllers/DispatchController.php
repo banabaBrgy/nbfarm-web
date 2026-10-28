@@ -33,7 +33,7 @@ class DispatchController extends Controller
         }
 
         $dispatches = $query
-            ->orderByDesc('dispatch_date')
+            ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->paginate(5)
             ->withQueryString();
@@ -134,7 +134,7 @@ class DispatchController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $this->validatedDispatchPayload($request);
+        $validated = $this->validatedDispatchPayload($request, true);
         $this->validateDispatchDate($validated['dispatch_date']);
 
         DB::transaction(function () use ($validated) {
@@ -146,6 +146,7 @@ class DispatchController extends Controller
 
             $dispatch = Dispatch::create([
                 'recipient' => $validated['recipient'],
+                'contact' => $validated['contact'],
                 'address' => $validated['address'],
                 'dispatch_date' => $validated['dispatch_date'],
                 'price' => $validated['price'],
@@ -192,9 +193,9 @@ class DispatchController extends Controller
         return $role === 'owner' ? 'owner.dispatch' : 'manager.dispatch';
     }
 
-    private function validatedDispatchPayload(Request $request): array
+    private function validatedDispatchPayload(Request $request, bool $requireContact = false): array
     {
-        $validated = $request->validate([
+        $rules = [
             'recipient' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'dispatch_date' => 'required|date',
@@ -204,6 +205,15 @@ class DispatchController extends Controller
             'size.*' => 'required|in:Small,Medium,Large,Extra Large',
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required|integer|min:1',
+        ];
+
+        if ($requireContact) {
+            $rules['contact'] = ['required', 'string', 'max:30', 'regex:/^(?=.*\d)[0-9+\-\s()]{7,30}$/'];
+        }
+
+        $validated = $request->validate($rules, [
+            'contact.required' => 'Contact number is required.',
+            'contact.regex' => 'Enter a valid contact number.',
         ]);
 
         if (count($validated['size']) !== count($validated['quantity'])) {

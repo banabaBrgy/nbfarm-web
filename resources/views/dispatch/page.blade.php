@@ -128,6 +128,7 @@
                     @endif
                     <col class="dsp-col-date">
                     <col class="dsp-col-recipient">
+                    <col class="dsp-col-contact">
                     <col class="dsp-col-address">
                     <col class="dsp-col-items">
                     <col class="dsp-col-price">
@@ -141,8 +142,9 @@
                                 <input type="checkbox" id="selectAllDispatches" title="Select all" aria-label="Select all">
                             </th>
                         @endif
-                        <th>Date</th>
+                        <th>Created</th>
                         <th>Recipient</th>
+                        <th>Contact</th>
                         <th>Address</th>
                         <th>Items</th>
                         <th>Price</th>
@@ -153,7 +155,7 @@
                 <tbody>
                     @forelse($dispatches as $dispatch)
                         @php
-                            $date = \Carbon\Carbon::parse($dispatch->dispatch_date);
+                            $created = $dispatch->created_at ? \Carbon\Carbon::parse($dispatch->created_at) : null;
                             $statusKey = match ($dispatch->status) {
                                 'On Transit' => 'transit',
                                 'Delivered' => 'delivered',
@@ -172,10 +174,14 @@
                             @endif
                             <td>
                                 <div class="dsp-date">
-                                    <strong>{{ $date->format('M d, Y') }}</strong>
+                                    <strong>{{ $created?->format('M d, Y') ?? '—' }}</strong>
+                                    @if($created)
+                                        <span>{{ $created->format('h:i A') }}</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="dsp-recipient">{{ $dispatch->recipient }}</td>
+                            <td class="dsp-contact">{{ $dispatch->contact ?: 'N/A' }}</td>
                             <td>
                                 <div class="dsp-address" title="{{ $dispatch->address }}">
                                     {{ $dispatch->address }}
@@ -246,7 +252,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $canManage ? 8 : 7 }}">
+                            <td colspan="{{ $canManage ? 9 : 8 }}">
                                 <div class="dsp-empty">
                                     <i class="fas fa-truck"></i>
                                     <p>No dispatch records found</p>
@@ -301,6 +307,20 @@
                         <div class="col-md-6">
                             <label class="form-label">Recipient</label>
                             <input type="text" name="recipient" class="form-control" placeholder="Customer or store name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="dispatchContact">Contact</label>
+                            <input
+                                type="tel"
+                                id="dispatchContact"
+                                name="contact"
+                                class="form-control"
+                                placeholder="09XX XXX XXXX"
+                                value="{{ old('contact') }}"
+                                maxlength="30"
+                                inputmode="tel"
+                                autocomplete="tel"
+                                required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Dispatch Date</label>
@@ -440,6 +460,10 @@
                         <div class="dsp-field">
                             <label class="form-label">Recipient</label>
                             <input type="text" class="form-control dsp-readonly" value="{{ $dispatch->recipient }}" readonly>
+                        </div>
+                        <div class="dsp-field">
+                            <label class="form-label">Contact</label>
+                            <input type="text" class="form-control dsp-readonly" value="{{ $dispatch->contact ?: 'N/A' }}" readonly>
                         </div>
                         <div class="dsp-field">
                             <label class="form-label">Address</label>
