@@ -77,31 +77,89 @@ class DispatchStockTest extends TestCase
         $response->assertStatus(405);
     }
 
-    public function test_owner_can_edit_dispatch_date_and_status(): void
+    public function test_owner_can_edit_dispatch_details_and_items(): void
     {
-        $dispatch = Dispatch::create([
-            'recipient' => 'Test Store',
-            'address' => 'Test Address',
-            'dispatch_date' => today()->toDateString(),
-            'price' => 100,
-            'status' => 'Pending',
-        ]);
-        DispatchItem::create([
-            'dispatch_id' => $dispatch->id,
-            'size' => 'Large',
-            'quantity' => 1,
-        ]);
+        $this->production(['large_eggs' => 90, 'medium_eggs' => 30]);
+        $dispatch = $this->existingDispatch();
 
         $response = $this->actingAs($this->owner())
             ->put(route('owner.dispatch.update', $dispatch), [
+                'recipient' => 'Maria',
+                'address' => 'Pusil, Lipa City',
                 'dispatch_date' => today()->toDateString(),
+                'price' => 300,
                 'status' => 'Delivered',
+                'size' => ['Medium'],
+                'quantity' => [1],
             ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('dispatches', [
             'id' => $dispatch->id,
+            'recipient' => 'Maria',
+            'address' => 'Pusil, Lipa City',
+            'price' => 300,
             'status' => 'Delivered',
+        ]);
+        $this->assertDatabaseHas('dispatch_items', [
+            'dispatch_id' => $dispatch->id,
+            'size' => 'Medium',
+            'quantity' => 1,
+        ]);
+        $this->assertDatabaseMissing('dispatch_items', [
+            'dispatch_id' => $dispatch->id,
+            'size' => 'Large',
+        ]);
+    }
+
+    public function test_owner_can_keep_an_old_dispatch_date_when_editing(): void
+    {
+        $dispatch = $this->existingDispatch([
+            'dispatch_date' => today()->subDays(8)->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->owner())
+            ->put(route('owner.dispatch.update', $dispatch), [
+                'recipient' => 'Updated Store',
+                'address' => 'Test Address',
+                'dispatch_date' => today()->subDays(8)->toDateString(),
+                'price' => 100,
+                'status' => 'Delivered',
+                'size' => ['Large'],
+                'quantity' => [1],
+            ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('dispatches', [
+            'id' => $dispatch->id,
+            'recipient' => 'Updated Store',
+            'status' => 'Delivered',
+        ]);
+    }
+
+    public function test_owner_cannot_increase_trays_beyond_available_stock(): void
+    {
+        $this->production(['large_eggs' => 30]);
+        $dispatch = $this->existingDispatch();
+
+        $response = $this->actingAs($this->owner())
+            ->from(route('owner.dispatch'))
+            ->put(route('owner.dispatch.update', $dispatch), [
+                'recipient' => 'Test Store',
+                'address' => 'Test Address',
+                'dispatch_date' => today()->toDateString(),
+                'price' => 100,
+                'status' => 'Pending',
+                'size' => ['Large'],
+                'quantity' => [2],
+            ]);
+
+        $response->assertRedirect(route('owner.dispatch'));
+        $response->assertSessionHasErrors('quantity');
+        $this->assertDatabaseHas('dispatch_items', [
+            'dispatch_id' => $dispatch->id,
+            'size' => 'Large',
+            'quantity' => 1,
         ]);
     }
 
@@ -126,7 +184,10 @@ class DispatchStockTest extends TestCase
             ->assertSee('title="Edit"', false)
             ->assertSee('title="View"', false)
             ->assertSee('Edit Dispatch')
-            ->assertSee('Dispatch Details');
+            ->assertSee('Dispatch Details')
+            ->assertSee('name="recipient"', false)
+            ->assertSee('name="size[]"', false)
+            ->assertDontSee('Size and trays cannot be changed here.');
     }
 
     private function manager(): User
@@ -151,6 +212,25 @@ class DispatchStockTest extends TestCase
             'cracked_eggs' => 0,
             'eggs_produced' => 0,
         ], $overrides));
+    }
+
+    private function existingDispatch(array $overrides = []): Dispatch
+    {
+        $dispatch = Dispatch::create(array_merge([
+            'recipient' => 'Test Store',
+            'address' => 'Test Address',
+            'dispatch_date' => today()->toDateString(),
+            'price' => 100,
+            'status' => 'Pending',
+        ], $overrides));
+
+        DispatchItem::create([
+            'dispatch_id' => $dispatch->id,
+            'size' => 'Large',
+            'quantity' => 1,
+        ]);
+
+        return $dispatch;
     }
 
     private function payload(string $size = 'Large'): array

@@ -498,10 +498,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.dispatch-modal').forEach(function (modal) {
-        document.body.appendChild(modal);
-    });
-
     document.querySelectorAll('.btn-delete-dispatch').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const form = btn.closest('form');

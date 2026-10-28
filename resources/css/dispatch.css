@@ -936,24 +936,6 @@
 }
 
 @media (max-width: 768px) {
-    .wrapper > .main-content {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    .dispatch-modal .modal-dialog {
-        height: calc(100% - 1rem);
-        max-height: calc(100% - 1rem);
-    }
-
-    .dispatch-modal .modal-content {
-        max-height: 100%;
-    }
-
-    .dispatch-modal .modal-body {
-        overflow-y: auto;
-    }
-
     .dispatch-page .page-header {
         flex-direction: column;
         align-items: stretch;
@@ -998,22 +980,6 @@
 
     .dsp-field-row {
         grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .dispatch-modal {
-        width: 100vw;
-    }
-
-    .dispatch-modal .modal-dialog {
-        width: calc(100% - 1rem);
-        max-width: none;
-        margin: 0.5rem auto;
-    }
-
-    .dispatch-modal .modal-dialog-centered {
-        min-height: calc(100% - 1rem);
     }
 }
 
