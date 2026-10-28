@@ -936,6 +936,11 @@
 }
 
 @media (max-width: 768px) {
+    .wrapper > .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+
     .dispatch-page .page-header {
         flex-direction: column;
         align-items: stretch;
