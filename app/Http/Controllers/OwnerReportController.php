@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\StockNotification;
+use App\Services\WebPushSender;
 use Illuminate\Http\Request;
 
 class OwnerReportController extends Controller{
@@ -80,18 +81,39 @@ class OwnerReportController extends Controller{
     /**
      * Save owner's remark.
      */
-    public function saveRemark(Request $request, Report $report)
+    public function saveRemark(Request $request, Report $report, WebPushSender $push)
     {
         $request->validate([
             'owner_comment' => 'required|string|max:5000',
         ]);
 
+        $remark = $request->input('owner_comment');
+        $remarkChanged = $report->owner_comment !== $remark;
+
         $report->update(Report::existing([
-            'owner_comment' => $request->owner_comment,
+            'owner_comment' => $remark,
             'status' => 'Read',
             'is_read' => 1,
             'read_at' => now(),
         ]));
+
+        if ($remarkChanged && $report->manager_id) {
+            $notification = StockNotification::create([
+                'user_id' => $report->manager_id,
+                'type' => 'report_remark',
+                'report_id' => $report->id,
+                'item_name' => 'Report',
+                'title' => 'New report remark',
+                'body' => sprintf(
+                    'The owner added a remark to “%s” (%s).',
+                    $report->title,
+                    $report->report_no
+                ),
+                'url' => '/manager/reports',
+            ]);
+
+            $push->send($notification);
+        }
 
         return redirect()
             ->route('owner.reports')

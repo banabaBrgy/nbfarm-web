@@ -83,4 +83,29 @@ class ReportAlertTest extends TestCase
             ->assertJsonFragment(['title' => 'New report'])
             ->assertJsonFragment(['url' => '/owner/reports/'.$report->id]);
     }
+
+    public function test_owner_remark_notifies_the_report_manager(): void
+    {
+        $owner = $this->user('owner', 'owner1');
+        $manager = $this->user('manager', 'manager1');
+        $report = $this->draft($manager);
+
+        $this->actingAs($owner)
+            ->post(route('owner.reports.remark', $report), [
+                'owner_comment' => 'Please review the dispatch figures.',
+            ])
+            ->assertRedirect(route('owner.reports'));
+
+        $this->assertSame(
+            'Please review the dispatch figures.',
+            $report->fresh()->owner_comment
+        );
+        $this->assertTrue(
+            StockNotification::where('user_id', $manager->id)
+                ->where('type', 'report_remark')
+                ->where('report_id', $report->id)
+                ->where('title', 'New report remark')
+                ->exists()
+        );
+    }
 }
