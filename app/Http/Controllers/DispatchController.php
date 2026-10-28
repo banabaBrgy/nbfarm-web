@@ -208,12 +208,43 @@ class DispatchController extends Controller
         ];
 
         if ($requireContact) {
-            $rules['contact'] = ['required', 'string', 'max:30', 'regex:/^(?=.*\d)[0-9+\-\s()]{7,30}$/'];
+            $request->merge([
+                'contact' => trim((string) $request->input('contact')),
+            ]);
+            $rules['contact'] = [
+                'required',
+                'string',
+                'max:30',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $contact = (string) $value;
+                    $digits = preg_replace('/\D/', '', $contact) ?? '';
+
+                    if (! preg_match('/^[0-9+\-\s()]+$/', $contact) || strlen($digits) < 10 || strlen($digits) > 13) {
+                        $fail('Enter a contact number with 10 to 13 digits. Letters are not allowed.');
+                    }
+                },
+            ];
         }
 
         $validated = $request->validate($rules, [
+            'recipient.required' => 'Recipient is required.',
+            'address.required' => 'Delivery address is required.',
+            'dispatch_date.required' => 'Dispatch date is required.',
+            'dispatch_date.date' => 'Enter a valid dispatch date.',
+            'price.required' => 'Price is required.',
+            'price.numeric' => 'Price must be a valid amount.',
+            'price.min' => 'Price cannot be negative.',
+            'status.required' => 'Status is required.',
+            'status.in' => 'Select a valid status.',
+            'size.required' => 'Add at least one egg size.',
+            'size.*.required' => 'Select an egg size.',
+            'size.*.in' => 'Select a valid egg size.',
+            'quantity.required' => 'Enter the tray quantity.',
+            'quantity.*.required' => 'Enter the tray quantity.',
+            'quantity.*.integer' => 'Tray quantity must be a whole number.',
+            'quantity.*.min' => 'Enter at least 1 tray.',
             'contact.required' => 'Contact number is required.',
-            'contact.regex' => 'Enter a valid contact number.',
+            'contact.max' => 'Contact number must be 30 characters or fewer.',
         ]);
 
         if (count($validated['size']) !== count($validated['quantity'])) {

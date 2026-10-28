@@ -80,8 +80,19 @@ class DispatchStockTest extends TestCase
             ->post(route('manager.dispatch.store'), $payload);
 
         $response->assertRedirect(route('manager.dispatch'));
-        $response->assertSessionHasErrors('contact');
+        $response->assertSessionHasErrors([
+            'contact' => 'Contact number is required.',
+        ]);
         $this->assertDatabaseCount('dispatches', 0);
+
+        $invalid = $this->payload('Large');
+        $invalid['contact'] = 'abc';
+        $this->actingAs($this->manager())
+            ->from(route('manager.dispatch'))
+            ->post(route('manager.dispatch.store'), $invalid)
+            ->assertSessionHasErrors([
+                'contact' => 'Enter a contact number with 10 to 13 digits. Letters are not allowed.',
+            ]);
 
         $this->actingAs($this->manager())
             ->get(route('manager.dispatch'))

@@ -8,12 +8,22 @@
     $availableDispatchTrays = array_sum(
         \App\Models\Production::availableDispatchTraysBySize()
     );
+    $createFailed = $errors->any() && old('_form') === 'create';
+    $editFailedId = $errors->any() && old('_form') === 'edit' ? (int) old('dispatch_id') : null;
+    $itemSizes = $createFailed ? array_values((array) old('size', [''])) : [''];
+    $itemQuantities = $createFailed ? array_values((array) old('quantity', [''])) : [''];
+    $itemCount = max(count($itemSizes), count($itemQuantities), 1);
 @endphp
 
 <div class="dispatch-page">
-    @if($errors->any())
+    @if($errors->any() && ! $createFailed && ! $editFailedId)
         <div class="dsp-alert dsp-alert-error" role="alert">
-            {{ $errors->first() }}
+            <strong>The dispatch could not be saved.</strong>
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -295,18 +305,38 @@
 @if($canManage)
 <div class="modal fade dispatch-modal" id="newDispatchModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <form action="{{ route($rolePrefix . '.dispatch.store') }}" method="POST">
+        <form id="newDispatchForm" action="{{ route($rolePrefix . '.dispatch.store') }}" method="POST" novalidate>
             @csrf
+            <input type="hidden" name="_form" value="create">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">New Dispatch</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="dsp-form-errors" id="newDispatchErrors" role="alert" @unless($createFailed) hidden @endunless>
+                        <strong>Please review the highlighted fields.</strong>
+                        @if($createFailed)
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Recipient</label>
-                            <input type="text" name="recipient" class="form-control" placeholder="Customer or store name" required>
+                            <label class="form-label" for="dispatchRecipient">Recipient</label>
+                            <input
+                                type="text"
+                                id="dispatchRecipient"
+                                name="recipient"
+                                class="form-control @if($createFailed && $errors->has('recipient')) is-invalid @endif"
+                                placeholder="Customer or store name"
+                                value="{{ $createFailed ? old('recipient') : '' }}"
+                                maxlength="255"
+                                required>
+                            @if($createFailed && $errors->has('recipient'))<p class="dsp-field-error">{{ $errors->first('recipient') }}</p>@endif
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="dispatchContact">Contact</label>
@@ -314,33 +344,60 @@
                                 type="tel"
                                 id="dispatchContact"
                                 name="contact"
-                                class="form-control"
+                                class="form-control @if($createFailed && $errors->has('contact')) is-invalid @endif"
                                 placeholder="09XX XXX XXXX"
-                                value="{{ old('contact') }}"
+                                value="{{ $createFailed ? old('contact') : '' }}"
                                 maxlength="30"
                                 inputmode="tel"
                                 autocomplete="tel"
                                 required>
+                            @if($createFailed && $errors->has('contact'))<p class="dsp-field-error">{{ $errors->first('contact') }}</p>@endif
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Dispatch Date</label>
-                            <input type="date" name="dispatch_date" class="form-control" value="{{ now()->toDateString() }}" required>
+                            <label class="form-label" for="dispatchDate">Dispatch Date</label>
+                            <input
+                                type="date"
+                                id="dispatchDate"
+                                name="dispatch_date"
+                                class="form-control @if($createFailed && $errors->has('dispatch_date')) is-invalid @endif"
+                                value="{{ $createFailed ? old('dispatch_date') : now()->toDateString() }}"
+                                required>
+                            @if($createFailed && $errors->has('dispatch_date'))<p class="dsp-field-error">{{ $errors->first('dispatch_date') }}</p>@endif
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Address</label>
-                            <textarea name="address" class="form-control" rows="2" placeholder="Delivery address" required></textarea>
+                            <label class="form-label" for="dispatchAddress">Address</label>
+                            <textarea
+                                id="dispatchAddress"
+                                name="address"
+                                class="form-control @if($createFailed && $errors->has('address')) is-invalid @endif"
+                                rows="2"
+                                placeholder="Delivery address"
+                                maxlength="255"
+                                required>{{ $createFailed ? old('address') : '' }}</textarea>
+                            @if($createFailed && $errors->has('address'))<p class="dsp-field-error">{{ $errors->first('address') }}</p>@endif
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Price (₱)</label>
-                            <input type="number" step="0.01" min="0" name="price" class="form-control" placeholder="0.00" required>
+                            <label class="form-label" for="dispatchPrice">Price (₱)</label>
+                            <input
+                                type="number"
+                                id="dispatchPrice"
+                                step="0.01"
+                                min="0"
+                                name="price"
+                                class="form-control @if($createFailed && $errors->has('price')) is-invalid @endif"
+                                placeholder="0.00"
+                                value="{{ $createFailed ? old('price') : '' }}"
+                                required>
+                            @if($createFailed && $errors->has('price'))<p class="dsp-field-error">{{ $errors->first('price') }}</p>@endif
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-select" required>
-                                <option value="Pending" selected>Pending</option>
-                                <option value="On Transit">On Transit</option>
-                                <option value="Delivered">Delivered</option>
+                            <label class="form-label" for="dispatchStatus">Status</label>
+                            <select id="dispatchStatus" name="status" class="form-select @if($createFailed && $errors->has('status')) is-invalid @endif" required>
+                                @foreach(['Pending', 'On Transit', 'Delivered'] as $dispatchStatus)
+                                    <option value="{{ $dispatchStatus }}" @selected(($createFailed ? old('status', 'Pending') : 'Pending') === $dispatchStatus)>{{ $dispatchStatus }}</option>
+                                @endforeach
                             </select>
+                            @if($createFailed && $errors->has('status'))<p class="dsp-field-error">{{ $errors->first('status') }}</p>@endif
                         </div>
                     </div>
 
@@ -351,19 +408,31 @@
                         </button>
                     </div>
 
+                    @if($createFailed && $errors->has('quantity'))
+                        <p class="dsp-field-error">{{ $errors->first('quantity') }}</p>
+                    @endif
                     <div id="itemsWrapper">
-                        <div class="dsp-item-row item-row">
-                            <select name="size[]" class="form-select" required>
-                                <option value="">Select size</option>
-                                @foreach($sizes as $size)
-                                    <option value="{{ $size }}">{{ $size }}</option>
-                                @endforeach
-                            </select>
-                            <input type="number" min="1" name="quantity[]" class="form-control" placeholder="Trays" required>
-                            <button type="button" class="dsp-remove-item removeItem" disabled>
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        @for($itemIndex = 0; $itemIndex < $itemCount; $itemIndex++)
+                            <div class="dsp-item-row item-row">
+                                <select name="size[]" class="form-select @if($createFailed && ($errors->has('size') || $errors->has('size.'.$itemIndex))) is-invalid @endif" required>
+                                    <option value="">Select size</option>
+                                    @foreach($sizes as $size)
+                                        <option value="{{ $size }}" @selected(($itemSizes[$itemIndex] ?? '') === $size)>{{ $size }}</option>
+                                    @endforeach
+                                </select>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    name="quantity[]"
+                                    class="form-control @if($createFailed && ($errors->has('quantity.'.$itemIndex))) is-invalid @endif"
+                                    placeholder="Trays"
+                                    value="{{ $itemQuantities[$itemIndex] ?? '' }}"
+                                    required>
+                                <button type="button" class="dsp-remove-item removeItem" @disabled($itemCount === 1)>
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        @endfor
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -383,12 +452,31 @@
                 <form action="{{ route($rolePrefix . '.dispatch.update', $dispatch->id) }}" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="_form" value="edit">
+                    <input type="hidden" name="dispatch_id" value="{{ $dispatch->id }}">
+                    <input type="hidden" name="recipient" value="{{ $dispatch->recipient }}">
+                    <input type="hidden" name="address" value="{{ $dispatch->address }}">
+                    <input type="hidden" name="price" value="{{ $dispatch->price }}">
+                    @foreach($dispatch->items as $item)
+                        <input type="hidden" name="size[]" value="{{ $item->size }}">
+                        <input type="hidden" name="quantity[]" value="{{ $item->quantity }}">
+                    @endforeach
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Dispatch</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
+                            @if($editFailedId === $dispatch->id)
+                                <div class="dsp-form-errors" role="alert">
+                                    <strong>Please review the highlighted fields.</strong>
+                                    <ul>
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                             <div class="dsp-field">
                                 <label class="form-label">Recipient</label>
                                 <input type="text" class="form-control dsp-readonly" value="{{ $dispatch->recipient }}" readonly>
@@ -405,9 +493,12 @@
                                     <input
                                         type="date"
                                         name="dispatch_date"
-                                        class="form-control"
-                                        value="{{ \Carbon\Carbon::parse($dispatch->dispatch_date)->format('Y-m-d') }}"
+                                        class="form-control @if($editFailedId === $dispatch->id && $errors->has('dispatch_date')) is-invalid @endif"
+                                        value="{{ $editFailedId === $dispatch->id ? old('dispatch_date') : \Carbon\Carbon::parse($dispatch->dispatch_date)->format('Y-m-d') }}"
                                         required>
+                                    @if($editFailedId === $dispatch->id && $errors->has('dispatch_date'))
+                                        <p class="dsp-field-error">{{ $errors->first('dispatch_date') }}</p>
+                                    @endif
                                 </div>
                                 <div class="dsp-field">
                                     <label class="form-label">Price</label>
@@ -662,6 +753,120 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!btn || btn.disabled) return;
             const row = btn.closest('.item-row');
             if (row) row.remove();
+        });
+    }
+
+    const openFailedModal = (modal) => {
+        if (modal && window.bootstrap) {
+            window.bootstrap.Modal.getOrCreateInstance(modal).show();
+        }
+    };
+
+    if (@json($createFailed)) {
+        openFailedModal(document.getElementById('newDispatchModal'));
+    }
+
+    if (@json((bool) $editFailedId)) {
+        openFailedModal(document.getElementById('editDispatchModal{{ $editFailedId }}'));
+    }
+
+    const newDispatchForm = document.getElementById('newDispatchForm');
+    if (newDispatchForm) {
+        const contactPattern = /^(?=.*\d)[0-9+\-\s()]{7,30}$/;
+        const errorBox = document.getElementById('newDispatchErrors');
+
+        const showFieldError = (field, message) => {
+            field.classList.toggle('is-invalid', Boolean(message));
+            field.setAttribute('aria-invalid', message ? 'true' : 'false');
+            const row = field.closest('.dsp-item-row');
+            const host = row || field.parentElement;
+            const existing = host.querySelector('.dsp-field-error[data-client="true"]');
+
+            if (!message) {
+                if (existing && (!row || existing.dataset.field === field.name)) {
+                    existing.remove();
+                }
+                return;
+            }
+
+            const error = existing || document.createElement('p');
+            error.className = 'dsp-field-error';
+            error.dataset.client = 'true';
+            error.dataset.field = field.name;
+            error.textContent = message;
+            host.appendChild(error);
+        };
+
+        newDispatchForm.addEventListener('input', (event) => {
+            if (event.target === newDispatchForm.contact) {
+                const cleaned = event.target.value.replace(/[^0-9+\-\s()]/g, '');
+                if (cleaned !== event.target.value) {
+                    event.target.value = cleaned;
+                    showFieldError(event.target, 'Letters are not allowed in the contact number.');
+                    return;
+                }
+            }
+
+            if (event.target.matches('input, textarea, select')) {
+                showFieldError(event.target, '');
+            }
+        });
+
+        newDispatchForm.addEventListener('submit', (event) => {
+            let firstInvalid = null;
+            const requireText = (field, message) => {
+                const invalid = field.value.trim() === '';
+                showFieldError(field, invalid ? message : '');
+                if (invalid && !firstInvalid) firstInvalid = field;
+            };
+
+            requireText(newDispatchForm.recipient, 'Recipient is required.');
+
+            const contact = newDispatchForm.contact.value.trim();
+            const contactDigits = contact.replace(/\D/g, '');
+            const contactMessage = contact === ''
+                ? 'Contact number is required.'
+                : (!contactPattern.test(contact) || contactDigits.length < 10 || contactDigits.length > 13
+                    ? 'Enter a contact number with 10 to 13 digits. Letters are not allowed.'
+                    : '');
+            showFieldError(newDispatchForm.contact, contactMessage);
+            if (contactMessage && !firstInvalid) firstInvalid = newDispatchForm.contact;
+
+            requireText(newDispatchForm.dispatch_date, 'Dispatch date is required.');
+            requireText(newDispatchForm.address, 'Delivery address is required.');
+
+            const price = newDispatchForm.price.value.trim();
+            const priceMessage = price === ''
+                ? 'Price is required.'
+                : (Number(price) < 0 || Number.isNaN(Number(price)) ? 'Price must be a valid amount.' : '');
+            showFieldError(newDispatchForm.price, priceMessage);
+            if (priceMessage && !firstInvalid) firstInvalid = newDispatchForm.price;
+
+            requireText(newDispatchForm.status, 'Status is required.');
+
+            newDispatchForm.querySelectorAll('[name="size[]"]').forEach((field) => {
+                const invalid = field.value === '';
+                showFieldError(field, invalid ? 'Select an egg size.' : '');
+                if (invalid && !firstInvalid) firstInvalid = field;
+            });
+
+            newDispatchForm.querySelectorAll('[name="quantity[]"]').forEach((field) => {
+                const quantity = Number(field.value);
+                const invalid = field.value.trim() === '' || !Number.isInteger(quantity) || quantity < 1;
+                showFieldError(field, invalid ? 'Enter at least 1 tray.' : '');
+                if (invalid && !firstInvalid) firstInvalid = field;
+            });
+
+            if (!firstInvalid) {
+                return;
+            }
+
+            event.preventDefault();
+            if (errorBox) {
+                errorBox.hidden = false;
+                errorBox.innerHTML = '<strong>Please review the highlighted fields.</strong>';
+            }
+            firstInvalid.focus();
         });
     }
 });
