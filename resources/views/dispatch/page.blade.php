@@ -498,6 +498,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Keep modals outside the padded app shell so fixed centering
+    // uses the real viewport (same pattern as forecast modals).
+    document.querySelectorAll('.dispatch-modal').forEach(function (modal) {
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+    });
+
     document.querySelectorAll('.btn-delete-dispatch').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const form = btn.closest('form');

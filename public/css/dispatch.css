@@ -650,7 +650,59 @@
 
 /* ----- Modals ----- */
 
-.dispatch-modal .modal-content {
+/*
+ * Center with fixed inset + margin:auto (no translateX).
+ * Bootstrap's show-state transform:none was killing left:50%
+ * + translate(-50%) and leaving a left-heavy 100vw box.
+ */
+.modal.dispatch-modal .modal-dialog,
+.modal.dispatch-modal .modal-dialog.modal-lg {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    max-width: 520px;
+    height: fit-content;
+    max-height: calc(100dvh - 24px);
+    margin: auto;
+    min-height: 0;
+    transform: none;
+    pointer-events: auto;
+}
+
+.modal.dispatch-modal .modal-dialog.modal-lg {
+    max-width: 720px;
+}
+
+.modal.dispatch-modal.fade .modal-dialog,
+.modal.dispatch-modal.show .modal-dialog,
+.modal.dispatch-modal.fade .modal-dialog.modal-lg,
+.modal.dispatch-modal.show .modal-dialog.modal-lg {
+    transform: none;
+}
+
+.modal.dispatch-modal .modal-dialog-centered {
+    display: block;
+    align-items: initial;
+    min-height: 0;
+}
+
+/* Form sits between .modal-dialog and .modal-content. */
+.modal.dispatch-modal .modal-dialog > form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    max-height: inherit;
+}
+
+.modal.dispatch-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: calc(100dvh - 24px);
     border: none;
     border-radius: 16px;
     overflow: hidden;
@@ -658,6 +710,7 @@
 }
 
 .dispatch-modal .modal-header {
+    flex-shrink: 0;
     background: #34853F;
     color: #fff;
     border: none;
@@ -675,11 +728,17 @@
 }
 
 .dispatch-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 24px 24px 8px;
 }
 
 .dispatch-modal .modal-footer {
+    flex-shrink: 0;
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     border-top: 1px solid #eef2ef;
     padding: 16px 24px;
@@ -981,11 +1040,96 @@
     .dsp-field-row {
         grid-template-columns: 1fr;
     }
+
+    .modal.dispatch-modal .modal-dialog,
+    .modal.dispatch-modal .modal-dialog.modal-lg {
+        top: 10px;
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+        max-width: none;
+        max-height: calc(100dvh - 20px);
+    }
+
+    .modal.dispatch-modal .modal-content {
+        max-height: calc(100dvh - 20px);
+        border-radius: 14px;
+    }
+
+    .modal.dispatch-modal .modal-header {
+        padding: 14px 16px;
+    }
+
+    .modal.dispatch-modal .modal-title {
+        font-size: 15px;
+    }
+
+    .modal.dispatch-modal .modal-body {
+        padding: 16px 16px 4px;
+    }
+
+    .modal.dispatch-modal .modal-footer {
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        gap: 8px;
+    }
+
+    .modal.dispatch-modal .form-control,
+    .modal.dispatch-modal .form-select,
+    .modal.dispatch-modal .btn-cancel,
+    .modal.dispatch-modal .btn-save {
+        min-height: 44px;
+        height: auto;
+        font-size: 16px;
+    }
+
+    .dsp-field {
+        margin-bottom: 14px;
+    }
+
+    .dsp-items-box-row {
+        min-height: 44px;
+        padding: 0 12px;
+    }
+
+    .dsp-add-item {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dsp-items-head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
 }
 
 @media (max-width: 420px) {
     .dispatch-page .dispatch-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .modal.dispatch-modal .modal-dialog,
+    .modal.dispatch-modal .modal-dialog.modal-lg {
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        max-height: calc(100dvh - 16px);
+    }
+
+    .modal.dispatch-modal .modal-content {
+        max-height: calc(100dvh - 16px);
+        border-radius: 12px;
+    }
+
+    .modal.dispatch-modal .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .modal.dispatch-modal .btn-cancel,
+    .modal.dispatch-modal .btn-save {
+        flex: 1 1 100%;
+        width: 100%;
     }
 }
 
