@@ -26,7 +26,7 @@
             <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
             Revenue History
         </button>
-        @include('revenue.partials.form')
+        {{-- @include('revenue.partials.form') --}}
     </div>
 </div>
 
