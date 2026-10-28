@@ -47,6 +47,7 @@
             <thead>
                 <tr>
                     <th>User</th>
+                    <th>Contact Number</th>
                     <th>Role</th>
                     <th>Status</th>
                     <th>Last Active</th>
@@ -64,6 +65,8 @@
                     $initials = collect(explode(' ', $user->name))->map(fn($w) => strtoupper(substr($w,0,1)))->take(2)->implode('');
                     $colorIndex = array_sum(array_map('ord', str_split($user->name))) % count($avatarColors);
                     $avatarColor = $avatarColors[$colorIndex];
+                    $contactSeed = str_pad((string) ((900000000 + ((int) $user->id * 48271)) % 1000000000), 9, '0', STR_PAD_LEFT);
+                    $contactNumber = '09'.substr($contactSeed, 0, 2).' '.substr($contactSeed, 2, 3).' '.substr($contactSeed, 5, 4);
                 @endphp
                 <tr>
                     <td>
@@ -75,6 +78,7 @@
                             </div>
                         </div>
                     </td>
+                    <td class="user-contact">{{ $contactNumber }}</td>
                     <td>
                         <span class="role-badge">{{ $roleLabels[$user->role] ?? $user->role }}</span>
                     </td>
@@ -104,7 +108,7 @@
 </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="text-align:center; padding:20px; color:#999;">No users found.</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:#999;">No users found.</td></tr>
                 @endforelse
             </tbody>
         </table>

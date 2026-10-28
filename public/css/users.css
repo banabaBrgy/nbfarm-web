@@ -178,6 +178,11 @@
 .user-info { display: flex; flex-direction: column; }
 .user-sub { font-size: 12.5px; color: #999; }
 
+.user-contact {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
 .role-badge {
     background: #ede7f6;
     color: #6a3fb5;
