@@ -941,6 +941,19 @@
         margin-left: 0;
     }
 
+    .dispatch-modal .modal-dialog {
+        height: calc(100% - 1rem);
+        max-height: calc(100% - 1rem);
+    }
+
+    .dispatch-modal .modal-content {
+        max-height: 100%;
+    }
+
+    .dispatch-modal .modal-body {
+        overflow-y: auto;
+    }
+
     .dispatch-page .page-header {
         flex-direction: column;
         align-items: stretch;
