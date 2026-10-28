@@ -983,6 +983,22 @@
     }
 }
 
+@media (max-width: 575.98px) {
+    .dispatch-modal {
+        width: 100vw;
+    }
+
+    .dispatch-modal .modal-dialog {
+        width: calc(100% - 1rem);
+        max-width: none;
+        margin: 0.5rem auto;
+    }
+
+    .dispatch-modal .modal-dialog-centered {
+        min-height: calc(100% - 1rem);
+    }
+}
+
 @media (max-width: 420px) {
     .dispatch-page .dispatch-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
