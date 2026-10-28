@@ -255,7 +255,17 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $report->title }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="rpt-modal-header-actions">
+                            <button type="button"
+                                class="rpt-btn-print"
+                                data-print-report="{{ $report->id }}"
+                                aria-label="Print report: {{ $report->title }}"
+                                title="Print report">
+                                <i class="fas fa-print" aria-hidden="true"></i>
+                                <span>Print Report</span>
+                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
                     </div>
                     <div class="modal-body">
                         @php
@@ -341,6 +351,235 @@
                         preview.innerHTML = '<div class="rpt-preview-empty">Preview could not be generated.</div>';
                     });
     }
+</script>
+
+<script>
+    const printFileName = (title, reportNumber) => {
+        const slug = (value) => String(value || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+
+        return `${slug(title) || 'farm-report'}-${slug(reportNumber) || 'report'}`;
+    };
+
+    const printReport = (reportId) => {
+        const modal = document.getElementById(`viewReport${reportId}`);
+        const reportBody = modal?.querySelector('.modal-body');
+        const reportTitle = modal?.querySelector('.modal-title')?.textContent?.trim() || 'Farm Report';
+        const reportNumber = reportBody?.querySelector('.rpt-meta-item strong')?.textContent?.trim() || `report-${reportId}`;
+
+        if (!reportBody) {
+            return;
+        }
+
+        const printWindow = window.open('', '_blank', 'width=900,height=1100');
+        if (!printWindow) {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Print blocked',
+                    text: 'Please allow pop-ups for this site and try again.'
+                });
+            }
+            return;
+        }
+
+        const escapeHtml = (value) => {
+            const element = document.createElement('div');
+            element.textContent = value;
+            return element.innerHTML;
+        };
+        const fileName = printFileName(reportTitle, reportNumber);
+        const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+            .map((style) => style.outerHTML)
+            .join('');
+        const reportMarkup = reportBody.cloneNode(true);
+        reportMarkup.querySelectorAll('button, form, textarea, details').forEach((element) => element.remove());
+        reportMarkup.classList.remove('modal-body');
+        reportMarkup.classList.add('print-report-body');
+
+        printWindow.document.write(`
+            <!doctype html>
+            <html lang="en">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>${escapeHtml(fileName)}</title>
+                    ${styles}
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 16mm 14mm;
+                        }
+
+                        html,
+                        body {
+                            min-height: 100%;
+                        }
+
+                        body {
+                            margin: 0;
+                            background: #fff;
+                            color: #1f2937;
+                            font-family: Inter, Arial, sans-serif;
+                        }
+
+                        .print-shell {
+                            max-width: 820px;
+                            margin: 0 auto;
+                            padding: 12px 0 24px;
+                        }
+
+                        .print-header {
+                            margin-bottom: 22px;
+                            padding-bottom: 14px;
+                            border-bottom: 2px solid #34853f;
+                            text-align: center;
+                        }
+
+                        .print-brand {
+                            color: #34853f;
+                            font-size: 12px;
+                            font-weight: 800;
+                            letter-spacing: .16em;
+                            text-transform: uppercase;
+                        }
+
+                        .print-header h1 {
+                            margin: 7px 0 0;
+                            color: #1f2937;
+                            font-size: 24px;
+                            line-height: 1.2;
+                        }
+
+                        .print-header p {
+                            margin: 7px 0 0;
+                            color: #6b7280;
+                            font-size: 12px;
+                        }
+
+                        .print-report-body {
+                            max-height: none;
+                            overflow: visible;
+                            padding: 0;
+                        }
+
+                        .print-report-body .rpt-meta {
+                            grid-template-columns: repeat(4, 1fr);
+                            margin-bottom: 18px;
+                        }
+
+                        .print-report-body .rpt-doc-card,
+                        .print-report-body .rpt-remark-box {
+                            box-shadow: none;
+                            break-inside: avoid;
+                        }
+
+                        .print-report-body .rpt-doc-card {
+                            border-color: #d9e3dc;
+                        }
+
+                        .print-report-body .rpt-remark-box {
+                            margin-top: 18px;
+                        }
+
+                        .print-footer {
+                            margin-top: 24px;
+                            padding-top: 10px;
+                            border-top: 1px solid #d9e3dc;
+                            color: #6b7280;
+                            font-size: 10px;
+                            text-align: center;
+                        }
+
+                        @media print {
+                            .print-shell {
+                                max-width: none;
+                                padding: 0;
+                            }
+
+                            .print-report-body .rpt-doc-card,
+                            .print-report-body .rpt-remark-box {
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="print-shell">
+                        <header class="print-header">
+                            <div class="print-brand">NB Poultry Farm</div>
+                            <h1>${escapeHtml(reportTitle)}</h1>
+                            <p>Farm Management Report</p>
+                        </header>
+                        ${reportMarkup.outerHTML}
+                        <footer class="print-footer">
+                            Printed from NB Poultry Farm Management System
+                        </footer>
+                    </main>
+                    <script>
+                        (() => {
+                            let printStarted = false;
+                            const fileName = ${JSON.stringify(fileName)};
+                            const finishPrint = () => {
+                                if (window.opener && !window.opener.closed) {
+                                    window.opener.postMessage({
+                                        type: 'report-print-complete',
+                                        fileName
+                                    }, window.opener.location.origin);
+                                }
+                                window.close();
+                            };
+                            const startPrint = () => {
+                                if (printStarted) {
+                                    return;
+                                }
+
+                                printStarted = true;
+                                window.focus();
+                                window.print();
+                            };
+
+                            window.addEventListener('afterprint', () => {
+                                window.setTimeout(finishPrint, 250);
+                            }, { once: true });
+                            window.addEventListener('load', () => {
+                                window.setTimeout(startPrint, 250);
+                            }, { once: true });
+                            window.setTimeout(startPrint, 1000);
+                        })();
+                    <\/script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
+    document.querySelectorAll('[data-print-report]').forEach((button) => {
+        button.addEventListener('click', () => printReport(button.dataset.printReport));
+    });
+
+    window.addEventListener('message', (event) => {
+        if (event.origin !== window.location.origin || event.data?.type !== 'report-print-complete') {
+            return;
+        }
+
+        const fileName = event.data.fileName || 'farm-report';
+        if (window.Swal) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Print dialog completed',
+                text: `Suggested filename: ${fileName}.pdf`,
+                showConfirmButton: false,
+                timer: 4200,
+                timerProgressBar: true
+            });
+        }
+    });
 </script>
 
 @if(session('success'))
