@@ -163,6 +163,10 @@ Route::prefix('manager')
         Route::get('/reports/preview/{type}', [ReportController::class, 'preview'])
             ->name('reports.preview');
 
+        Route::get('/reports/{report}', [ReportController::class, 'show'])
+            ->whereNumber('report')
+            ->name('reports.show');
+
         Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
         Route::post('/dispatch/store', [DispatchController::class, 'store'])->name('dispatch.store');
         Route::patch('/dispatch/{dispatch}/status', [DispatchController::class, 'updateStatus'])->name('dispatch.updateStatus');

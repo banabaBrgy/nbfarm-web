@@ -39,10 +39,21 @@ class ReportController extends Controller
             $query->where('status', $filters['status']);
         }
 
-        $reports = $query->paginate(5)->withQueryString();
+        $reports = $query->paginate(5)->appends(
+            collect($request->query())->except(['open', 'page'])->all()
+        );
+
+        $openReport = null;
+        $openId = (int) $request->query('open');
+        if ($openId > 0) {
+            $openReport = Report::query()
+                ->where('manager_id', auth()->id())
+                ->find($openId);
+        }
 
         return view('manager.reports', [
             'reports' => $reports,
+            'openReport' => $openReport,
             'filters' => $filters,
             'reportStats' => [
                 'total' => Report::where('manager_id', auth()->id())->count(),
@@ -93,6 +104,18 @@ class ReportController extends Controller
         app(ReportNotifier::class)->sent($report);
 
         return back()->with('success', 'Report sent to Owner.');
+    }
+
+    public function show(Report $report)
+    {
+        $owned = Report::query()
+            ->where('manager_id', auth()->id())
+            ->whereKey($report->id)
+            ->first();
+
+        abort_unless($owned, 404);
+
+        return redirect()->route('manager.reports', ['open' => $owned->id]);
     }
 
     public function destroy($id)

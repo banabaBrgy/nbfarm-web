@@ -133,7 +133,7 @@ class OwnerReportController extends Controller{
                     $report->title,
                     $report->report_no
                 ),
-                'url' => '/manager/reports',
+                'url' => '/manager/reports/'.$report->id,
             ]);
 
             $push->send($notification);

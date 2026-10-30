@@ -24,7 +24,7 @@ class AlertController extends Controller
                 'id' => $row->id,
                 'title' => $row->title,
                 'body' => $row->body,
-                'url' => $row->url ?: route(User::routeRole($user->role).'.inventory'),
+                'url' => $this->alertUrl($row, $user),
                 'read' => $row->read_at !== null,
                 'when' => $row->created_at?->diffForHumans(),
             ]);
@@ -50,7 +50,7 @@ class AlertController extends Controller
         return response()->json([
             'ok' => true,
             'read' => true,
-            'url' => $alert->url ?: route(User::routeRole($user->role).'.inventory'),
+            'url' => $this->alertUrl($alert, $user),
             'unread' => StockNotification::query()->where('user_id', $user->id)->unread()->count(),
         ]);
     }
@@ -149,6 +149,15 @@ class AlertController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    private function alertUrl(StockNotification $alert, User $user): string
+    {
+        if ($alert->type === 'report_remark' && $alert->report_id && User::routeRole($user->role) === 'manager') {
+            return '/manager/reports/'.$alert->report_id;
+        }
+
+        return $alert->url ?: route(User::routeRole($user->role).'.inventory');
     }
 
     private function farmLead(Request $request): User

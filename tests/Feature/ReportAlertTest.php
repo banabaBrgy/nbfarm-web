@@ -129,13 +129,29 @@ class ReportAlertTest extends TestCase
             'Please review the dispatch figures.',
             $report->fresh()->owner_comment
         );
-        $this->assertTrue(
-            StockNotification::where('user_id', $manager->id)
-                ->where('type', 'report_remark')
-                ->where('report_id', $report->id)
-                ->where('title', 'New report remark')
-                ->exists()
-        );
+        $notification = StockNotification::where('user_id', $manager->id)
+            ->where('type', 'report_remark')
+            ->where('report_id', $report->id)
+            ->where('title', 'New report remark')
+            ->first();
+
+        $this->assertNotNull($notification);
+        $this->assertSame('/manager/reports/'.$report->id, $notification->url);
+
+        $this->actingAs($manager)
+            ->get(route('manager.reports.show', $report))
+            ->assertRedirect(route('manager.reports', ['open' => $report->id]));
+
+        $this->actingAs($manager)
+            ->get(route('manager.reports', ['open' => $report->id]))
+            ->assertOk()
+            ->assertSee('id="viewReport'.$report->id.'"', false)
+            ->assertSee('viewReport'.$report->id, false);
+
+        $other = $this->user('manager', 'manager2');
+        $this->actingAs($other)
+            ->get(route('manager.reports.show', $report))
+            ->assertNotFound();
     }
 
     public function test_owner_cannot_remark_on_a_draft_report(): void
