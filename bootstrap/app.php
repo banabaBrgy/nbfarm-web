@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\PreventHtmlCache::class,
+            \App\Http\Middleware\PreventClickjacking::class,
+            \App\Http\Middleware\EnsureActiveUser::class,
         ]);
 
         $middleware->alias([

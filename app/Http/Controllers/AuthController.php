@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Support\Recaptcha;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -50,18 +50,7 @@ class AuthController extends Controller
 
         $this->ensureIsNotRateLimited($request);
 
-        $recaptchaResponse = Http::asForm()->post(
-            'https://www.google.com/recaptcha/api/siteverify',
-            [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $request->input('g-recaptcha-response'),
-                'remoteip' => $request->ip(),
-            ]
-        );
-
-        $recaptchaBody = $recaptchaResponse->json();
-
-        if (! isset($recaptchaBody['success']) || ! $recaptchaBody['success']) {
+        if (! Recaptcha::passes($request)) {
             throw ValidationException::withMessages([
                 'g-recaptcha-response' => 'reCAPTCHA verification failed. Please try again.',
             ]);
@@ -103,6 +92,7 @@ class AuthController extends Controller
 
         RateLimiter::clear($this->throttleKey($request));
         $request->session()->regenerate();
+        $request->session()->put('session_version', (int) $user->session_version);
 
         $user->forceFill(['last_login_at' => now()])->save();
 

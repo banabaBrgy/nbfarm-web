@@ -232,7 +232,7 @@
                             </div>
                             <details class="rpt-source-toggle">
                                 <summary>Edit source text</summary>
-                                <textarea id="generatedContent" name="content" rows="10" class="form-control" required></textarea>
+                                <textarea id="generatedContent" name="content" rows="10" class="form-control" maxlength="100000" required></textarea>
                             </details>
                         </div>
                     </div>

@@ -8,7 +8,11 @@ class DispatchItem extends Model
 {
     protected $table = 'dispatch_items';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'dispatch_id',
+        'size',
+        'quantity',
+    ];
 
     public function dispatch()
     {

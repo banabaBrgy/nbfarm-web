@@ -121,7 +121,7 @@ class DispatchStockTest extends TestCase
                 'dispatch_date' => today()->toDateString(),
                 'price' => 300,
                 'status' => 'Delivered',
-                'size' => ['Medium'],
+                'size' => ['Large'],
                 'quantity' => [1],
             ]);
 
@@ -135,12 +135,35 @@ class DispatchStockTest extends TestCase
         ]);
         $this->assertDatabaseHas('dispatch_items', [
             'dispatch_id' => $dispatch->id,
-            'size' => 'Medium',
+            'size' => 'Large',
             'quantity' => 1,
         ]);
-        $this->assertDatabaseMissing('dispatch_items', [
+    }
+
+    public function test_owner_cannot_raise_trays_on_an_old_dispatch(): void
+    {
+        $dispatch = $this->existingDispatch([
+            'dispatch_date' => today()->subDays(8)->toDateString(),
+        ]);
+
+        $response = $this->actingAs($this->owner())
+            ->from(route('owner.dispatch'))
+            ->put(route('owner.dispatch.update', $dispatch), [
+                'recipient' => 'Test Store',
+                'address' => 'Test Address',
+                'dispatch_date' => today()->subDays(8)->toDateString(),
+                'price' => 100,
+                'status' => 'Pending',
+                'size' => ['Large'],
+                'quantity' => [5],
+            ]);
+
+        $response->assertRedirect(route('owner.dispatch'));
+        $response->assertSessionHasErrors('quantity');
+        $this->assertDatabaseHas('dispatch_items', [
             'dispatch_id' => $dispatch->id,
             'size' => 'Large',
+            'quantity' => 1,
         ]);
     }
 
@@ -219,7 +242,7 @@ class DispatchStockTest extends TestCase
             ->assertSee('Dispatch Details')
             ->assertSee('name="recipient"', false)
             ->assertSee('name="size[]"', false)
-            ->assertDontSee('Size and trays cannot be changed here.');
+            ->assertSee('Size and trays cannot be changed here.');
     }
 
     private function manager(): User

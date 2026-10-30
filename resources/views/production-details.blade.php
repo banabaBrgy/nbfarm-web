@@ -93,6 +93,7 @@
                                     data-code="{{ $transaction->qrRecord?->qr_code ?? '' }}"
                                     data-size="{{ $transaction->qrRecord?->egg_size ?? '' }}"
                                     data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
+                                    data-production-id="{{ $transaction->production_id }}"
                                     data-eggs="{{ $transaction->total_eggs }}">
 
                                     <i class="fas fa-pen" aria-hidden="true"></i>
@@ -278,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function () {
             transactionInput.value = this.dataset.id || '';
             transactionInput.dataset.updateUrl = this.dataset.updateUrl || '';
+            transactionInput.dataset.productionId = this.dataset.productionId || '';
             document.getElementById('qr_code').value = this.dataset.code || '';
             document.getElementById('egg_size').value = this.dataset.size || '';
             totalEggsInput.value = this.dataset.eggs || '';
@@ -314,7 +316,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                total_eggs: totalEggsInput.value
+                total_eggs: totalEggsInput.value,
+                production_id: transactionInput.dataset.productionId
             })
         })
         .then(async function (response) {

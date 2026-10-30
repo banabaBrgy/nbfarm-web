@@ -72,6 +72,7 @@ class DispatchController extends Controller
             Production::lockStockWindow();
 
             $requestedBySize = $this->requestedTraysBySize($validated);
+            $this->assertItemsUnchanged($dispatch, $requestedBySize);
 
             if ($this->isWithinStockWindow($validated['dispatch_date'])) {
                 $this->assertEnoughTrays(
@@ -282,6 +283,24 @@ class DispatchController extends Controller
         }
 
         return $available;
+    }
+
+    private function assertItemsUnchanged(Dispatch $dispatch, array $requestedBySize): void
+    {
+        $dispatch->loadMissing('items');
+        $current = array_fill_keys(array_keys(Production::EGG_SIZE_COLUMNS), 0);
+
+        foreach ($dispatch->items as $item) {
+            $current[$item->size] = ($current[$item->size] ?? 0) + (int) $item->quantity;
+        }
+
+        foreach (array_keys($current) as $size) {
+            if ((int) ($requestedBySize[$size] ?? 0) !== (int) ($current[$size] ?? 0)) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Size and trays cannot be changed here.',
+                ]);
+            }
+        }
     }
 
     private function assertEnoughTrays(array $requestedBySize, array $availableBySize): void

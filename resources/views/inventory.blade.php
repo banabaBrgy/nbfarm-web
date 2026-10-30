@@ -116,9 +116,9 @@
             </span>
         </td>
         <td class="action-cell">
-    <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, '{{ $item->item_name }}')" title="Add Stock"> <i class="fas fa-pen"></i> </button>
+    <button type="button" class="icon-btn icon-btn-edit" onclick="openIncreaseModal({{ $item->id }}, @js($item->item_name))" title="Add Stock"> <i class="fas fa-pen"></i> </button>
 
-    <form action="{{ route(auth()->user()->role . '.inventory', $item->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete {{ $item->item_name }}? This cannot be undone.');">
+    <form action="{{ route(auth()->user()->role . '.inventory', $item->id) }}" method="POST" style="display:inline;" onsubmit="return confirm(@js('Delete '.$item->item_name.'? This cannot be undone.'));">
         @csrf
         @method('DELETE')
         <button type="submit" class="icon-btn icon-btn-delete" title="Delete">
@@ -287,7 +287,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.2/dist/sweetalert2.all.min.js" integrity="sha384-kR2tS24oEqwHzfBnAN4yxA8ib4vGEOMaANrncAlq8i0lsgvGoOzSPXFbj5dHYUZK" crossorigin="anonymous"></script>
 <script>
 
 function openStockModal() {

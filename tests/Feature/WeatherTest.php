@@ -53,7 +53,8 @@ class WeatherTest extends TestCase
         $this->fakeForecast();
         Cache::flush();
 
-        $user = new User([
+        $user = new User;
+        $user->forceFill([
             'username' => 'owner1',
             'role' => 'farm owner',
         ]);

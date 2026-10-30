@@ -90,6 +90,8 @@ class ReportAlertTest extends TestCase
         $manager = $this->user('manager', 'manager1');
         $report = $this->draft($manager);
 
+        $this->actingAs($manager)->post(route('manager.reports.send', $report));
+
         $this->actingAs($owner)
             ->post(route('owner.reports.remark', $report), [
                 'owner_comment' => 'Please review the dispatch figures.',
@@ -107,5 +109,37 @@ class ReportAlertTest extends TestCase
                 ->where('title', 'New report remark')
                 ->exists()
         );
+    }
+
+    public function test_owner_cannot_remark_on_a_draft_report(): void
+    {
+        $owner = $this->user('owner', 'owner1');
+        $manager = $this->user('manager', 'manager1');
+        $report = $this->draft($manager);
+
+        $this->actingAs($owner)
+            ->post(route('owner.reports.remark', $report), [
+                'owner_comment' => 'This draft should stay closed.',
+            ])
+            ->assertNotFound();
+
+        $this->assertNull($report->fresh()->owner_comment);
+    }
+
+    public function test_manager_cannot_send_or_delete_another_managers_report(): void
+    {
+        $owner = $this->user('manager', 'manager1');
+        $other = $this->user('manager', 'manager2');
+        $report = $this->draft($owner);
+
+        $this->actingAs($other)
+            ->post(route('manager.reports.send', $report))
+            ->assertNotFound();
+
+        $this->actingAs($other)
+            ->delete(route('manager.reports.destroy', $report))
+            ->assertNotFound();
+
+        $this->assertSame('Draft', $report->fresh()->status);
     }
 }

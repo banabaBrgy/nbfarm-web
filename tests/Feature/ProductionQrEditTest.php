@@ -46,6 +46,7 @@ class ProductionQrEditTest extends TestCase
         $this->actingAs($staff)
             ->postJson(route('staff.qr.update', $earlierSmall->id), [
                 'total_eggs' => 90,
+                'production_id' => $production->production_id,
             ])
             ->assertStatus(422)
             ->assertJsonPath('message', 'Only the last recorded tray for this size can be edited.');
@@ -55,11 +56,14 @@ class ProductionQrEditTest extends TestCase
         $this->actingAs($staff)
             ->postJson(route('staff.qr.update', $mediumTx->id), [
                 'total_eggs' => 90,
+                'production_id' => $production->production_id,
             ])
             ->assertOk()
             ->assertJsonPath('success', true);
 
         $this->assertSame(90, (int) $mediumTx->fresh()->total_eggs);
+        $this->assertSame($staff->id, (int) $mediumTx->fresh()->edited_by);
+        $this->assertNotNull($mediumTx->fresh()->edited_at);
         $this->assertSame(690, (int) $production->fresh()->eggs_produced);
     }
 
@@ -77,6 +81,7 @@ class ProductionQrEditTest extends TestCase
         $this->actingAs($staff)
             ->postJson(route('staff.qr.update', $smallTx->id), [
                 'total_eggs' => '90',
+                'production_id' => $production->production_id,
             ])
             ->assertOk()
             ->assertJsonPath('success', true);
@@ -100,6 +105,7 @@ class ProductionQrEditTest extends TestCase
         $this->actingAs($owner)
             ->postJson(route('owner.qr.update', $smallTx->id), [
                 'total_eggs' => 301,
+                'production_id' => $production->production_id,
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors('total_eggs');

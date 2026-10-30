@@ -57,15 +57,18 @@ Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])
     ->name('forgot.password');
 
 Route::post('/forgot-password/check', [ForgotPasswordController::class, 'checkUsername'])
+    ->middleware('throttle:5,1')
     ->name('forgot.check');
 
 Route::post('/forgot-password/verify', [ForgotPasswordController::class, 'verifyAnswer'])
+    ->middleware('throttle:5,1')
     ->name('forgot.verify');
 
 Route::get('/forgot-password/verify', [ForgotPasswordController::class, 'showVerifyForm'])
     ->name('forgot.verify.form');
 
 Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])
+    ->middleware('throttle:5,1')
     ->name('forgot.reset');
 
 Route::get('/forgot-password/reset', [ForgotPasswordController::class, 'showResetForm'])

@@ -195,6 +195,15 @@
     padding: 24px;
     width: 400px;
     max-width: 90%;
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+}
+.modal-box .field-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #777;
 }
 .modal-box h3 { margin: 0 0 16px; color: #3B8F47; }
 .modal-box label { display: block; font-size: 13px; font-weight: 600; color: #555; margin: 12px 0 6px; }

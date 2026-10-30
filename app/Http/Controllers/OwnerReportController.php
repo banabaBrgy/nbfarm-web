@@ -55,27 +55,36 @@ class OwnerReportController extends Controller{
      * View a single report.
      * Automatically marks it as read.
      */
-    public function show(Report $report)
+    public function show(Request $request, Report $report)
     {
         if (! in_array($report->status, ['Sent', 'Read'], true)) {
             abort(404);
         }
 
-        if ($report->status === 'Sent') {
-            $report->update(Report::existing([
-                'is_read' => 1,
-                'status' => 'Read',
-                'read_at' => now(),
-            ]));
+        if ($this->openedFromThisSite($request)) {
+            if ($report->status === 'Sent') {
+                $report->update(Report::existing([
+                    'is_read' => 1,
+                    'status' => 'Read',
+                    'read_at' => now(),
+                ]));
+            }
+
+            StockNotification::query()
+                ->where('user_id', auth()->id())
+                ->where('report_id', $report->id)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
         }
 
-        StockNotification::query()
-            ->where('user_id', auth()->id())
-            ->where('report_id', $report->id)
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
         return redirect()->route('owner.reports');
+    }
+
+    private function openedFromThisSite(Request $request): bool
+    {
+        $site = $request->headers->get('Sec-Fetch-Site');
+
+        return in_array($site, ['same-origin', 'none'], true);
     }
 
     /**
@@ -83,6 +92,10 @@ class OwnerReportController extends Controller{
      */
     public function saveRemark(Request $request, Report $report, WebPushSender $push)
     {
+        if (! in_array($report->status, ['Sent', 'Read'], true)) {
+            abort(404);
+        }
+
         $request->validate([
             'owner_comment' => 'required|string|max:5000',
         ]);

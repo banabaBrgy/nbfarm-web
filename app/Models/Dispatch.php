@@ -8,7 +8,14 @@ class Dispatch extends Model
 {
     protected $table = 'dispatches';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'recipient',
+        'contact',
+        'address',
+        'dispatch_date',
+        'price',
+        'status',
+    ];
 
     public function items()
     {

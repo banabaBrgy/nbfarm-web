@@ -20,6 +20,10 @@ class QrTransaction extends Model
 
         'scanned_at',
 
+        'edited_by',
+
+        'edited_at',
+
     ];
 
     public function qrRecord()

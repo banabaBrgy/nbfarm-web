@@ -352,7 +352,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.2/dist/sweetalert2.all.min.js" integrity="sha384-kR2tS24oEqwHzfBnAN4yxA8ib4vGEOMaANrncAlq8i0lsgvGoOzSPXFbj5dHYUZK" crossorigin="anonymous"></script>
 <script>
 
 function openStockModal() {
@@ -374,6 +374,15 @@ function closeIncreaseModal() {
 }
 
 const historyUrlTemplate = @json(route(\App\Models\User::routeRole() . '.inventory.history', ['id' => 999999]));
+
+function escapeHistoryHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 function openHistoryModal(itemId) {
     const modal = document.getElementById('historyModal');
@@ -399,8 +408,8 @@ function openHistoryModal(itemId) {
                 const change = Number(row.change);
                 const sign = change > 0 ? '+' : '';
                 return '<tr>' +
-                    '<td>' + row.when + '</td>' +
-                    '<td>' + row.action + (row.note ? '<div class="history-note">' + row.note + '</div>' : '') + '</td>' +
+                    '<td>' + escapeHistoryHtml(row.when) + '</td>' +
+                    '<td>' + escapeHistoryHtml(row.action) + (row.note ? '<div class="history-note">' + escapeHistoryHtml(row.note) + '</div>' : '') + '</td>' +
                     '<td>' + sign + Number(change).toLocaleString() + '</td>' +
                     '<td>' + Number(row.after).toLocaleString() + '</td>' +
                     '</tr>';

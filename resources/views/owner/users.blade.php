@@ -75,6 +75,9 @@
                             <div class="user-info">
                                 <strong>{{ $user->name }}</strong>
                                 <span class="user-sub">{{ $user->username }} · {{ $user->email }}</span>
+                                @if(! $user->hasSecurityAnswer())
+                                    <span class="user-sub">Recovery question not set</span>
+                                @endif
                             </div>
                         </div>
                     </td>
@@ -91,8 +94,13 @@
                         {{ $user->last_login_at ? \Carbon\Carbon::parse($user->last_login_at)->diffForHumans() : 'Never' }}
                     </td>
                     <td class="actions-cell">
-    <button type="button" class="icon-btn icon-edit" title="Edit"
-       onclick="openEditModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->username }}', '{{ $user->email }}', '{{ $user->role }}')">
+    <button type="button" class="icon-btn icon-edit js-edit-user" title="Edit"
+       data-id="{{ $user->id }}"
+       data-name="{{ $user->name }}"
+       data-username="{{ $user->username }}"
+       data-email="{{ $user->email }}"
+       data-role="{{ $user->role }}"
+       data-question="{{ $user->security_question }}">
         <i class="fas fa-pen"></i>
     </button>
 
@@ -122,7 +130,7 @@
 </div>
 
 <!-- ADD USER MODAL -->
-<div class="modal-overlay {{ $errors->any() && old('_form') === 'add' ? 'active' : '' }}" id="addModal">
+<div class="modal-overlay {{ $errors->any() && old('_form') !== 'edit' ? 'active' : '' }}" id="addModal">
     <div class="modal-box">
         <h3>Add User</h3>
         @if($errors->any())
@@ -136,18 +144,28 @@
         @endif
         <form action="{{ route('owner.users.store') }}" method="POST">
             @csrf
+            <input type="hidden" name="_form" value="add">
 
             <label>Full Name</label>
-            <input type="text" name="name" required>
+            <input type="text" name="name" value="{{ old('_form') !== 'edit' ? old('name') : '' }}" required>
 
             <label>Username</label>
-            <input type="text" name="username" required>
+            <input type="text" name="username" value="{{ old('_form') !== 'edit' ? old('username') : '' }}" required>
 
             <label>Email</label>
-            <input type="email" name="email" required>
+            <input type="email" name="email" value="{{ old('_form') !== 'edit' ? old('email') : '' }}" required>
 
             <label>Password</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password" required autocomplete="new-password">
+            <span class="field-hint">At least 8 characters, with upper and lower case, a number, and a symbol.</span>
+
+            <label>Security question</label>
+            <input type="text" name="security_question" value="{{ old('_form') !== 'edit' ? old('security_question') : '' }}" maxlength="255" required>
+            <span class="field-hint">The person must remember this question. The reset page asks only for the answer.</span>
+
+            <label>Security answer</label>
+            <input type="text" name="security_answer" minlength="8" maxlength="255" required autocomplete="off">
+            <span class="field-hint">At least 8 characters. Five wrong tries from the same network pause recovery for 15 minutes.</span>
 
             <label>Role</label>
             <select name="role" required>
@@ -165,30 +183,49 @@
 </div>
 
 <!-- EDIT USER MODAL -->
-<div class="modal-overlay" id="editModal">
+<div class="modal-overlay {{ $errors->any() && old('_form') === 'edit' ? 'active' : '' }}" id="editModal">
     <div class="modal-box">
         <h3>Edit User</h3>
-        <form id="editForm" method="POST">
+        @if($errors->any() && old('_form') === 'edit')
+        <div class="alert-errors">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+        <form id="editForm" method="POST" action="{{ old('_form') === 'edit' ? route('owner.users.update', old('_user_id')) : '' }}">
             @csrf
             @method('PUT')
+            <input type="hidden" name="_form" value="edit">
+            <input type="hidden" name="_user_id" id="editUserId" value="{{ old('_form') === 'edit' ? old('_user_id') : '' }}">
 
             <label>Full Name</label>
-            <input type="text" name="name" id="editName" required>
+            <input type="text" name="name" id="editName" value="{{ old('_form') === 'edit' ? old('name') : '' }}" required>
 
             <label>Username</label>
-            <input type="text" name="username" id="editUsername" required>
+            <input type="text" name="username" id="editUsername" value="{{ old('_form') === 'edit' ? old('username') : '' }}" required>
 
             <label>Email</label>
-            <input type="email" name="email" id="editEmail" required>
+            <input type="email" name="email" id="editEmail" value="{{ old('_form') === 'edit' ? old('email') : '' }}" required>
 
             <label>New Password (leave blank to keep current)</label>
-            <input type="password" name="password">
+            <input type="password" name="password" autocomplete="new-password">
+            <span class="field-hint">Leave blank to keep the current password. A new password needs 8 characters, upper and lower case, a number, and a symbol.</span>
+
+            <label>Security question</label>
+            <input type="text" name="security_question" id="editQuestion" value="{{ old('_form') === 'edit' ? old('security_question') : '' }}" maxlength="255">
+
+            <label>Security answer</label>
+            <input type="text" name="security_answer" maxlength="255" autocomplete="off">
+            <span class="field-hint">Leave the answer blank to keep the current one. Fill both fields to set or change recovery.</span>
 
             <label>Role</label>
             <select name="role" id="editRole" required>
-                <option value="owner">Farm Owner</option>
-                <option value="manager">Farm Manager</option>
-                <option value="staff">Farm Worker</option>
+                <option value="owner" @selected(old('_form') === 'edit' && old('role') === 'owner')>Farm Owner</option>
+                <option value="manager" @selected(old('_form') === 'edit' && old('role') === 'manager')>Farm Manager</option>
+                <option value="staff" @selected(old('_form') === 'edit' && old('role') === 'staff')>Farm Worker</option>
             </select>
 
             <div class="modal-actions">
@@ -202,7 +239,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.2/dist/sweetalert2.all.min.js" integrity="sha384-kR2tS24oEqwHzfBnAN4yxA8ib4vGEOMaANrncAlq8i0lsgvGoOzSPXFbj5dHYUZK" crossorigin="anonymous"></script>
 <script>
 function openAddModal() {
     document.getElementById('addModal').classList.add('active');
@@ -211,14 +248,29 @@ function closeAddModal() {
     document.getElementById('addModal').classList.remove('active');
 }
 
-function openEditModal(id, name, username, email, role) {
+function openEditModal(id, name, username, email, role, question) {
     document.getElementById('editForm').action = `/owner/users/${id}`;
+    document.getElementById('editUserId').value = id;
     document.getElementById('editName').value = name;
     document.getElementById('editUsername').value = username;
     document.getElementById('editEmail').value = email;
     document.getElementById('editRole').value = role;
+    document.getElementById('editQuestion').value = question || '';
     document.getElementById('editModal').classList.add('active');
 }
+
+document.querySelectorAll('.js-edit-user').forEach(function (button) {
+    button.addEventListener('click', function () {
+        openEditModal(
+            button.dataset.id,
+            button.dataset.name,
+            button.dataset.username,
+            button.dataset.email,
+            button.dataset.role,
+            button.dataset.question
+        );
+    });
+});
 function closeEditModal() {
     document.getElementById('editModal').classList.remove('active');
 }
@@ -238,6 +290,15 @@ Swal.fire({
     confirmButtonColor: '#3B8F47',
     timer: 2000,
     timerProgressBar: true,
+});
+@endif
+
+@if(session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Not allowed',
+    text: @json(session('error')),
+    confirmButtonColor: '#3B8F47',
 });
 @endif
 </script>

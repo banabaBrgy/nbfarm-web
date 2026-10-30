@@ -9,7 +9,8 @@ class QrScannerTest extends TestCase
 {
     public function test_scan_page_uses_normalized_staff_routes(): void
     {
-        $user = new User([
+        $user = new User;
+        $user->forceFill([
             'username' => 'staff1',
             'role' => 'poultry staff',
         ]);
@@ -33,7 +34,8 @@ class QrScannerTest extends TestCase
 
     public function test_owner_and_manager_cannot_open_scan_or_generate(): void
     {
-        $owner = new User([
+        $owner = new User;
+        $owner->forceFill([
             'username' => 'owner1',
             'role' => 'farm owner',
         ]);
@@ -47,7 +49,8 @@ class QrScannerTest extends TestCase
             ->post(route('owner.qr.generate'))
             ->assertForbidden();
 
-        $manager = new User([
+        $manager = new User;
+        $manager->forceFill([
             'username' => 'manager1',
             'role' => 'farm manager',
         ]);

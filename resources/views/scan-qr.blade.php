@@ -98,11 +98,20 @@
 
 @push('scripts')
 
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" integrity="sha384-c9d8RFSL+u3exBOJ4Yp3HUJXS4znl9f+z66d1y54ig+ea249SpqR+w1wyvXz/lk+" crossorigin="anonymous"></script>
 
 <script>
 
 let scannerPaused = false;
+
+function escapeScanHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 function isCameraScanning() {
     const video = document.querySelector('#reader video');
@@ -186,16 +195,16 @@ function onScanSuccess(decodedText) {
                 html: `
                     <div style="font-size:16px">
 
-                        <strong>${res.qr_code}</strong><br><br>
+                        <strong>${escapeScanHtml(res.qr_code)}</strong><br><br>
 
                         Batch :
-                        <strong>${res.batch}</strong><br>
+                        <strong>${escapeScanHtml(res.batch)}</strong><br>
 
                         Egg Size :
-                        <strong>${res.size}</strong><br>
+                        <strong>${escapeScanHtml(res.size)}</strong><br>
 
                         Total Eggs :
-                        <strong>${res.eggs}</strong>
+                        <strong>${escapeScanHtml(res.eggs)}</strong>
 
                     </div>
                 `,

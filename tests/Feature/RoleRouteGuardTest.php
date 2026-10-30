@@ -9,7 +9,8 @@ class RoleRouteGuardTest extends TestCase
 {
     public function test_staff_opening_owner_dashboard_is_sent_to_staff_dashboard(): void
     {
-        $staff = new User([
+        $staff = new User;
+        $staff->forceFill([
             'username' => 'staff1',
             'role' => 'poultry staff',
         ]);
@@ -22,7 +23,8 @@ class RoleRouteGuardTest extends TestCase
 
     public function test_manager_opening_owner_dashboard_is_sent_to_manager_dashboard(): void
     {
-        $manager = new User([
+        $manager = new User;
+        $manager->forceFill([
             'username' => 'manager1',
             'role' => 'farm manager',
         ]);
@@ -35,7 +37,8 @@ class RoleRouteGuardTest extends TestCase
 
     public function test_owner_opening_staff_dashboard_is_sent_to_owner_dashboard(): void
     {
-        $owner = new User([
+        $owner = new User;
+        $owner->forceFill([
             'username' => 'owner1',
             'role' => 'farm owner',
         ]);

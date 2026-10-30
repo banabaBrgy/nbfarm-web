@@ -27,7 +27,9 @@ class ReportController extends Controller
                 : '',
         ];
 
-        $query = Report::with('manager')->latest();
+        $query = Report::with('manager')
+            ->where('manager_id', auth()->id())
+            ->latest();
 
         if ($filters['report_type'] !== '') {
             $query->where('report_type', $filters['report_type']);
@@ -43,9 +45,9 @@ class ReportController extends Controller
             'reports' => $reports,
             'filters' => $filters,
             'reportStats' => [
-                'total' => Report::count(),
-                'sent' => Report::where('status', 'Sent')->count(),
-                'read' => Report::where('status', 'Read')->count(),
+                'total' => Report::where('manager_id', auth()->id())->count(),
+                'sent' => Report::where('manager_id', auth()->id())->where('status', 'Sent')->count(),
+                'read' => Report::where('manager_id', auth()->id())->where('status', 'Read')->count(),
             ],
         ]);
     }
@@ -55,7 +57,7 @@ class ReportController extends Controller
         $request->validate([
             'report_type' => 'required|in:overall,production,inventory,dispatch,sales',
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'required|string|max:100000',
         ]);
 
         Report::create(Report::existing([
@@ -77,7 +79,7 @@ class ReportController extends Controller
 
     public function send($id)
     {
-        $report = Report::findOrFail($id);
+        $report = $this->ownedReport($id);
 
         if ($report->status !== 'Draft') {
             return back()->with('success', 'Report sent to Owner.');
@@ -95,11 +97,20 @@ class ReportController extends Controller
 
     public function destroy($id)
     {
-        app(ReportNotifier::class)->forget((int) $id);
+        $report = $this->ownedReport($id);
 
-        Report::findOrFail($id)->delete();
+        app(ReportNotifier::class)->forget((int) $report->id);
+
+        $report->delete();
 
         return back()->with('success', 'Report deleted successfully.');
+    }
+
+    private function ownedReport($id): Report
+    {
+        return Report::query()
+            ->where('manager_id', auth()->id())
+            ->findOrFail($id);
     }
 
     public function preview(Request $request, $type)
