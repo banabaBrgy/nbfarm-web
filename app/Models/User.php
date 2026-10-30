@@ -93,6 +93,36 @@ class User extends Authenticatable
         return trim((string) $this->security_answer) !== '';
     }
 
+    public static function normalizeContactNumber(?string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '63') && strlen($digits) === 12) {
+            $digits = '0'.substr($digits, 2);
+        }
+
+        if (strlen($digits) === 10 && str_starts_with($digits, '9')) {
+            $digits = '0'.$digits;
+        }
+
+        return preg_match('/^09\d{9}$/', $digits) === 1 ? $digits : null;
+    }
+
+    public function formattedContactNumber(): string
+    {
+        $digits = (string) $this->contact_number;
+
+        if (preg_match('/^09\d{9}$/', $digits) !== 1) {
+            return $digits;
+        }
+
+        return substr($digits, 0, 4).' '.substr($digits, 4, 3).' '.substr($digits, 7, 4);
+    }
+
     public static function hashSecurityAnswer(string $answer): string
     {
         return Hash::make(mb_strtolower(trim($answer)));

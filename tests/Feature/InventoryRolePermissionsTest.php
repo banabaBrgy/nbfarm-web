@@ -124,7 +124,7 @@ class InventoryRolePermissionsTest extends TestCase
         $this->assertDatabaseMissing('inventory_items', ['id' => $item->id]);
     }
 
-    public function test_manager_can_add_and_restock_but_cannot_delete_inventory(): void
+    public function test_manager_inventory_is_view_only(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
         $item = InventoryItem::create([
@@ -137,10 +137,11 @@ class InventoryRolePermissionsTest extends TestCase
         $this->actingAs($manager)
             ->get(route('manager.inventory'))
             ->assertOk()
-            ->assertSee('icon-btn-edit')
+            ->assertDontSee('icon-btn-edit')
             ->assertDontSee('icon-btn-delete')
-            ->assertSee('id="stockModal"', false)
-            ->assertSee('id="increaseModal"', false);
+            ->assertDontSee('id="stockModal"', false)
+            ->assertDontSee('id="increaseModal"', false)
+            ->assertSee('icon-btn-history');
 
         $this->actingAs($manager)
             ->get(route('manager.inventory.history', $item))
@@ -153,29 +154,16 @@ class InventoryRolePermissionsTest extends TestCase
                 'current_stock' => 5,
                 'min_level' => 1,
             ])
-            ->assertRedirect();
-
-        $this->assertDatabaseHas('inventory_items', [
-            'item_name' => 'Vitamins',
-            'current_stock' => 5,
-        ]);
-
-        $this->actingAs($manager)->get(route('manager.inventory'))->assertOk();
-        $this->assertSame(85.0, (float) $item->fresh()->current_stock);
+            ->assertForbidden();
 
         $this->actingAs($manager)
             ->post(route('manager.inventory.increaseStock'), [
                 'item_id' => $item->id,
                 'quantity' => 3,
             ])
-            ->assertRedirect();
+            ->assertForbidden();
 
-        $this->assertSame(88.0, (float) $item->fresh()->current_stock);
-
-        $this->actingAs($manager)
-            ->delete("/manager/inventory/delete/{$item->id}")
-            ->assertNotFound();
-
-        $this->assertDatabaseHas('inventory_items', ['id' => $item->id]);
+        $this->assertSame(85.0, (float) $item->fresh()->current_stock);
+        $this->assertDatabaseMissing('inventory_items', ['item_name' => 'Vitamins']);
     }
 }

@@ -99,16 +99,42 @@ class ProductionQrEditTest extends TestCase
 
     public function test_edit_rejects_counts_above_one_qr_stack(): void
     {
-        $owner = User::factory()->create(['role' => 'owner']);
+        $staff = User::factory()->create(['role' => 'staff']);
         ['smallTx' => $smallTx, 'production' => $production] = $this->harvest();
 
-        $this->actingAs($owner)
-            ->postJson(route('owner.qr.update', $smallTx->id), [
+        $this->actingAs($staff)
+            ->postJson(route('staff.qr.update', $smallTx->id), [
                 'total_eggs' => 301,
                 'production_id' => $production->production_id,
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors('total_eggs');
+
+        $this->assertSame(300, (int) $smallTx->fresh()->total_eggs);
+        $this->assertSame(450, (int) $production->fresh()->eggs_produced);
+    }
+
+    public function test_owner_and_manager_cannot_edit_a_production_tray(): void
+    {
+        ['smallTx' => $smallTx, 'production' => $production] = $this->harvest();
+
+        foreach (['owner', 'manager'] as $role) {
+            $user = User::factory()->create(['role' => $role]);
+
+            $this->actingAs($user)
+                ->get(route($role.'.production.details', $production->production_id))
+                ->assertOk()
+                ->assertDontSee('title="Edit"', false)
+                ->assertDontSee('btn-edit', false)
+                ->assertSee('Recorded', false);
+
+            $this->actingAs($user)
+                ->postJson(route($role.'.qr.update', $smallTx->id), [
+                    'total_eggs' => 90,
+                    'production_id' => $production->production_id,
+                ])
+                ->assertForbidden();
+        }
 
         $this->assertSame(300, (int) $smallTx->fresh()->total_eggs);
         $this->assertSame(450, (int) $production->fresh()->eggs_produced);

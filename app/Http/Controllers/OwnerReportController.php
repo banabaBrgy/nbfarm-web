@@ -36,12 +36,23 @@ class OwnerReportController extends Controller{
             $query->where('status', $filters['status']);
         }
 
-        $reports = $query->paginate(5)->withQueryString();
+        $reports = $query->paginate(5)->appends(
+            collect($request->query())->except(['open', 'page'])->all()
+        );
+
+        $openReport = null;
+        $openId = (int) $request->query('open');
+        if ($openId > 0) {
+            $openReport = Report::with('manager')
+                ->whereIn('status', $statuses)
+                ->find($openId);
+        }
 
         $visibleReports = Report::whereIn('status', $statuses);
 
         return view('owner.reports', [
             'reports' => $reports,
+            'openReport' => $openReport,
             'filters' => $filters,
             'reportStats' => [
                 'total' => (clone $visibleReports)->count(),
@@ -77,7 +88,7 @@ class OwnerReportController extends Controller{
                 ->update(['read_at' => now()]);
         }
 
-        return redirect()->route('owner.reports');
+        return redirect()->route('owner.reports', ['open' => $report->id]);
     }
 
     private function openedFromThisSite(Request $request): bool

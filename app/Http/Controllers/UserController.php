@@ -86,6 +86,15 @@ class UserController extends Controller
             'role' => 'required|in:owner,manager,staff',
             'security_question' => 'nullable|string|max:255',
             'security_answer' => 'nullable|string|max:255',
+            'contact_number' => ['nullable', 'string', 'max:20', function (string $attribute, mixed $value, \Closure $fail) {
+                if (trim((string) $value) === '') {
+                    return;
+                }
+
+                if (User::normalizeContactNumber($value) === null) {
+                    $fail('Enter an 11-digit mobile number, like 0917 123 4567.');
+                }
+            }],
         ];
 
         if ($request->filled('password')) {
@@ -113,6 +122,10 @@ class UserController extends Controller
         $user->username = $validated['username'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
+
+        if ($request->exists('contact_number')) {
+            $user->contact_number = User::normalizeContactNumber($validated['contact_number'] ?? null);
+        }
 
         if ($request->filled('security_question')) {
             $user->security_question = $validated['security_question'];

@@ -13,7 +13,7 @@
     <div class="page-header">
         <div>
             <h2>Batch {{ $production->batch_id }}</h2>
-            <p>Review and update this harvest record.</p>
+            <p>{{ \App\Models\User::routeRole() === 'staff' ? 'Review and update this harvest record.' : 'Review this harvest record.' }}</p>
         </div>
         <a href="{{ route(\App\Models\User::routeRole() . '.production', ['date' => $production->production_date]) }}" class="btn-back">
             <i class="fas fa-arrow-left"></i>
@@ -83,7 +83,7 @@
 
                         <td>
 
-                            @if(in_array((int) $transaction->id, $editableTransactionIds, true))
+                            @if(\App\Models\User::routeRole() === 'staff' && in_array((int) $transaction->id, $editableTransactionIds, true))
                                 <button
                                     type="button"
                                     class="btn-edit editQR"

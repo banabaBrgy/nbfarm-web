@@ -97,7 +97,7 @@ class InventoryEggTraysStockTest extends TestCase
             ->assertDontSee('stat-card--inventory stat-card-alert', false);
     }
 
-    public function test_manager_restock_updates_egg_trays_display(): void
+    public function test_manager_sees_egg_trays_without_a_restock_action(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
         $trays = InventoryItem::create([
@@ -113,14 +113,15 @@ class InventoryEggTraysStockTest extends TestCase
                 'item_id' => $trays->id,
                 'quantity' => 100,
             ])
-            ->assertRedirect();
+            ->assertForbidden();
 
-        $this->assertSame(150.0, (float) $trays->fresh()->current_stock);
+        $this->assertSame(50.0, (float) $trays->fresh()->current_stock);
 
         $this->actingAs($manager)
             ->get(route('manager.inventory'))
             ->assertOk()
-            ->assertSee('pcs — Min: 100.00 — OK', false);
+            ->assertSee('pcs — Min: 100.00 — LOW', false)
+            ->assertDontSee('icon-btn-edit');
     }
 
     public function test_stock_history_hides_daily_checked_latch_entries(): void

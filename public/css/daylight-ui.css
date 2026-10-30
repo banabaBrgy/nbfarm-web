@@ -1192,6 +1192,18 @@ body,
     border-bottom: none;
 }
 
+.users-page .user-table th:first-child,
+.users-page .user-table td:first-child {
+    text-align: left;
+    padding-left: 14px;
+    padding-right: 10px;
+}
+
+.users-page .user-cell {
+    justify-content: flex-start;
+    gap: 10px;
+}
+
 .users-page .user-table td {
     padding: 12px 16px;
     color: var(--nb-day-text);

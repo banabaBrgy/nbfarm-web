@@ -154,7 +154,7 @@ class InventoryController extends Controller
 
     public function addStock(Request $request)
     {
-        abort_unless(in_array(User::routeRole(), ['owner', 'manager'], true), 403);
+        abort_unless(User::routeRole() === 'owner', 403);
 
         $validated = $request->validate([
             'item_name'     => ['required', 'string', 'max:255', 'unique:inventory_items,item_name'],
@@ -194,7 +194,7 @@ class InventoryController extends Controller
 
     public function increaseStock(Request $request)
     {
-        abort_unless(in_array(User::routeRole(), ['owner', 'manager', 'staff'], true), 403);
+        abort_unless(in_array(User::routeRole(), ['owner', 'staff'], true), 403);
 
         $validated = $request->validate([
             'item_id'  => ['required', 'exists:inventory_items,id'],

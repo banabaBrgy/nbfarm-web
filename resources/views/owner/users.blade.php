@@ -65,8 +65,7 @@
                     $initials = collect(explode(' ', $user->name))->map(fn($w) => strtoupper(substr($w,0,1)))->take(2)->implode('');
                     $colorIndex = array_sum(array_map('ord', str_split($user->name))) % count($avatarColors);
                     $avatarColor = $avatarColors[$colorIndex];
-                    $contactSeed = str_pad((string) ((900000000 + ((int) $user->id * 48271)) % 1000000000), 9, '0', STR_PAD_LEFT);
-                    $contactNumber = '09'.substr($contactSeed, 0, 2).' '.substr($contactSeed, 2, 3).' '.substr($contactSeed, 5, 4);
+                    $contactNumber = $user->contact_number ? $user->formattedContactNumber() : '—';
                 @endphp
                 <tr>
                     <td>
@@ -99,6 +98,7 @@
        data-name="{{ $user->name }}"
        data-username="{{ $user->username }}"
        data-email="{{ $user->email }}"
+       data-contact="{{ $user->contact_number ? $user->formattedContactNumber() : '' }}"
        data-role="{{ $user->role }}"
        data-question="{{ $user->security_question }}">
         <i class="fas fa-pen"></i>
@@ -210,6 +210,10 @@
             <label>Email</label>
             <input type="email" name="email" id="editEmail" value="{{ old('_form') === 'edit' ? old('email') : '' }}" required>
 
+            <label>Contact number</label>
+            <input type="text" name="contact_number" id="editContact" value="{{ old('_form') === 'edit' ? old('contact_number') : '' }}" maxlength="20" inputmode="tel" autocomplete="tel">
+            <span class="field-hint">11-digit mobile number, like 0917 123 4567. Leave blank to clear it.</span>
+
             <label>New Password (leave blank to keep current)</label>
             <input type="password" name="password" autocomplete="new-password">
             <span class="field-hint">Leave blank to keep the current password. A new password needs 8 characters, upper and lower case, a number, and a symbol.</span>
@@ -248,12 +252,13 @@ function closeAddModal() {
     document.getElementById('addModal').classList.remove('active');
 }
 
-function openEditModal(id, name, username, email, role, question) {
+function openEditModal(id, name, username, email, contact, role, question) {
     document.getElementById('editForm').action = `/owner/users/${id}`;
     document.getElementById('editUserId').value = id;
     document.getElementById('editName').value = name;
     document.getElementById('editUsername').value = username;
     document.getElementById('editEmail').value = email;
+    document.getElementById('editContact').value = contact || '';
     document.getElementById('editRole').value = role;
     document.getElementById('editQuestion').value = question || '';
     document.getElementById('editModal').classList.add('active');
@@ -266,6 +271,7 @@ document.querySelectorAll('.js-edit-user').forEach(function (button) {
             button.dataset.name,
             button.dataset.username,
             button.dataset.email,
+            button.dataset.contact,
             button.dataset.role,
             button.dataset.question
         );

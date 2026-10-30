@@ -14,7 +14,7 @@ class QrTransactionController extends Controller
     {
         $user = $request->user();
         abort_unless($user && strtolower((string) $user->status) !== 'inactive', 403);
-        abort_unless(in_array(User::routeRole($user->role), ['staff', 'manager', 'owner'], true), 403);
+        abort_unless(User::routeRole($user->role) === 'staff', 403);
 
         $validated = $request->validate([
             'total_eggs' => 'required|integer|min:0|max:300',

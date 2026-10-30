@@ -166,7 +166,14 @@
         VIEW REPORT MODALS
         =========================================== --}}
 
-        @foreach($reports as $report)
+        @php
+            $modalReports = collect($reports->items());
+            if (! empty($openReport) && ! $modalReports->contains(fn ($item) => (int) $item->id === (int) $openReport->id)) {
+                $modalReports->push($openReport);
+            }
+        @endphp
+
+        @foreach($modalReports as $report)
 
             <div class="modal fade report-modal" id="viewReport{{ $report->id }}" tabindex="-1">
 
@@ -260,6 +267,17 @@
 
         @endforeach
         @push('scripts')
+
+            @if(! empty($openReport))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var modal = document.getElementById('viewReport{{ $openReport->id }}');
+                        if (modal && window.bootstrap) {
+                            window.bootstrap.Modal.getOrCreateInstance(modal).show();
+                        }
+                    });
+                </script>
+            @endif
 
             @if(session('success'))
 

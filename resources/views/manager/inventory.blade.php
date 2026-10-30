@@ -9,7 +9,7 @@
 
 @section('content')
 @php
-    $canEditInventory = in_array(\App\Models\User::routeRole(), ['owner', 'manager'], true);
+    $canEditInventory = false;
     $canDeleteInventory = \App\Models\User::routeRole() === 'owner';
 @endphp
 <div class="inventory-page">

@@ -96,6 +96,11 @@
     background:#3B8F47;
     color:white;
 }
+.user-table th:first-child,
+.user-table td:first-child {
+    text-align: left;
+}
+
 .user-table th:last-child{
     width:100px;
     text-align:center;
@@ -159,7 +164,8 @@
 .user-cell {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 .avatar {
@@ -243,6 +249,8 @@
     padding: 24px;
     width: 400px;
     max-width: 90%;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
 }
 .modal-box h3 { margin: 0 0 16px; color: #3B8F47; }
 .modal-box label { display: block; font-size: 13px; font-weight: 600; color: #555; margin: 12px 0 6px; }

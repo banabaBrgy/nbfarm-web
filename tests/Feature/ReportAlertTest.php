@@ -84,6 +84,33 @@ class ReportAlertTest extends TestCase
             ->assertJsonFragment(['url' => '/owner/reports/'.$report->id]);
     }
 
+    public function test_clicking_a_report_notification_opens_that_report_modal(): void
+    {
+        $owner = $this->user('owner', 'owner1');
+        $manager = $this->user('manager', 'manager1');
+        $report = $this->draft($manager);
+
+        $this->actingAs($manager)->post(route('manager.reports.send', $report));
+
+        $this->actingAs($owner)
+            ->get(route('owner.reports.show', $report))
+            ->assertRedirect(route('owner.reports', ['open' => $report->id]));
+
+        $this->actingAs($owner)
+            ->get(route('owner.reports', ['open' => $report->id]))
+            ->assertOk()
+            ->assertSee('id="viewReport'.$report->id.'"', false)
+            ->assertSee('viewReport'.$report->id, false);
+
+        $this->actingAs($owner)
+            ->get(route('owner.reports', [
+                'open' => $report->id,
+                'report_type' => 'inventory',
+            ]))
+            ->assertOk()
+            ->assertSee('id="viewReport'.$report->id.'"', false);
+    }
+
     public function test_owner_remark_notifies_the_report_manager(): void
     {
         $owner = $this->user('owner', 'owner1');
