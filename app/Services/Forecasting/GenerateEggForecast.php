@@ -81,6 +81,59 @@ class GenerateEggForecast
     }
 
     /**
+     * Next-day forecast for the production date on screen.
+     * October 30 loads the forecast saved for October 31.
+     *
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    public function summaryForProductionDate(Carbon $productionDate): array
+    {
+        $forecastDate = $productionDate->copy()->startOfDay()->addDay();
+
+        if ($forecastDate->equalTo(Carbon::tomorrow()->startOfDay())) {
+            return $this->summary();
+        }
+
+        return $this->savedSummary($forecastDate);
+    }
+
+    /**
+     * Forecast for the production date itself, the day before the card's next-day forecast.
+     *
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    public function previousSummaryForProductionDate(Carbon $productionDate): array
+    {
+        $forecastDate = $productionDate->copy()->startOfDay();
+
+        if ($forecastDate->equalTo(Carbon::today()->startOfDay())) {
+            return $this->previousSummary();
+        }
+
+        return $this->savedSummary($forecastDate);
+    }
+
+    /**
      * Egg totals for the next N days starting tomorrow.
      * Read-only: does not write forecast rows. The saved row for a date
      * stays the expected number the production-drop alert compares later.
@@ -166,6 +219,114 @@ class GenerateEggForecast
             'engine' => (string) ($prediction['engine'] ?? 'php'),
             'sizes' => $sizes,
         ];
+    }
+
+    /**
+     * Saved forecast for a past day, with a fresh size mix fitted to that total.
+     * Missing rows fall back to a read-only calculation and are not stored.
+     *
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    private function savedSummary(Carbon $forecastDate): array
+    {
+        $summary = $this->forecastSummaryForDate($forecastDate);
+        $stored = Forecast::query()
+            ->whereDate('forecast_date', $forecastDate->toDateString())
+            ->value('predicted_eggs');
+
+        if ($stored === null) {
+            return $summary;
+        }
+
+        return $this->summaryWithTotal($summary, (int) $stored);
+    }
+
+    /**
+     * Keep the size mix, but make the eggs add up to the saved forecast total.
+     *
+     * @param  array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }  $summary
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    private function summaryWithTotal(array $summary, int $total): array
+    {
+        $summary['predicted_eggs'] = $total;
+        $computed = (int) array_sum(array_column($summary['sizes'], 'eggs'));
+
+        if ($total === $computed) {
+            return $summary;
+        }
+
+        if ($total <= 0 || $computed <= 0) {
+            foreach ($summary['sizes'] as $index => $size) {
+                $summary['sizes'][$index]['eggs'] = 0;
+                $summary['sizes'][$index]['trays'] = 0;
+                $summary['sizes'][$index]['share'] = 0.0;
+            }
+
+            return $summary;
+        }
+
+        $remainders = [];
+        $floors = [];
+        $allocated = 0;
+
+        foreach ($summary['sizes'] as $index => $size) {
+            $exact = $size['eggs'] * $total / $computed;
+            $floors[$index] = (int) floor($exact);
+            $remainders[$index] = $exact - $floors[$index];
+            $allocated += $floors[$index];
+        }
+
+        $remaining = $total - $allocated;
+        arsort($remainders);
+
+        foreach (array_keys($remainders) as $index) {
+            if ($remaining <= 0) {
+                break;
+            }
+
+            $floors[$index]++;
+            $remaining--;
+        }
+
+        foreach ($summary['sizes'] as $index => $size) {
+            $eggs = $floors[$index];
+            $summary['sizes'][$index]['eggs'] = $eggs;
+            $summary['sizes'][$index]['trays'] = intdiv($eggs, Production::EGGS_PER_TRAY);
+            $summary['sizes'][$index]['share'] = round(($eggs / $total) * 100, 1);
+        }
+
+        return $summary;
     }
 
     /**

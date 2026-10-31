@@ -37,8 +37,9 @@ class ProductionController extends Controller
 
         $totalEggs = (int) $productions->sum('eggs_produced');
 
-        $forecastSummary = app(GenerateEggForecast::class)->summary();
-        $previousForecastSummary = app(GenerateEggForecast::class)->previousSummary();
+        $forecasts = app(GenerateEggForecast::class);
+        $forecastSummary = $forecasts->summaryForProductionDate($date);
+        $previousForecastSummary = $forecasts->previousSummaryForProductionDate($date);
         $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? 0);
 
         $forecastHistory = Forecast::query()

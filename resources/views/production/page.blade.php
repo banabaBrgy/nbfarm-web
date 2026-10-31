@@ -77,7 +77,7 @@
         <div class="stat-info">
             <span class="stat-title">Predicted Eggs</span>
             <h2>{{ number_format($predictedEggs) }}</h2>
-            <small>Next-day forecast · tap for sizes</small>
+            <small>Next-day forecast for {{ \Carbon\Carbon::parse($forecastSummary['forecast_date'])->format('M j') }} · tap for sizes</small>
         </div>
     </div>
 
