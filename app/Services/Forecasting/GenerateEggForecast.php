@@ -81,8 +81,8 @@ class GenerateEggForecast
     }
 
     /**
-     * Next-day forecast for the production date on screen.
-     * October 30 loads the forecast saved for October 31.
+     * Forecast saved for the production date on screen.
+     * October 24 loads the forecast saved for October 24, not the next day.
      *
      * @return array{
      *     predicted_eggs: int,
@@ -98,17 +98,11 @@ class GenerateEggForecast
      */
     public function summaryForProductionDate(Carbon $productionDate): array
     {
-        $forecastDate = $productionDate->copy()->startOfDay()->addDay();
-
-        if ($forecastDate->equalTo(Carbon::tomorrow()->startOfDay())) {
-            return $this->summary();
-        }
-
-        return $this->savedSummary($forecastDate);
+        return $this->savedSummary($productionDate->copy()->startOfDay());
     }
 
     /**
-     * Forecast for the production date itself, the day before the card's next-day forecast.
+     * Forecast for the day before the selected production date.
      *
      * @return array{
      *     predicted_eggs: int,
@@ -124,13 +118,7 @@ class GenerateEggForecast
      */
     public function previousSummaryForProductionDate(Carbon $productionDate): array
     {
-        $forecastDate = $productionDate->copy()->startOfDay();
-
-        if ($forecastDate->equalTo(Carbon::today()->startOfDay())) {
-            return $this->previousSummary();
-        }
-
-        return $this->savedSummary($forecastDate);
+        return $this->savedSummary($productionDate->copy()->startOfDay()->subDay());
     }
 
     /**

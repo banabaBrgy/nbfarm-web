@@ -2,6 +2,7 @@
     'forecastSummary' => null,
     'previousForecastSummary' => null,
     'showHistory' => false,
+    'totalLabel' => 'Next-day total',
 ])
 
 @php
@@ -34,7 +35,7 @@
             </div>
             <div class="modal-body">
                 <div class="forecast-summary-total">
-                    <span>Next-day total</span>
+                    <span>{{ $totalLabel }}</span>
                     <strong>{{ number_format($forecastSummary['predicted_eggs']) }} eggs</strong>
                     <small>
                         For {{ \Carbon\Carbon::parse($forecastSummary['forecast_date'])->format('M j, Y') }}

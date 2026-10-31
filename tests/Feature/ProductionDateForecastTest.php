@@ -13,7 +13,7 @@ class ProductionDateForecastTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_predicted_eggs_follow_the_day_after_the_selected_production_date(): void
+    public function test_predicted_eggs_match_the_selected_production_date(): void
     {
         Carbon::setTestNow('2026-10-31');
 
@@ -55,6 +55,18 @@ class ProductionDateForecastTest extends TestCase
         });
 
         Forecast::query()->create([
+            'forecast_date' => '2026-10-23',
+            'predicted_eggs' => 7050,
+        ]);
+        Forecast::query()->create([
+            'forecast_date' => '2026-10-24',
+            'predicted_eggs' => 7200,
+        ]);
+        Forecast::query()->create([
+            'forecast_date' => '2026-10-25',
+            'predicted_eggs' => 7210,
+        ]);
+        Forecast::query()->create([
             'forecast_date' => '2026-10-30',
             'predicted_eggs' => 7100,
         ]);
@@ -62,31 +74,26 @@ class ProductionDateForecastTest extends TestCase
             'forecast_date' => '2026-10-31',
             'predicted_eggs' => 7320,
         ]);
-        Forecast::query()->create([
-            'forecast_date' => '2026-11-01',
-            'predicted_eggs' => 7200,
-        ]);
 
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->get('/staff/production?date=2026-10-30')
+            ->get('/staff/production?date=2026-10-24')
             ->assertOk()
-            ->assertSee('Next-day forecast for Oct 31', false)
-            ->assertSee('7,320', false)
-            ->assertSee('For Oct 31, 2026', false)
-            ->assertSee('For Oct 30, 2026', false)
-            ->assertSee('7,100', false)
+            ->assertSee('Forecast for Oct 24', false)
+            ->assertSee('7,200', false)
+            ->assertSee('For Oct 24, 2026', false)
+            ->assertSee('For Oct 23, 2026', false)
+            ->assertDontSee('Next-day forecast for Oct 25', false)
             ->assertDontSee('9,999', false);
-
-        $this->assertSame(7320, (int) Forecast::query()->whereDate('forecast_date', '2026-10-31')->value('predicted_eggs'));
-        $this->assertSame(7200, (int) Forecast::query()->whereDate('forecast_date', '2026-11-01')->value('predicted_eggs'));
 
         $this->actingAs($user)
             ->get('/staff/production?date=2026-10-31')
             ->assertOk()
-            ->assertSee('Next-day forecast for Nov 1', false)
-            ->assertSee('9,999', false);
+            ->assertSee('Forecast for Oct 31', false)
+            ->assertSee('7,320', false)
+            ->assertDontSee('Next-day forecast for Nov 1', false)
+            ->assertDontSee('9,999', false);
 
         Carbon::setTestNow();
     }

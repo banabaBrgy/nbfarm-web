@@ -77,7 +77,7 @@
         <div class="stat-info">
             <span class="stat-title">Predicted Eggs</span>
             <h2>{{ number_format($predictedEggs) }}</h2>
-            <small>Next-day forecast for {{ \Carbon\Carbon::parse($forecastSummary['forecast_date'])->format('M j') }} · tap for sizes</small>
+            <small>Forecast for {{ \Carbon\Carbon::parse($forecastSummary['forecast_date'])->format('M j') }} · tap for sizes</small>
         </div>
     </div>
 
@@ -188,6 +188,7 @@
 <x-forecast-summary-modal
     :forecast-summary="$forecastSummary ?? null"
     :previous-forecast-summary="$previousForecastSummary ?? null"
+    total-label="Forecast total"
     :show-history="true" />
 
 <div class="modal fade" id="forecastHistoryModal" tabindex="-1" aria-labelledby="forecastHistoryLabel" aria-hidden="true">
