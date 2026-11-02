@@ -327,8 +327,13 @@
 <!-- ITEM HISTORY MODAL -->
 <div class="modal-overlay" id="historyModal">
     <div class="modal-box history-modal-box">
-        <h3>Stock History</h3>
-        <p style="color:#777; font-size:13px; margin:-10px 0 16px;">Item: <strong id="historyItemName"></strong></p>
+        <div class="history-modal-head">
+            <h3>Stock History</h3>
+            <button type="button" class="modal-x" onclick="closeHistoryModal()" aria-label="Close">
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <p style="color:#777; font-size:13px; margin:8px 0 16px;">Item: <strong id="historyItemName"></strong></p>
         <div class="history-table-wrap">
             <table class="inventory-table history-table">
                 <thead>
@@ -343,9 +348,6 @@
                     <tr><td colspan="4" style="text-align:center; color:#999;">Loading…</td></tr>
                 </tbody>
             </table>
-        </div>
-        <div class="modal-actions">
-            <button type="button" class="btn-cancel" onclick="closeHistoryModal()">Close</button>
         </div>
     </div>
 </div>

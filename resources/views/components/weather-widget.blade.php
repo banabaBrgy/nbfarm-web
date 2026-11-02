@@ -32,7 +32,7 @@
         </span>
         <span class="farm-weather__trigger-hint">
             Forecast
-            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
         </span>
     </button>
 

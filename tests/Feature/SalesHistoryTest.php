@@ -100,6 +100,34 @@ class SalesHistoryTest extends TestCase
             ->assertSee('₱200.00');
     }
 
+    public function test_status_filter_limits_sales_to_paid_or_pending(): void
+    {
+        $manager = User::factory()->create(['role' => 'manager']);
+        $owner = User::factory()->create(['role' => 'owner']);
+        $this->seedSales();
+        Transaction::query()->where('customer', 'South Store')->update(['status' => 'Pending']);
+
+        $this->actingAs($manager)
+            ->get(route('manager.sales.history', ['status' => 'Paid']))
+            ->assertOk()
+            ->assertSee('North Store')
+            ->assertDontSee('South Store')
+            ->assertSee('₱550.00');
+
+        $this->actingAs($manager)
+            ->get(route('manager.sales.history', ['status' => 'Pending']))
+            ->assertOk()
+            ->assertSee('South Store')
+            ->assertDontSee('North Store')
+            ->assertSee('₱200.00');
+
+        $this->actingAs($owner)
+            ->get(route('owner.revenue', ['status' => 'Pending']))
+            ->assertOk()
+            ->assertSee('South Store')
+            ->assertSee('Showing 1–1 of 1');
+    }
+
     public function test_sales_page_links_to_revenue_history(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);

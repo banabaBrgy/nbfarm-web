@@ -9,6 +9,12 @@
         <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search customer..." />
       </div>
 
+      <select name="status" class="sort-select" data-auto-submit aria-label="Filter transactions by payment status">
+        <option value="" {{ ($filters['status'] ?? '') === '' ? 'selected' : '' }}>All status</option>
+        <option value="Paid" {{ ($filters['status'] ?? '') === 'Paid' ? 'selected' : '' }}>Paid</option>
+        <option value="Pending" {{ ($filters['status'] ?? '') === 'Pending' ? 'selected' : '' }}>Pending</option>
+      </select>
+
       <select name="sort" class="sort-select" data-auto-submit>
         <option value="date_desc" {{ ($filters['sort'] ?? 'date_desc') === 'date_desc' ? 'selected' : '' }}>Newest First</option>
         <option value="date_asc" {{ ($filters['sort'] ?? '') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>

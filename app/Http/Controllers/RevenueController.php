@@ -21,6 +21,7 @@ class RevenueController extends Controller
         'filters'       => [
             'search' => $request->query('search'),
             'sort'   => $request->query('sort', 'date_desc'),
+            'status' => $this->paymentStatus($request->query('status')),
         ],
     ]);
 }
@@ -84,6 +85,11 @@ private function buildTopCustomers()
     private function filteredTransactions(Request $request)
     {
         $query = Transaction::search($request->query('search'));
+        $status = $this->paymentStatus($request->query('status'));
+
+        if ($status !== '') {
+            $query->where('status', $status);
+        }
 
         switch ($request->query('sort', 'date_desc')) {
             case 'date_asc':
@@ -102,5 +108,12 @@ private function buildTopCustomers()
         }
 
         return $query->paginate(5)->withQueryString();
+    }
+
+    private function paymentStatus(mixed $status): string
+    {
+        $status = is_string($status) ? $status : '';
+
+        return in_array($status, ['Paid', 'Pending'], true) ? $status : '';
     }
 }

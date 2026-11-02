@@ -12,6 +12,7 @@ class SalesHistoryController extends Controller
     public function index(Request $request): View
     {
         $range = $this->normalizeRange($request->query('range'));
+        $status = $this->normalizeStatus($request->query('status'));
         $from = $this->dateOrNull($request->query('from'));
         $to = $this->dateOrNull($request->query('to'));
 
@@ -19,16 +20,18 @@ class SalesHistoryController extends Controller
             [$from, $to] = [$to, $from];
         }
 
-        $sales = Transaction::query()
-            ->forSalesRange($range, $from, $to)
+        $salesQuery = Transaction::query()->forSalesRange($range, $from, $to);
+        if ($status !== '') {
+            $salesQuery->where('status', $status);
+        }
+
+        $sales = (clone $salesQuery)
             ->orderByDesc('transaction_date')
             ->orderByDesc('id')
             ->paginate(5)
             ->withQueryString();
 
-        $periodTotal = (float) Transaction::query()
-            ->forSalesRange($range, $from, $to)
-            ->sum('price');
+        $periodTotal = (float) (clone $salesQuery)->sum('price');
 
         $view = $request->boolean('modal')
             ? 'sales.partials.history-content'
@@ -39,6 +42,7 @@ class SalesHistoryController extends Controller
             'periodTotal' => $periodTotal,
             'filters' => [
                 'range' => $range,
+                'status' => $status,
                 'from' => $from,
                 'to' => $to,
                 'label' => $this->periodLabel($range, $from, $to),
@@ -59,6 +63,13 @@ class SalesHistoryController extends Controller
         }
 
         return 'all';
+    }
+
+    private function normalizeStatus(mixed $status): string
+    {
+        $status = is_string($status) ? $status : '';
+
+        return in_array($status, ['Paid', 'Pending'], true) ? $status : '';
     }
 
     private function dateOrNull(mixed $value): ?string

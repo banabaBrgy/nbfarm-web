@@ -1,5 +1,6 @@
 @php
     $range = $filters['range'] ?? 'all';
+    $status = $filters['status'] ?? '';
     $isModal = request()->boolean('modal');
     $historyRoute = route(
         \App\Models\User::routeRole().'.sales.history',
@@ -17,6 +18,15 @@
             <option value="month" @selected($range === 'month')>This month</option>
             <option value="previous" @selected($range === 'previous')>All previous months</option>
             <option value="custom" @selected($range === 'custom')>Custom range</option>
+        </select>
+    </label>
+
+    <label class="sales-history-field sales-history-range-field">
+        <span>Status</span>
+        <select name="status" data-auto-submit aria-label="Filter sales by payment status">
+            <option value="" @selected($status === '')>All</option>
+            <option value="Paid" @selected($status === 'Paid')>Paid</option>
+            <option value="Pending" @selected($status === 'Pending')>Pending</option>
         </select>
     </label>
 
@@ -72,6 +82,8 @@
                         <td colspan="5" class="sales-history-empty">
                             @if($range === 'custom' && (empty($filters['from']) || empty($filters['to'])))
                                 Choose a start and end date to review that range.
+                            @elseif($status !== '')
+                                No {{ strtolower($status) }} sales for this period.
                             @else
                                 No sales recorded for this period.
                             @endif

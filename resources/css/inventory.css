@@ -848,13 +848,17 @@ body.inventory-forecast-open {
 .modal-box.inventory-forecast-modal .forecast-close {
     flex-shrink: 0;
     align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
     height: 36px;
-    padding: 0 16px;
+    padding: 0;
     border-radius: 9px;
     border: 1px solid #c9d8ce;
     background: #fff;
     color: #3d4a44;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     line-height: 1;
     cursor: pointer;

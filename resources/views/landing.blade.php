@@ -48,7 +48,6 @@
                 <a href="#about">About</a>
                 <a href="#modules">System</a>
                 <a href="#team">Team</a>
-                <a class="thesis-login" href="{{ route('login') }}">Log in</a>
             </nav>
         </header>
 

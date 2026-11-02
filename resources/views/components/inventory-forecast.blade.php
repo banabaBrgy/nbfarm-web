@@ -15,7 +15,9 @@
                 <h3 id="inventory-forecast-title">Next 7 days</h3>
                 <p>Expected use starting tomorrow. Feeds and vitamins follow the daily farm rates. Egg trays follow the egg forecast and reset each morning.</p>
             </div>
-            <button type="button" class="forecast-close" onclick="closeInventoryForecast()">Close</button>
+            <button type="button" class="forecast-close" onclick="closeInventoryForecast()" aria-label="Close">
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
         </div>
         <div class="inventory-forecast-scroll">
 
