@@ -97,17 +97,7 @@
 
     @include('components.inventory-forecast')
 
-<!-- FILTER BAR (aligned right) -->
-    <form method="GET" class="filter-bar">
-        <input type="text" name="search" placeholder="Search item..." value="{{ $search }}">
-
-        <select name="status" data-auto-submit>
-            <option value="">All Status</option>
-            <option value="LOW" {{ $statusFilter === 'LOW' ? 'selected' : '' }}>Low</option>
-            <option value="WATCH" {{ $statusFilter === 'WATCH' ? 'selected' : '' }}>Watch</option>
-            <option value="OK" {{ $statusFilter === 'OK' ? 'selected' : '' }}>OK</option>
-        </select>
-    </form>
+@include('components.inventory-filter-bar')
 
     <!-- ITEMS TABLE -->
     <div class="inventory-table-wrapper">
@@ -186,6 +176,9 @@
                 <form method="GET" style="display:flex; gap:8px; align-items:center;">
                     <input type="hidden" name="search" value="{{ $search }}">
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
+                    <input type="hidden" name="range" value="{{ $dateFilters['range'] ?? 'all' }}">
+                    <input type="hidden" name="from" value="{{ $dateFilters['from'] ?? '' }}">
+                    <input type="hidden" name="to" value="{{ $dateFilters['to'] ?? '' }}">
 
                     <select name="year" class="sort-select" data-auto-submit>
                         @foreach(($availableYears ?? $availableMonths->pluck('year')->unique()->sortDesc()) as $year)
@@ -245,29 +238,7 @@
             </table>
         </div>
 
-        <!-- RECENT STOCK MOVEMENTS -->
-        <div class="inventory-table-wrapper">
-            <h2 class="section-title" style="margin-top:0;">Recent Stock Updates</h2>
-
-            <ul class="movement-list">
-                @forelse($recentMovements as $move)
-                <li class="movement-item">
-                    <div class="movement-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="movement-info">
-                        <strong>{{ $move->item_name }}</strong>
-                        <span class="movement-sub">Current stock: {{ $move->current_stock }} {{ $move->unit }}</span>
-                    </div>
-                    <div class="movement-time">
-                        {{ \Carbon\Carbon::parse($move->updated_at)->diffForHumans() }}
-                    </div>
-                </li>
-                @empty
-                <li class="movement-item" style="justify-content:center; color:#999;">No recent updates.</li>
-                @endforelse
-            </ul>
-        </div>
+        @include('components.inventory-stock-records')
 
     </div>
 
@@ -375,7 +346,15 @@ function closeIncreaseModal() {
     document.getElementById('increaseModal').classList.remove('active');
 }
 
+@php
+    $historyDateQuery = http_build_query(array_filter([
+        'range' => $dateFilters['range'] ?? 'all',
+        'from' => $dateFilters['from'] ?? null,
+        'to' => $dateFilters['to'] ?? null,
+    ], fn ($value) => $value !== null && $value !== ''));
+@endphp
 const historyUrlTemplate = @json(route(\App\Models\User::routeRole() . '.inventory.history', ['id' => 999999]));
+const historyDateQuery = @json($historyDateQuery);
 
 function escapeHistoryHtml(value) {
     return String(value ?? '')
@@ -393,7 +372,10 @@ function openHistoryModal(itemId) {
     body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999;">Loading…</td></tr>';
     modal.classList.add('active');
 
-    fetch(historyUrlTemplate.replace('999999', itemId), {
+    const historyUrl = historyUrlTemplate.replace('999999', itemId)
+        + (historyDateQuery ? ('?' + historyDateQuery) : '');
+
+    fetch(historyUrl, {
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
     })
         .then(res => {
@@ -403,7 +385,7 @@ function openHistoryModal(itemId) {
         .then(data => {
             document.getElementById('historyItemName').textContent = data.item + ' (' + data.unit + ')';
             if (!data.history.length) {
-                body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">No history yet. Add stock to start a log.</td></tr>';
+                body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">No history for this period.</td></tr>';
                 return;
             }
             body.innerHTML = data.history.map(row => {

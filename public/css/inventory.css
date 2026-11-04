@@ -510,6 +510,50 @@
 
 .filter-bar button:hover { background: #327A3C; }
 
+.filter-bar input[type="date"] {
+    padding: 9px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 150px;
+}
+
+.filter-bar .filter-apply {
+    background: #34853F;
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.filter-bar .filter-apply:hover {
+    background: #1e5318;
+}
+
+.stock-records-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.stock-records-period {
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.stock-records-count {
+    color: #34853F;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
 .filter-clear {
     color: #888;
     font-size: 13px;

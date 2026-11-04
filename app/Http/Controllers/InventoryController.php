@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\DailyInventory;
 use App\Services\InventoryForecast;
 use App\Services\LowStockNotifier;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,6 +21,13 @@ class InventoryController extends Controller
 
         $search = $request->query('search');
         $statusFilter = $request->query('status');
+        $range = $this->normalizeRange($request->query('range'));
+        $from = $this->dateOrNull($request->query('from'));
+        $to = $this->dateOrNull($request->query('to'));
+
+        if ($range === 'custom' && $from && $to && $from > $to) {
+            [$from, $to] = [$to, $from];
+        }
 
         $itemsQuery = DB::table('inventory_items')->orderBy('id');
 
@@ -120,11 +128,23 @@ class InventoryController extends Controller
             + ($eggTotals->large ?? 0)
             + ($eggTotals->extra_large ?? 0);
 
-        // Recent stock movements (simple log base sa updated_at ng inventory_items)
-        $recentMovements = DB::table('inventory_items')
-            ->orderBy('updated_at', 'desc')
-            ->limit(5)
+        $movementsQuery = InventoryItemHistory::query()
+            ->where('action', '!=', 'Checked')
+            ->forDateRange($range, $from, $to)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
+
+        $recentMovements = (clone $movementsQuery)
+            ->limit($range === 'all' ? 8 : 50)
             ->get();
+
+        $dateFilters = [
+            'range' => $range,
+            'from' => $from,
+            'to' => $to,
+            'label' => $this->periodLabel($range, $from, $to),
+            'count' => (clone $movementsQuery)->count(),
+        ];
 
         $role = User::routeRole();
 
@@ -148,7 +168,8 @@ class InventoryController extends Controller
             'selectedYear',
             'availableYears',
             'availableMonths',
-            'inventoryForecast'
+            'inventoryForecast',
+            'dateFilters'
         ));
     }
 
@@ -261,7 +282,7 @@ class InventoryController extends Controller
         return back()->with('success', 'Item deleted successfully!');
     }
 
-    public function history($id)
+    public function history(Request $request, $id)
     {
         $item = DB::table('inventory_items')->where('id', $id)->first();
 
@@ -269,8 +290,17 @@ class InventoryController extends Controller
             abort(404);
         }
 
+        $range = $this->normalizeRange($request->query('range'));
+        $from = $this->dateOrNull($request->query('from'));
+        $to = $this->dateOrNull($request->query('to'));
+
+        if ($range === 'custom' && $from && $to && $from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
         $history = InventoryItemHistory::where('inventory_item_id', $id)
             ->where('action', '!=', 'Checked')
+            ->forDateRange($range, $from, $to)
             ->orderByDesc('created_at')
             ->limit(50)
             ->get()
@@ -286,8 +316,56 @@ class InventoryController extends Controller
         return response()->json([
             'item' => $item->item_name,
             'unit' => $item->unit,
+            'period' => $this->periodLabel($range, $from, $to),
             'history' => $history,
         ]);
+    }
+
+    private function normalizeRange(mixed $range): string
+    {
+        $range = is_string($range) ? $range : 'all';
+
+        return in_array($range, ['all', 'daily', 'weekly', 'monthly', 'custom'], true)
+            ? $range
+            : 'all';
+    }
+
+    private function dateOrNull(mixed $value): ?string
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function periodLabel(string $range, ?string $from, ?string $to): string
+    {
+        if ($range === 'daily') {
+            return 'Daily · '.Carbon::today()->format('M j, Y');
+        }
+
+        if ($range === 'weekly') {
+            return 'Weekly · '.Carbon::today()->startOfWeek()->format('M j').'–'.Carbon::today()->endOfWeek()->format('M j, Y');
+        }
+
+        if ($range === 'monthly') {
+            return 'Monthly · '.Carbon::today()->format('F Y');
+        }
+
+        if ($range === 'custom' && $from && $to) {
+            return Carbon::parse($from)->format('M j, Y').' – '.Carbon::parse($to)->format('M j, Y');
+        }
+
+        if ($range === 'custom') {
+            return 'Choose a start and end date';
+        }
+
+        return 'All inventory records';
     }
 
     private function computeStatus($currentStock, $minLevel)
