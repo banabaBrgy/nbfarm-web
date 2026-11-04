@@ -158,6 +158,147 @@ class GenerateEggForecast
     }
 
     /**
+     * Monthly forecast totals for a calendar year (dashboard year chart).
+     * Only days that have production records are predicted and summed,
+     * so the series lines up with Actual monthly harvest totals.
+     *
+     * 2023 (archive start year) has no prior calendar year, so those days
+     * use a within-year prior-7-day average instead of the year-over-year model.
+     *
+     * @return list<int|null>
+     */
+    public function monthlyTotalsForYear(int $year): array
+    {
+        $empty = array_fill(0, 12, null);
+
+        $dateExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? 'date(production_date)'
+            : 'DATE(production_date)';
+
+        $dates = Production::query()
+            ->whereYear('production_date', $year)
+            ->selectRaw("{$dateExpression} as date")
+            ->groupBy(DB::raw($dateExpression))
+            ->orderBy(DB::raw($dateExpression))
+            ->pluck('date')
+            ->map(fn ($date) => Carbon::parse($date)->toDateString())
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($dates === []) {
+            return $empty;
+        }
+
+        $maxDate = max($dates);
+        $cacheKey = 'egg-forecast:monthly-year:v2:'.$year.':'.$maxDate;
+
+        return Cache::remember($cacheKey, now()->addHour(), function () use ($dates, $empty, $year) {
+            $archiveStartYear = Carbon::parse((string) config(
+                'forecasting.archive_start',
+                '2023-01-01'
+            ))->year;
+
+            $byDate = [];
+
+            if ($year > $archiveStartYear) {
+                foreach (array_chunk($dates, 90) as $chunk) {
+                    try {
+                        $byDate += $this->predictDates($chunk);
+                    } catch (Throwable $e) {
+                        Log::warning('Yearly egg forecast chunk failed', [
+                            'year' => $year,
+                            'message' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
+
+            $predictedSum = (int) array_sum(array_map(
+                fn ($date) => (int) ($byDate[$date]['eggs'] ?? 0),
+                $dates
+            ));
+
+            if ($year <= $archiveStartYear || $predictedSum <= 0) {
+                $byDate = $this->withinYearBaselineForDates($dates);
+            }
+
+            $totals = array_fill(0, 12, 0);
+            $hasMonth = array_fill(0, 12, false);
+
+            foreach ($dates as $date) {
+                $monthIndex = Carbon::parse($date)->month - 1;
+                $hasMonth[$monthIndex] = true;
+                $totals[$monthIndex] += (int) ($byDate[$date]['eggs'] ?? 0);
+            }
+
+            $result = [];
+            for ($month = 0; $month < 12; $month++) {
+                $result[] = $hasMonth[$month] ? $totals[$month] : null;
+            }
+
+            return $result !== [] ? $result : $empty;
+        });
+    }
+
+    /**
+     * First-archive-year chart fallback: average of up to 7 prior harvest days
+     * in the same year, rounded to trays.
+     *
+     * @param  list<string>  $dates
+     * @return array<string, array{eggs: int}>
+     */
+    private function withinYearBaselineForDates(array $dates): array
+    {
+        $ordered = array_values($dates);
+        sort($ordered);
+
+        $year = Carbon::parse($ordered[0])->year;
+        $wanted = array_fill_keys($ordered, true);
+        $actualByDate = [];
+
+        $rows = Production::query()
+            ->whereYear('production_date', $year)
+            ->orderBy('production_date')
+            ->get(['production_date', 'eggs_produced']);
+
+        foreach ($rows as $row) {
+            $key = Carbon::parse($row->production_date)->toDateString();
+            if (! isset($wanted[$key])) {
+                continue;
+            }
+            $actualByDate[$key] = ($actualByDate[$key] ?? 0) + (int) $row->eggs_produced;
+        }
+
+        $tray = Production::EGGS_PER_TRAY;
+        $result = [];
+
+        foreach ($ordered as $index => $date) {
+            $window = [];
+            for ($j = $index - 1; $j >= 0 && count($window) < 7; $j--) {
+                $prior = $ordered[$j];
+                $eggs = (int) ($actualByDate[$prior] ?? 0);
+                if ($eggs > 0) {
+                    $window[] = $eggs;
+                }
+            }
+
+            if ($window === []) {
+                $result[$date] = ['eggs' => 0];
+
+                continue;
+            }
+
+            $avg = array_sum($window) / count($window);
+            $result[$date] = [
+                'eggs' => (int) (round($avg / $tray) * $tray),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
      * @return array{
      *     predicted_eggs: int,
      *     forecast_date: string,

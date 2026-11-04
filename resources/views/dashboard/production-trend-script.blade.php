@@ -22,21 +22,30 @@
             ? {
                 labels: months,
                 datasets: series.map(function (row) {
+                    const isForecast = row.label === 'Forecast' || row.style === 'forecast';
+                    const color = row.color || (isForecast ? forecastOrange : green);
+
                     return {
                         type: 'line',
                         label: row.label,
                         data: row.data,
-                        borderColor: row.color || green,
-                        backgroundColor: greenFill,
+                        borderColor: color,
+                        backgroundColor: isForecast ? 'transparent' : greenFill,
+                        borderDash: isForecast ? [7, 5] : undefined,
                         borderWidth: compact ? 2 : 2.5,
-                        pointRadius: compact ? 3.5 : 4,
-                        pointHoverRadius: compact ? 5 : 6,
-                        pointBackgroundColor: row.color || green,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 1.5,
-                        fill: true,
+                        pointRadius: compact
+                            ? (isForecast ? 2.5 : 3.5)
+                            : (isForecast ? 3 : 4),
+                        pointHoverRadius: compact
+                            ? 5
+                            : (isForecast ? 4 : 6),
+                        pointBackgroundColor: color,
+                        pointBorderColor: isForecast ? color : '#fff',
+                        pointBorderWidth: isForecast ? 1 : 1.5,
+                        fill: !isForecast,
                         tension: 0.15,
                         spanGaps: false,
+                        order: isForecast ? 1 : 2,
                     };
                 }),
             }
@@ -128,21 +137,7 @@
                 },
                 plugins: {
                     legend: {
-                        display: monthly,
-                        position: 'top',
-                        align: 'center',
-                        labels: {
-                            color: '#54595e',
-                            boxWidth: 14,
-                            boxHeight: 14,
-                            padding: compact ? 10 : 18,
-                            usePointStyle: false,
-                            font: {
-                                size: compact ? 11 : 13,
-                                weight: '700',
-                                family: "'Poppins', 'Nunito', sans-serif",
-                            },
-                        },
+                        display: false,
                     },
                     tooltip: {
                         backgroundColor: '#1f2937',
@@ -208,8 +203,6 @@
             chart.options.scales.y.ticks.font.size = compact ? 10 : 11;
             chart.options.scales.y.ticks.padding = compact ? 4 : 8;
             chart.options.layout.padding.right = compact ? 4 : 8;
-            chart.options.plugins.legend.labels.padding = compact ? 10 : 18;
-            chart.options.plugins.legend.labels.font.size = compact ? 11 : 13;
             chart.options.scales.x.ticks.maxTicksLimit = compact && monthly ? 6 : undefined;
         }
 
@@ -220,28 +213,26 @@
             });
         }
 
-        if (!monthly) {
-            const legendButtons = document.querySelectorAll('[data-egg-chart-toggle]');
+        const legendButtons = document.querySelectorAll('[data-egg-chart-toggle]');
 
-            legendButtons.forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const label = button.getAttribute('data-egg-chart-toggle');
-                    const index = chart.data.datasets.findIndex(function (dataset) {
-                        return dataset.label === label;
-                    });
-
-                    if (index < 0) {
-                        return;
-                    }
-
-                    const visible = chart.isDatasetVisible(index);
-                    chart.setDatasetVisibility(index, !visible);
-                    chart.update();
-
-                    button.classList.toggle('is-hidden', visible);
-                    button.setAttribute('aria-pressed', visible ? 'false' : 'true');
+        legendButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const label = button.getAttribute('data-egg-chart-toggle');
+                const index = chart.data.datasets.findIndex(function (dataset) {
+                    return dataset.label === label;
                 });
+
+                if (index < 0) {
+                    return;
+                }
+
+                const visible = chart.isDatasetVisible(index);
+                chart.setDatasetVisibility(index, !visible);
+                chart.update();
+
+                button.classList.toggle('is-hidden', visible);
+                button.setAttribute('aria-pressed', visible ? 'false' : 'true');
             });
-        }
+        });
     })();
 </script>

@@ -1,5 +1,5 @@
 /* =====================================================
-   PRINT QR LABELS — NB Poultry Farm
+   BATCH IDENTIFICATION / PRINT QR — NB Poultry Farm
 ===================================================== */
 
 .qr-print-page {
@@ -41,7 +41,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
 .qr-print-header-copy h1 {
@@ -102,20 +102,122 @@
     transform: translateY(-1px);
 }
 
-/* ----- Label grid ----- */
+/* ----- Filters ----- */
+
+.qr-filter-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1px solid #e6ece8;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.qr-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+}
+
+.qr-filter-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.qr-filter-select {
+    appearance: none;
+    background: #fafcfb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.4.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E") right 12px center / 12px no-repeat;
+    border: 1px solid #d8e2da;
+    border-radius: 10px;
+    padding: 10px 36px 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    min-width: 180px;
+}
+
+.qr-filter-select:focus {
+    outline: none;
+    border-color: #2f8158;
+    box-shadow: 0 0 0 3px rgba(47, 129, 88, 0.12);
+}
+
+.qr-filter-clear {
+    align-self: center;
+    margin-left: auto;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.qr-filter-clear:hover {
+    color: #2f8158;
+}
+
+/* ----- Batch / size groups ----- */
+
+.qr-batch-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.qr-batch-group {
+    background: #fff;
+    border: 1px solid #e6ece8;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.qr-batch-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eef2ef;
+}
+
+.qr-batch-group-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: -0.2px;
+}
+
+.qr-batch-group-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* ----- Label grid: 10 codes in 2×5 ----- */
 
 .qr-label-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
 }
 
 .qr-label {
     background: #fff;
     border: 1px solid #e6ece8;
-    border-radius: 16px;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
 }
@@ -124,17 +226,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     background: #2f8158;
     color: #fff;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.4px;
-    padding: 12px 16px;
+    letter-spacing: 0.3px;
+    padding: 8px 10px;
 }
 
 .qr-label-body {
-    padding: 20px 20px 18px;
+    padding: 12px 12px 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -146,33 +248,37 @@
     align-items: center;
     background: #fafcfb;
     border: 1px solid #eef2ef;
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 10px;
+    padding: 8px;
     width: 100%;
 }
 
 .qr-label-image svg {
     display: block;
-    width: 168px;
-    height: 168px;
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    aspect-ratio: 1;
 }
 
 .qr-label-code {
-    margin-top: 14px;
-    font-size: 15px;
+    margin-top: 10px;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     color: #1f2937;
     font-variant-numeric: tabular-nums;
+    text-align: center;
+    word-break: break-all;
 }
 
 .qr-label-meta {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px 16px;
+    gap: 8px 10px;
     width: 100%;
-    margin-top: 14px;
-    padding-top: 14px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid #eef2ef;
 }
 
@@ -183,7 +289,7 @@
 }
 
 .qr-label-meta span {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: #9ca3af;
     text-transform: uppercase;
@@ -191,7 +297,7 @@
 }
 
 .qr-label-meta strong {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     color: #374151;
 }
@@ -243,79 +349,17 @@
     font-size: 13px;
 }
 
-/* ----- Pagination ----- */
-
-.qr-pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 24px;
-    padding: 16px 20px;
-    background: #fff;
-    border: 1px solid #e6ece8;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-}
-
-.qr-pagination-info {
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.qr-pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.qr-page-btn,
-.qr-page-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 36px;
-    padding: 7px 12px;
-    border: 1px solid #d8e2da;
-    border-radius: 8px;
-    background: #fff;
-    color: #374151;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    line-height: 1;
-}
-
-.qr-page-btn:hover,
-.qr-page-num:hover {
-    border-color: #2f8158;
-    color: #2f8158;
-}
-
-.qr-page-btn.disabled {
-    opacity: 0.45;
-    pointer-events: none;
-}
-
-.qr-page-num.active {
-    background: #2f8158;
-    border-color: #2f8158;
-    color: #fff;
-}
-
-.qr-page-ellipsis {
-    padding: 0 4px;
-    color: #9ca3af;
-    font-weight: 600;
-}
-
 /* ----- Responsive ----- */
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
     .qr-label-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .qr-label-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
@@ -337,31 +381,46 @@
         justify-content: center;
     }
 
-    .qr-label-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .qr-pagination {
-        flex-direction: column;
+    .qr-filter-bar {
         align-items: stretch;
-        text-align: center;
     }
 
-    .qr-pagination-controls {
-        justify-content: center;
+    .qr-filter-group,
+    .qr-filter-select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .qr-filter-clear {
+        margin-left: 0;
+    }
+
+    .qr-batch-group-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .qr-label-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
 }
 
-/* ----- Print ----- */
+@media (max-width: 480px) {
+    .qr-label-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ----- Print: one Batch + Size group per paper ----- */
 
 @media print {
     @page {
-        margin: 12mm;
+        margin: 10mm;
     }
 
     body {
-        background: #fff !important;
+        background: #fff;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -371,26 +430,54 @@
     .sidebar-backdrop,
     .footer,
     .no-print {
-        display: none !important;
+        display: none;
     }
 
     .wrapper > .main-content,
     .main-content {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #fff !important;
-        width: 100% !important;
-        max-width: none !important;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        width: 100%;
+        max-width: none;
     }
 
     .qr-print-page {
         padding: 0;
     }
 
+    .qr-batch-groups {
+        gap: 0;
+    }
+
+    .qr-batch-group {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .qr-batch-group:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .qr-batch-group-header {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #c5d4c8;
+    }
+
+    .qr-batch-group-header h2 {
+        font-size: 20px;
+    }
+
     .qr-label-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10mm;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6mm;
     }
 
     .qr-label {
@@ -398,54 +485,53 @@
         page-break-inside: avoid;
         box-shadow: none;
         border: 1px solid #c5d4c8;
-        border-radius: 8px;
+        border-radius: 6px;
     }
 
     .qr-label-brand {
-        background: #2f8158 !important;
-        color: #fff !important;
-        padding: 8px 10px;
-        font-size: 11px;
+        background: #2f8158;
+        color: #fff;
+        padding: 6px 8px;
+        font-size: 9px;
     }
 
     .qr-label-body {
-        padding: 10px 12px 12px;
+        padding: 8px;
     }
 
     .qr-label-image {
         background: #fff;
         border: none;
-        padding: 4px;
+        padding: 2px;
     }
 
     .qr-label-image svg {
-        width: 32mm;
-        height: 32mm;
+        max-width: 28mm;
     }
 
     .qr-label-code {
-        font-size: 12px;
-        margin-top: 8px;
+        font-size: 9px;
+        margin-top: 6px;
     }
 
     .qr-label-meta {
-        margin-top: 8px;
-        padding-top: 8px;
-        gap: 6px 10px;
+        margin-top: 6px;
+        padding-top: 6px;
+        gap: 4px 6px;
     }
 
     .qr-label-meta span {
-        font-size: 9px;
+        font-size: 8px;
     }
 
     .qr-label-meta strong {
-        font-size: 11px;
+        font-size: 9px;
     }
 
     .qr-size {
         background: none;
         color: inherit;
         padding: 0;
-        font-size: 11px;
+        font-size: 10px;
     }
 }
