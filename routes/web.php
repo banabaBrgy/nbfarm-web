@@ -271,6 +271,9 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
     Route::post('/qr/generate', [QrRecordController::class, 'generate'])
         ->name('qr.generate');
 
+    Route::get('/qr/overview', [QrRecordController::class, 'overview'])
+        ->name('qr.overview');
+
     Route::get('/qr/list', [QrRecordController::class, 'index'])
         ->name('qr.list');
 

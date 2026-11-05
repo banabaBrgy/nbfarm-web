@@ -3,6 +3,7 @@
     $indexRoute = $rolePrefix . '.production';
     $scanRoute = $rolePrefix . '.production.scan';
     $generateRoute = $rolePrefix . '.qr.generate';
+    $overviewRoute = $rolePrefix . '.qr.overview';
     $detailsRoute = $rolePrefix . '.production.details';
     $canManageQr = $rolePrefix === 'staff';
     $date = $selectedDate instanceof \Carbon\Carbon
@@ -29,6 +30,10 @@
                 <a href="{{ route($scanRoute) }}" class="btn-update">
                     <i class="fas fa-camera"></i>
                     Scan QR
+                </a>
+                <a href="{{ route($overviewRoute) }}" class="btn-update">
+                    <i class="fas fa-table-list"></i>
+                    Overview
                 </a>
             </div>
         @endif

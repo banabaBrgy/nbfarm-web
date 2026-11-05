@@ -106,6 +106,14 @@
 
                     </a>
 
+                    <a href="{{ route(\App\Models\User::routeRole() . '.qr.overview') }}" class="btn btn-outline-success">
+
+                    <i class="fas fa-table-list"></i>
+
+                    Overview
+
+                    </a>
+
                 </div>
                 @endif
 

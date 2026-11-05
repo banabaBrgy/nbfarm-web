@@ -17,6 +17,75 @@ class QrRecordController extends Controller
         return view('qr.list', compact('records'));
     }
 
+    public function overview(Request $request)
+    {
+        abort_unless(User::routeRole() === 'staff', 403);
+
+        $eggSize = $this->resolvedEggSize($request->input('egg_size'));
+        $batchId = $this->resolvedBatchId($request->input('batch_id'));
+        $search = mb_substr(trim((string) $request->input('search', '')), 0, 80);
+        $todayProductionIds = Production::query()
+            ->whereDate('production_date', today())
+            ->pluck('production_id');
+
+        $query = QrRecord::query()
+            ->with(['transactions' => function ($relation) use ($todayProductionIds) {
+                $relation
+                    ->whereIn('production_id', $todayProductionIds)
+                    ->orderByDesc('scanned_at')
+                    ->orderByDesc('id');
+            }])
+            ->whereIn('batch_id', QrRecord::BATCH_IDS)
+            ->whereIn('egg_size', array_keys(QrRecord::SIZE_PREFIXES));
+
+        if ($eggSize) {
+            $query->where('egg_size', $eggSize);
+        }
+
+        if ($batchId) {
+            $query->where('batch_id', $batchId);
+        }
+
+        $safeSearch = str_replace(['%', '_'], '', $search);
+
+        if ($safeSearch !== '') {
+            $query->where('qr_code', 'like', '%'.$safeSearch.'%');
+        }
+
+        $rows = $query
+            ->orderBy('batch_id')
+            ->orderByRaw("CASE egg_size WHEN 'Small' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Large' THEN 3 WHEN 'Extra Large' THEN 4 ELSE 5 END")
+            ->orderBy('qr_code')
+            ->paginate(5)
+            ->withQueryString();
+
+        $rows->setCollection(
+            $rows->getCollection()->map(function (QrRecord $record) {
+                $latest = $record->transactions->first();
+                $scanned = $latest !== null;
+
+                return [
+                    'qr_code' => (string) $record->qr_code,
+                    'batch_id' => (int) $record->batch_id,
+                    'egg_size' => (string) $record->egg_size,
+                    'quantity' => $scanned
+                        ? (int) $latest->total_eggs
+                        : (int) $record->tray_count * (int) $record->eggs_per_tray,
+                    'status' => $scanned ? 'Scanned' : 'Available',
+                ];
+            })
+        );
+
+        return view('qr.overview', [
+            'rows' => $rows,
+            'sizes' => array_keys(QrRecord::SIZE_PREFIXES),
+            'batches' => QrRecord::BATCH_IDS,
+            'eggSize' => $eggSize,
+            'batchId' => $batchId,
+            'search' => $search,
+        ]);
+    }
+
     public function print(Request $request)
     {
         $printAll = $request->boolean('all');

@@ -1345,6 +1345,11 @@ body,
     color: var(--nb-day-text);
 }
 
+.qr-overview-table thead th {
+    background: #2f8158;
+    color: #ffffff;
+}
+
 .qr-btn-ghost {
     color: var(--nb-day-green);
     border-color: var(--nb-day-border);
