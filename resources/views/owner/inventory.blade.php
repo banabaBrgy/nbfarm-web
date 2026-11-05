@@ -176,9 +176,6 @@
                 <form method="GET" style="display:flex; gap:8px; align-items:center;">
                     <input type="hidden" name="search" value="{{ $search }}">
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
-                    <input type="hidden" name="range" value="{{ $dateFilters['range'] ?? 'all' }}">
-                    <input type="hidden" name="from" value="{{ $dateFilters['from'] ?? '' }}">
-                    <input type="hidden" name="to" value="{{ $dateFilters['to'] ?? '' }}">
 
                     <select name="year" class="sort-select" data-auto-submit>
                         @foreach(($availableYears ?? $availableMonths->pluck('year')->unique()->sortDesc()) as $year)
@@ -238,7 +235,28 @@
             </table>
         </div>
 
-        @include('components.inventory-stock-records')
+        <div class="inventory-table-wrapper">
+            <h2 class="section-title" style="margin-top:0;">Recent Stock Updates</h2>
+
+            <ul class="movement-list">
+                @forelse($recentMovements as $move)
+                <li class="movement-item">
+                    <div class="movement-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="movement-info">
+                        <strong>{{ $move->item_name }}</strong>
+                        <span class="movement-sub">Current stock: {{ $move->current_stock }} {{ $move->unit }}</span>
+                    </div>
+                    <div class="movement-time">
+                        {{ \Carbon\Carbon::parse($move->updated_at)->diffForHumans() }}
+                    </div>
+                </li>
+                @empty
+                <li class="movement-item" style="justify-content:center; color:#999;">No recent updates.</li>
+                @endforelse
+            </ul>
+        </div>
 
     </div>
 
@@ -295,33 +313,7 @@
 </div>
 @endif
 
-<!-- ITEM HISTORY MODAL -->
-<div class="modal-overlay" id="historyModal">
-    <div class="modal-box history-modal-box">
-        <div class="history-modal-head">
-            <h3>Stock History</h3>
-            <button type="button" class="modal-x" onclick="closeHistoryModal()" aria-label="Close">
-                <i class="fas fa-xmark" aria-hidden="true"></i>
-            </button>
-        </div>
-        <p style="color:#777; font-size:13px; margin:8px 0 16px;">Item: <strong id="historyItemName"></strong></p>
-        <div class="history-table-wrap">
-            <table class="inventory-table history-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Action</th>
-                        <th>Change</th>
-                        <th>Stock after</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTableBody">
-                    <tr><td colspan="4" style="text-align:center; color:#999;">Loading…</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+@include('components.inventory-history-modal')
 @endsection
 
 @push('scripts')
@@ -344,68 +336,6 @@ function openIncreaseModal(itemId, itemName) {
 
 function closeIncreaseModal() {
     document.getElementById('increaseModal').classList.remove('active');
-}
-
-@php
-    $historyDateQuery = http_build_query(array_filter([
-        'range' => $dateFilters['range'] ?? 'all',
-        'from' => $dateFilters['from'] ?? null,
-        'to' => $dateFilters['to'] ?? null,
-    ], fn ($value) => $value !== null && $value !== ''));
-@endphp
-const historyUrlTemplate = @json(route(\App\Models\User::routeRole() . '.inventory.history', ['id' => 999999]));
-const historyDateQuery = @json($historyDateQuery);
-
-function escapeHistoryHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-function openHistoryModal(itemId) {
-    const modal = document.getElementById('historyModal');
-    const body = document.getElementById('historyTableBody');
-    document.getElementById('historyItemName').textContent = '…';
-    body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999;">Loading…</td></tr>';
-    modal.classList.add('active');
-
-    const historyUrl = historyUrlTemplate.replace('999999', itemId)
-        + (historyDateQuery ? ('?' + historyDateQuery) : '');
-
-    fetch(historyUrl, {
-        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-    })
-        .then(res => {
-            if (!res.ok) throw new Error('Could not load history');
-            return res.json();
-        })
-        .then(data => {
-            document.getElementById('historyItemName').textContent = data.item + ' (' + data.unit + ')';
-            if (!data.history.length) {
-                body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">No history for this period.</td></tr>';
-                return;
-            }
-            body.innerHTML = data.history.map(row => {
-                const change = Number(row.change);
-                const sign = change > 0 ? '+' : '';
-                return '<tr>' +
-                    '<td>' + escapeHistoryHtml(row.when) + '</td>' +
-                    '<td>' + escapeHistoryHtml(row.action) + (row.note ? '<div class="history-note">' + escapeHistoryHtml(row.note) + '</div>' : '') + '</td>' +
-                    '<td>' + sign + Number(change).toLocaleString() + '</td>' +
-                    '<td>' + Number(row.after).toLocaleString() + '</td>' +
-                    '</tr>';
-            }).join('');
-        })
-        .catch(() => {
-            body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#c0392b;">Could not load history.</td></tr>';
-        });
-}
-
-function closeHistoryModal() {
-    document.getElementById('historyModal').classList.remove('active');
 }
 
 @if($canEditInventory)

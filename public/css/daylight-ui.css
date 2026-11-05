@@ -1690,3 +1690,12 @@ select.form-select,
     border-color: #3b8f47;
     color: #3b8f47;
 }
+
+#historyModal .history-table thead,
+#historyModal .history-table thead th {
+    background: #2f8158 !important;
+    color: #ffffff !important;
+    border-bottom: none;
+    position: static;
+    top: auto;
+}

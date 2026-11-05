@@ -21,13 +21,6 @@ class InventoryController extends Controller
 
         $search = $request->query('search');
         $statusFilter = $request->query('status');
-        $range = $this->normalizeRange($request->query('range'));
-        $from = $this->dateOrNull($request->query('from'));
-        $to = $this->dateOrNull($request->query('to'));
-
-        if ($range === 'custom' && $from && $to && $from > $to) {
-            [$from, $to] = [$to, $from];
-        }
 
         $itemsQuery = DB::table('inventory_items')->orderBy('id');
 
@@ -128,23 +121,10 @@ class InventoryController extends Controller
             + ($eggTotals->large ?? 0)
             + ($eggTotals->extra_large ?? 0);
 
-        $movementsQuery = InventoryItemHistory::query()
-            ->where('action', '!=', 'Checked')
-            ->forDateRange($range, $from, $to)
-            ->orderByDesc('created_at')
-            ->orderByDesc('id');
-
-        $recentMovements = (clone $movementsQuery)
-            ->limit($range === 'all' ? 8 : 50)
+        $recentMovements = DB::table('inventory_items')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
             ->get();
-
-        $dateFilters = [
-            'range' => $range,
-            'from' => $from,
-            'to' => $to,
-            'label' => $this->periodLabel($range, $from, $to),
-            'count' => (clone $movementsQuery)->count(),
-        ];
 
         $role = User::routeRole();
 
@@ -168,8 +148,7 @@ class InventoryController extends Controller
             'selectedYear',
             'availableYears',
             'availableMonths',
-            'inventoryForecast',
-            'dateFilters'
+            'inventoryForecast'
         ));
     }
 
@@ -302,22 +281,28 @@ class InventoryController extends Controller
             ->where('action', '!=', 'Checked')
             ->forDateRange($range, $from, $to)
             ->orderByDesc('created_at')
-            ->limit(50)
-            ->get()
-            ->map(fn ($row) => [
+            ->orderByDesc('id')
+            ->paginate(5);
+
+        return response()->json([
+            'item' => $item->item_name,
+            'unit' => $item->unit,
+            'period' => $this->periodLabel($range, $from, $to),
+            'history' => $history->getCollection()->map(fn ($row) => [
                 'when' => $row->created_at->format('M d, Y g:i A'),
                 'action' => $row->action,
                 'change' => $row->quantity_change,
                 'before' => $row->stock_before,
                 'after' => $row->stock_after,
                 'note' => $row->note,
-            ]);
-
-        return response()->json([
-            'item' => $item->item_name,
-            'unit' => $item->unit,
-            'period' => $this->periodLabel($range, $from, $to),
-            'history' => $history,
+            ])->values(),
+            'pagination' => [
+                'current' => $history->currentPage(),
+                'last' => $history->lastPage(),
+                'total' => $history->total(),
+                'from' => $history->firstItem(),
+                'to' => $history->lastItem(),
+            ],
         ]);
     }
 

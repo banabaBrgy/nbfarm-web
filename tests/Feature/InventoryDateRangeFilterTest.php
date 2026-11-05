@@ -33,15 +33,15 @@ class InventoryDateRangeFilterTest extends TestCase
         $this->actingAs($owner)
             ->get(route('owner.inventory'))
             ->assertOk()
+            ->assertSee('id="historyRange"', false)
             ->assertSee('Daily')
             ->assertSee('Weekly')
             ->assertSee('Monthly')
             ->assertSee('Custom Date Range')
-            ->assertSee('Inventory Records')
-            ->assertSee('All inventory records');
+            ->assertDontSee('name="range"', false);
     }
 
-    public function test_date_range_filters_inventory_records(): void
+    public function test_history_endpoint_filters_by_daily_weekly_monthly_and_custom(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
         $item = $this->seedItem();
@@ -52,38 +52,31 @@ class InventoryDateRangeFilterTest extends TestCase
         $this->seedHistory($item, 'Restocked last month', 4, '2026-09-15 10:00:00');
 
         $this->actingAs($manager)
-            ->get(route('manager.inventory', ['range' => 'daily']))
+            ->getJson(route('manager.inventory.history', ['id' => $item->id, 'range' => 'daily']))
             ->assertOk()
-            ->assertSee('Restocked today')
-            ->assertDontSee('Restocked this week')
-            ->assertDontSee('Restocked last month');
+            ->assertJsonPath('history.0.note', 'Restocked today')
+            ->assertJsonCount(1, 'history');
 
         $this->actingAs($manager)
-            ->get(route('manager.inventory', ['range' => 'weekly']))
+            ->getJson(route('manager.inventory.history', ['id' => $item->id, 'range' => 'weekly']))
             ->assertOk()
-            ->assertSee('Restocked today')
-            ->assertSee('Restocked this week')
-            ->assertDontSee('Restocked this month')
-            ->assertDontSee('Restocked last month');
+            ->assertJsonCount(2, 'history');
 
         $this->actingAs($manager)
-            ->get(route('manager.inventory', ['range' => 'monthly']))
+            ->getJson(route('manager.inventory.history', ['id' => $item->id, 'range' => 'monthly']))
             ->assertOk()
-            ->assertSee('Restocked today')
-            ->assertSee('Restocked this week')
-            ->assertSee('Restocked this month')
-            ->assertDontSee('Restocked last month');
+            ->assertJsonCount(3, 'history');
 
         $this->actingAs($manager)
-            ->get(route('manager.inventory', [
+            ->getJson(route('manager.inventory.history', [
+                'id' => $item->id,
                 'range' => 'custom',
                 'from' => '2026-09-01',
                 'to' => '2026-09-30',
             ]))
             ->assertOk()
-            ->assertSee('Restocked last month')
-            ->assertDontSee('Restocked today')
-            ->assertDontSee('Restocked this month');
+            ->assertJsonPath('history.0.note', 'Restocked last month')
+            ->assertJsonCount(1, 'history');
     }
 
     public function test_item_history_endpoint_respects_date_range(): void
@@ -103,7 +96,28 @@ class InventoryDateRangeFilterTest extends TestCase
             ->assertJsonPath('item', 'Feeds')
             ->assertJsonPath('period', 'Daily · Oct 8, 2026')
             ->assertJsonCount(1, 'history')
-            ->assertJsonPath('history.0.note', 'In range');
+            ->assertJsonPath('history.0.note', 'In range')
+            ->assertJsonPath('pagination.current', 1)
+            ->assertJsonPath('pagination.total', 1);
+    }
+
+    public function test_item_history_is_paginated_five_per_page(): void
+    {
+        $owner = User::factory()->create(['role' => 'owner']);
+        $item = $this->seedItem();
+
+        foreach (range(1, 6) as $index) {
+            $this->seedHistory($item, 'Row '.$index, 1, '2026-10-08 08:0'.$index.':00');
+        }
+
+        $this->actingAs($owner)
+            ->getJson(route('owner.inventory.history', ['id' => $item->id, 'page' => 2]))
+            ->assertOk()
+            ->assertJsonPath('pagination.current', 2)
+            ->assertJsonPath('pagination.last', 2)
+            ->assertJsonPath('pagination.total', 6)
+            ->assertJsonCount(1, 'history')
+            ->assertJsonPath('history.0.note', 'Row 1');
     }
 
     private function seedItem(): InventoryItem

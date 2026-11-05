@@ -300,6 +300,440 @@
     white-space: nowrap;
 }
 
+.modal-box.history-modal-box {
+    width: min(560px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    padding: 0;
+    border-radius: 16px;
+    overflow: visible;
+    box-shadow: 0 18px 48px rgba(20, 40, 24, 0.18);
+}
+
+.history-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 18px 0;
+}
+
+.history-modal-head h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #216E4B;
+}
+
+.history-item-line {
+    margin: 4px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.history-modal-body {
+    padding: 14px 18px 18px;
+}
+
+.history-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.history-modal-box .history-range-select {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 0;
+}
+
+.history-modal-box .history-range-select > span {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.history-dropdown {
+    position: relative;
+    width: 210px;
+}
+
+.history-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 42px;
+    margin: 0;
+    padding: 0 36px 0 12px;
+    border: 1px solid #d8e2da;
+    border-radius: 10px;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 8px;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.history-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 5;
+    width: 100%;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border: 1px solid #d8e2da;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(20, 40, 24, 0.12);
+}
+
+.history-dropdown-menu button {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.history-dropdown-menu button[aria-selected="true"],
+.history-dropdown-menu button:hover {
+    background: #eaf7eb;
+    color: #216E4B;
+}
+
+.history-custom-range {
+    display: inline-flex;
+    align-items: stretch;
+    margin: 0;
+    border: 1px solid #d8e2da;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.history-custom-range[hidden] {
+    display: none;
+}
+
+.history-calendar {
+    position: relative;
+    min-width: 0;
+}
+
+.history-calendar-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    min-width: 228px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 10px 0 0 10px;
+    background: transparent;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.history-calendar-toggle i {
+    color: #34853F;
+}
+
+.history-calendar-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 6;
+    width: min(520px, calc(100vw - 48px));
+    padding: 14px 12px 12px;
+    border: 1px solid #d8e2da;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(20, 40, 24, 0.14);
+}
+
+.history-calendar-menu[hidden],
+.history-dropdown-menu[hidden] {
+    display: none;
+}
+
+.history-cal-nav {
+    position: absolute;
+    top: 10px;
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+}
+
+.history-cal-nav.is-prev { left: 8px; }
+.history-cal-nav.is-next { right: 8px; }
+
+.history-cal-nav:hover {
+    background: #eaf7eb;
+    color: #216E4B;
+}
+
+.history-calendar-months {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.history-cal-title {
+    margin-bottom: 8px;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.history-cal-week,
+.history-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.history-cal-week span {
+    padding-bottom: 4px;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.history-cal-day {
+    height: 32px;
+    border: 0;
+    background: transparent;
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.history-cal-day.is-outside {
+    color: #b7c2bb;
+}
+
+.history-cal-day.is-between {
+    background: #e3f6e6;
+    color: #216E4B;
+}
+
+.history-cal-day.is-start,
+.history-cal-day.is-end {
+    border-radius: 8px;
+    background: #34853F;
+    color: #fff;
+}
+
+.history-apply {
+    height: auto;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 0 9px 9px 0;
+    background: #34853F;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.history-apply:hover {
+    background: #2d7436;
+}
+
+.history-period {
+    display: inline-flex;
+    margin: 0 0 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #eaf7eb;
+    color: #216E4B;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.history-table-wrap {
+    max-height: 360px;
+    overflow: auto;
+    border: 1px solid #e6ece8;
+    border-radius: 12px;
+}
+
+.history-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.history-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-page-label {
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.history-page-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #d8e2da;
+    border-radius: 10px;
+    background: #fff;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.history-page-btn:hover {
+    border-color: #34853F;
+    color: #34853F;
+}
+
+.history-page-btn.disabled,
+.history-page-btn:disabled {
+    background: #eef4f0;
+    border-color: #d8e2da;
+    color: #9ca3af;
+    cursor: default;
+}
+
+#historyModal .history-table thead,
+#historyModal .history-table thead th {
+    background: #2f8158;
+    color: #ffffff;
+    border-bottom: none;
+    position: static;
+    top: auto;
+}
+
+.history-modal-box .history-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 28px 16px;
+}
+
+.history-up {
+    color: #216E4B;
+    font-weight: 700;
+}
+
+.history-down {
+    color: #c0392b;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .history-toolbar {
+        position: relative;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .history-modal-box .history-range-select {
+        width: 100%;
+    }
+
+    .history-dropdown {
+        width: auto;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .history-custom-range {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        width: 100%;
+        border: 1px solid #d8e2da;
+        border-radius: 10px;
+        background: #fff;
+    }
+
+    .history-calendar {
+        position: static;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .history-calendar-toggle {
+        width: 100%;
+        min-width: 0;
+        padding: 0 10px;
+        border: 0;
+        border-radius: 10px 0 0 10px;
+        background: transparent;
+    }
+
+    .history-calendar-toggle span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .history-apply {
+        flex: 0 0 auto;
+        align-self: stretch;
+        height: auto;
+        border-radius: 0 9px 9px 0;
+    }
+
+    .history-calendar-menu {
+        left: 0;
+        right: 0;
+        width: auto;
+        max-height: min(420px, calc(100vh - 160px));
+        overflow: auto;
+    }
+
+    .history-calendar-months {
+        grid-template-columns: 1fr;
+    }
+
+    .history-cal-month:last-child {
+        display: none;
+    }
+}
+
 /* =========================================
    TABLE WRAPPER
 ========================================= */
