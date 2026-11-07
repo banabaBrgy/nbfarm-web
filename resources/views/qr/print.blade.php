@@ -4,7 +4,7 @@
 @section('page-label', 'Batch Identification')
 
 @push('styles')
-<link rel="stylesheet" href="/css/qr-print.css">
+<link rel="stylesheet" href="{{ versioned_asset('css/qr-print.css') }}">
 @endpush
 
 @section('content')
