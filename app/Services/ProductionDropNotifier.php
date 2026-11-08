@@ -68,6 +68,7 @@ class ProductionDropNotifier
 
                 if ($open) {
                     $open->update([
+                        'priority' => StockNotification::PRIORITY_HIGH,
                         'title' => 'Significant drop in egg production',
                         'body' => $body,
                     ]);
@@ -79,6 +80,7 @@ class ProductionDropNotifier
                 $created = StockNotification::create([
                     'user_id' => $user->id,
                     'type' => 'production_drop',
+                    'priority' => StockNotification::PRIORITY_HIGH,
                     'alert_date' => $day,
                     'item_name' => 'Egg production',
                     'title' => 'Significant drop in egg production',

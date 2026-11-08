@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\DailyInventory;
 use App\Services\InventoryForecast;
 use App\Services\LowStockNotifier;
+use App\Services\StockBand;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -355,14 +356,6 @@ class InventoryController extends Controller
 
     private function computeStatus($currentStock, $minLevel)
     {
-        if ($currentStock < $minLevel) {
-            return 'LOW';
-        }
-
-        if ($currentStock < $minLevel * 1.2) {
-            return 'WATCH';
-        }
-
-        return 'OK';
+        return StockBand::status((float) $currentStock, (float) $minLevel);
     }
 }

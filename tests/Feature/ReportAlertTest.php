@@ -54,6 +54,7 @@ class ReportAlertTest extends TestCase
             StockNotification::where('user_id', $manager->id)->exists()
         );
         $this->assertStringContainsString('Production Report', StockNotification::first()->body);
+        $this->assertSame('low', StockNotification::first()->priority);
     }
 
     public function test_sending_the_same_report_twice_does_not_duplicate(): void
@@ -136,6 +137,7 @@ class ReportAlertTest extends TestCase
             ->first();
 
         $this->assertNotNull($notification);
+        $this->assertSame('low', $notification->priority);
         $this->assertSame('/manager/reports/'.$report->id, $notification->url);
 
         $this->actingAs($manager)

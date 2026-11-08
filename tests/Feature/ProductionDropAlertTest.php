@@ -49,6 +49,7 @@ class ProductionDropAlertTest extends TestCase
         $this->assertStringContainsString('Difference: 1,460 eggs', $body);
         $this->assertStringContainsString('20.1% below expected', $body);
         $this->assertSame('Significant drop in egg production', $alerts->first()->title);
+        $this->assertTrue($alerts->every(fn (StockNotification $alert) => $alert->priority === 'high'));
         $this->assertSame('/owner/production', $alerts->firstWhere('user_id', $owner->id)->url);
         $this->assertSame('/manager/production', $alerts->firstWhere('user_id', $manager->id)->url);
     }

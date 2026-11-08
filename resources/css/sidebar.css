@@ -1109,10 +1109,51 @@ body {
     background: #f6faf6;
 }
 
-/* Unread: tinted surface + left accent bar + dot + "New" pill (see alerts.js) */
+/* Unread: tinted surface + dot + "New" pill. The left bar is the priority color. */
 .alert-item.is-unread {
     background: #edf5ee;
-    box-shadow: inset 3px 0 0 #34853f;
+}
+
+.alert-item.is-priority-high {
+    box-shadow: inset 3px 0 0 #dc2626;
+}
+
+.alert-item.is-priority-medium {
+    box-shadow: inset 3px 0 0 #ea580c;
+}
+
+.alert-item.is-priority-low {
+    box-shadow: inset 3px 0 0 #2563eb;
+}
+
+.alert-priority {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+    border-radius: 999px;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+}
+
+.alert-priority-high {
+    color: #9f1239;
+    background: #ffe4e6;
+    border-color: #fecdd3;
+}
+
+.alert-priority-medium {
+    color: #9a3412;
+    background: #ffedd5;
+    border-color: #fed7aa;
+}
+
+.alert-priority-low {
+    color: #1e3a8a;
+    background: #dbeafe;
+    border-color: #bfdbfe;
 }
 
 .alert-item.is-unread:hover {
@@ -1153,6 +1194,9 @@ body {
     display: block;
     flex: 1 1 auto;
     min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-weight: 600;
     color: #2C6B35;
     font-size: 14px;

@@ -125,6 +125,7 @@ class OwnerReportController extends Controller{
             $notification = StockNotification::create([
                 'user_id' => $report->manager_id,
                 'type' => 'report_remark',
+                'priority' => StockNotification::PRIORITY_LOW,
                 'report_id' => $report->id,
                 'item_name' => 'Report',
                 'title' => 'New report remark',

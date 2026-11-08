@@ -17,9 +17,10 @@ class LowStockNotifier
     {
         $stock = $this->effectiveStock($item);
         $min = (float) $item->min_level;
+        $priority = StockBand::priority($stock, $min);
 
-        if ($stock <= $min) {
-            $this->openAlerts($item, $stock, $min);
+        if ($priority !== null) {
+            $this->openAlerts($item, $stock, $min, $priority);
 
             return;
         }
@@ -32,10 +33,14 @@ class LowStockNotifier
         $this->resolveItem($inventoryItemId);
     }
 
-    private function openAlerts(InventoryItem $item, float $stock, float $min): void
+    private function openAlerts(InventoryItem $item, float $stock, float $min, string $priority): void
     {
+        $critical = $priority === StockNotification::PRIORITY_HIGH;
+        $title = $critical ? 'Critical low stock' : 'Stock approaching minimum';
         $body = sprintf(
-            '%s is low — %s %s (min %s).',
+            $critical
+                ? '%s is critically low — %s %s (min %s).'
+                : '%s is approaching minimum — %s %s (min %s).',
             $item->item_name,
             $this->qty($stock),
             $item->unit,
@@ -45,7 +50,7 @@ class LowStockNotifier
         foreach (User::farmLeads() as $user) {
             $created = null;
 
-            DB::transaction(function () use ($user, $item, $stock, $min, $body, &$created) {
+            DB::transaction(function () use ($user, $item, $stock, $min, $priority, $title, $body, &$created) {
                 $open = StockNotification::query()
                     ->where('user_id', $user->id)
                     ->where('inventory_item_id', $item->id)
@@ -53,13 +58,26 @@ class LowStockNotifier
                     ->lockForUpdate()
                     ->first();
 
+                $fields = [
+                    'priority' => $priority,
+                    'title' => $title,
+                    'body' => $body,
+                    'current_stock' => $stock,
+                    'min_level' => $min,
+                    'unit' => $item->unit,
+                ];
+
                 if ($open) {
-                    $open->update([
-                        'body' => $body,
-                        'current_stock' => $stock,
-                        'min_level' => $min,
-                        'unit' => $item->unit,
-                    ]);
+                    $rose = StockNotification::priorityRank($priority) < StockNotification::priorityRank($open->priority);
+                    if ($rose) {
+                        $fields['read_at'] = null;
+                    }
+
+                    $open->update($fields);
+
+                    if ($rose) {
+                        $created = $open;
+                    }
 
                     return;
                 }
@@ -70,9 +88,10 @@ class LowStockNotifier
                 $created = StockNotification::create([
                     'user_id' => $user->id,
                     'type' => 'low_stock',
+                    'priority' => $priority,
                     'inventory_item_id' => $item->id,
                     'item_name' => $item->item_name,
-                    'title' => 'Low stock',
+                    'title' => $title,
                     'body' => $body,
                     'url' => $url,
                     'current_stock' => $stock,

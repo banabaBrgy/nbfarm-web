@@ -159,11 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        list.innerHTML = alerts.map((row) => `
-            <div class="alert-item ${row.read ? '' : 'is-unread'}" data-alert-id="${row.id}" data-alert-url="${escapeHtml(row.url || '')}" data-alert-read="${row.read ? '1' : '0'}">
+        list.innerHTML = alerts.map((row) => {
+            const priority = ['high', 'medium', 'low'].includes(row.priority) ? row.priority : 'low';
+            const priorityLabel = escapeHtml(row.priority_label || 'Low');
+
+            return `
+            <div class="alert-item is-priority-${priority} ${row.read ? '' : 'is-unread'}" data-alert-id="${row.id}" data-alert-url="${escapeHtml(row.url || '')}" data-alert-read="${row.read ? '1' : '0'}">
                 <button type="button" class="alert-item-main" data-alert-open>
                     <span class="alert-item-title-row">
                         ${row.read ? '' : '<span class="alert-dot" aria-hidden="true"></span>'}
+                        <span class="alert-priority alert-priority-${priority}">${priorityLabel}</span>
                         <span class="alert-item-title">${escapeHtml(row.title || 'Notification')}</span>
                         ${row.read ? '' : '<span class="alert-new">New</span>'}
                     </span>
@@ -174,7 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
                 </button>
             </div>
-        `).join('');
+        `;
+        }).join('');
     };
 
     const load = async () => {

@@ -17,11 +17,13 @@ class AlertController extends Controller
         $alerts = StockNotification::query()
             ->where('user_id', $user->id)
             ->open()
-            ->latest()
+            ->orderedForPanel()
             ->limit(30)
             ->get()
             ->map(fn (StockNotification $row) => [
                 'id' => $row->id,
+                'priority' => $row->priority ?: StockNotification::PRIORITY_LOW,
+                'priority_label' => $row->priorityLabel(),
                 'title' => $row->title,
                 'body' => $row->body,
                 'url' => $this->alertUrl($row, $user),

@@ -27,7 +27,7 @@ class WebPushSender
         }
 
         $payload = json_encode([
-            'title' => $alert->title ?: 'NB Farm',
+            'title' => trim($alert->priorityLabel().' · '.($alert->title ?: 'NB Farm')),
             'body' => $alert->body,
             'url' => $alert->url ?: '/',
         ], JSON_UNESCAPED_UNICODE);

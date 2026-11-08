@@ -28,6 +28,7 @@ class ReportNotifier
             $created = StockNotification::create([
                 'user_id' => $owner->id,
                 'type' => 'report',
+                'priority' => StockNotification::PRIORITY_LOW,
                 'report_id' => $report->id,
                 'item_name' => 'Report',
                 'title' => 'New report',
