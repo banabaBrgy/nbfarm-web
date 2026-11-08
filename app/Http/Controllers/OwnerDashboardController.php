@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use App\Services\DailyInventory;
 use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
+use App\Services\SystemEffectiveness;
 use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,8 @@ class OwnerDashboardController extends Controller
     $request->validate([
         'start_date' => 'nullable|required_with:end_date|date',
         'end_date' => 'nullable|required_with:start_date|date|after_or_equal:start_date',
+        'effectiveness_from' => 'nullable|required_with:effectiveness_to|date',
+        'effectiveness_to' => 'nullable|required_with:effectiveness_from|date|after_or_equal:effectiveness_from',
     ]);
 
     app(DailyInventory::class)->applyForToday();
@@ -83,6 +86,7 @@ class OwnerDashboardController extends Controller
         $previousForecastSummary = $forecastService->previousSummary();
         $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? 0);
         $eggProductionChart = app(EggProductionChart::class)->forRequest($request);
+        $effectiveness = app(SystemEffectiveness::class)->forRequest($request);
 
         // ============================
         // RETURN DASHBOARD
@@ -106,7 +110,8 @@ class OwnerDashboardController extends Controller
             'predictedEggs',
             'forecastSummary',
             'previousForecastSummary',
-            'eggProductionChart'
+            'eggProductionChart',
+            'effectiveness'
         ), app(DashboardKpis::class)->summary()));
     }
 }

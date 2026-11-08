@@ -33,7 +33,12 @@
             <h2>Dashboard</h2>
             <p>Welcome back! Here's today's poultry farm overview.</p>
         </div>
-        <x-weather-widget />
+        <div class="dashboard-header-tools">
+            @include('dashboard.system-effectiveness', [
+                'effectivenessAction' => route('owner.dashboard'),
+            ])
+            <x-weather-widget />
+        </div>
     </div>
 
     @include('dashboard.low-stock-alert')

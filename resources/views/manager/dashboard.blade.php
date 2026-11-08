@@ -46,7 +46,12 @@
             <h2>Manager Dashboard</h2>
             <p>Welcome back! Here's today's poultry farm overview.</p>
         </div>
-        <x-weather-widget />
+        <div class="dashboard-header-tools">
+            @include('dashboard.system-effectiveness', [
+                'effectivenessAction' => route('manager.dashboard'),
+            ])
+            <x-weather-widget />
+        </div>
     </div>
 
 
@@ -279,10 +284,6 @@
 
 
     </div>
-
-
-
-
 
     <div class="content-grid">
 
