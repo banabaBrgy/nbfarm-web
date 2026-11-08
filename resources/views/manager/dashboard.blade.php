@@ -35,14 +35,7 @@
 
         $lowStockAlert = $lowStockAlert ?? null;
 
-        $eggChartLabels = $eggChartLabels ?? [];
-        $eggChartData = $eggChartData ?? [];
-
-        $eggForecastLabels = $eggForecastLabels ?? [];
-        $eggForecastData = $eggForecastData ?? [];
-
         $predictedEggs = $predictedEggs ?? 0;
-        $productionTrend = $productionTrend ?? ['months' => [], 'years' => [], 'selectedYear' => null, 'series' => []];
 
     @endphp
 
@@ -299,7 +292,6 @@
 
 
         @include('dashboard.egg-production-chart-card', [
-            'productionTrend' => $productionTrend,
             'trendAction' => route('manager.dashboard'),
         ])
 

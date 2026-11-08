@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Forecast;
 use App\Models\Production;
 use App\Services\Forecasting\GenerateEggForecast;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductionYearTrend
 {
@@ -24,6 +27,130 @@ class ProductionYearTrend
     public function __construct(
         private GenerateEggForecast $forecast,
     ) {}
+
+    /**
+     * Daily actual egg production and, when requested, historical forecasts within a selected date range.
+     */
+    public function forDateRange(?string $startDate = null, ?string $endDate = null, bool $includeForecast = true): array
+    {
+        if (! $startDate || ! $endDate) {
+            return [
+                'labels' => [],
+                'series' => [],
+                'startDate' => null,
+                'endDate' => null,
+            ];
+        }
+
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->startOfDay();
+
+        if ($start->gt($end)) {
+            return [
+                'labels' => [],
+                'series' => [],
+                'startDate' => null,
+                'endDate' => null,
+            ];
+        }
+
+        $startDay = $start->toDateString();
+        $endDay = $end->toDateString();
+
+        $rows = Production::query()
+            ->selectRaw('DATE(production_date) as production_day, SUM(eggs_produced) as total')
+            ->whereBetween('production_date', [$startDay, $endDay])
+            ->groupBy(DB::raw('DATE(production_date)'))
+            ->get()
+            ->keyBy('production_day');
+
+        $forecastByDate = [];
+
+        if ($includeForecast) {
+            $forecasts = Forecast::query()
+                ->whereDate('forecast_date', '>=', $start->copy()->subDays(7)->toDateString())
+                ->whereDate('forecast_date', '<=', $endDay)
+                ->orderBy('forecast_date')
+                ->get(['forecast_date', 'series']);
+
+            foreach ($forecasts as $forecast) {
+                $forecastSeries = $forecast->series ?? [];
+
+                if (is_string($forecastSeries)) {
+                    $forecastSeries = json_decode($forecastSeries, true) ?? [];
+                }
+
+                if (! is_array($forecastSeries)) {
+                    continue;
+                }
+
+                foreach ($forecastSeries as $item) {
+                    if (! is_array($item)) {
+                        continue;
+                    }
+
+                    $date = $item['date'] ?? null;
+                    $eggs = (int) ($item['eggs'] ?? 0);
+
+                    if (
+                        $date &&
+                        $eggs > 0 &&
+                        $date >= $startDay &&
+                        $date <= $endDay
+                    ) {
+                        $forecastByDate[$date] = $eggs;
+                    }
+                }
+            }
+        }
+
+        $labels = [];
+        $actualData = [];
+        $forecastData = [];
+
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $day = $date->toDateString();
+
+            $labels[] = $date->format('M d, Y');
+
+            $row = $rows->get($day);
+
+            $actualData[] = $row ? (int) $row->total : null;
+            $forecastData[] = $forecastByDate[$day] ?? null;
+        }
+
+        if ($includeForecast) {
+            Log::info('HISTORICAL BACKTEST CHART DATA', [
+                'start_date' => $startDay,
+                'end_date' => $endDay,
+                'actual_count' => count(array_filter($actualData, fn ($value) => $value !== null)),
+                'forecast_count' => count(array_filter($forecastData, fn ($value) => $value !== null)),
+            ]);
+        }
+
+        $series = [
+            [
+                'label' => 'Actual Production',
+                'data' => $actualData,
+                'color' => self::COLORS[0],
+            ],
+        ];
+
+        if ($includeForecast) {
+            $series[] = [
+                'label' => 'Forecast',
+                'data' => $forecastData,
+                'color' => self::COLORS[1],
+            ];
+        }
+
+        return [
+            'labels' => $labels,
+            'series' => $series,
+            'startDate' => $startDay,
+            'endDate' => $endDay,
+        ];
+    }
 
     /**
      * Monthly egg totals by year for the historical trend line graph.

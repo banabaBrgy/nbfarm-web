@@ -24,12 +24,7 @@
         $vitaminMin = $vitaminMin ?? 0;
         $vitaminLow = $vitaminLow ?? false;
         $lowStockAlert = $lowStockAlert ?? null;
-        $eggChartLabels = $eggChartLabels ?? [];
-        $eggChartData = $eggChartData ?? [];
-        $eggForecastLabels = $eggForecastLabels ?? [];
-        $eggForecastData = $eggForecastData ?? [];
         $predictedEggs = $predictedEggs ?? 0;
-        $productionTrend = $productionTrend ?? ['months' => [], 'years' => [], 'selectedYear' => null, 'series' => []];
     @endphp
 
     <!-- Header -->
@@ -172,7 +167,6 @@
     <!-- Chart + Inventory side by side -->
     <div class="content-grid">
         @include('dashboard.egg-production-chart-card', [
-            'productionTrend' => $productionTrend,
             'trendAction' => route('owner.dashboard'),
         ])
 

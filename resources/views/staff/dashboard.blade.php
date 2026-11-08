@@ -14,7 +14,6 @@
         $vitamins = $vitamins ?? 0;
         $vitaminMin = $vitaminMin ?? 0;
         $vitaminLow = $vitaminLow ?? false;
-        $productionTrend = $productionTrend ?? ['months' => [], 'years' => [], 'selectedYear' => null, 'series' => []];
     @endphp
 
     <div class="dashboard-header">
@@ -92,7 +91,6 @@
 
     <div class="content-grid">
         @include('dashboard.egg-production-chart-card', [
-            'productionTrend' => $productionTrend,
             'trendAction' => route('staff.dashboard'),
         ])
 

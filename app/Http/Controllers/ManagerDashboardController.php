@@ -7,17 +7,22 @@ use App\Models\InventoryItem;
 use App\Models\Dispatch;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Services\DailyInventory;
+use App\Services\EggProductionChart;
 use App\Services\Forecasting\GenerateEggForecast;
-use App\Services\ProductionYearTrend;
 
 class ManagerDashboardController extends Controller
 {
     public function index(Request $request)
-    {
-        app(DailyInventory::class)->applyForToday();
+{
+    $request->validate([
+        'start_date' => 'nullable|required_with:end_date|date',
+        'end_date' => 'nullable|required_with:start_date|date|after_or_equal:start_date',
+    ]);
+
+    app(DailyInventory::class)->applyForToday();
 
         // ============================
         // PRODUCTION TODAY
@@ -28,18 +33,14 @@ class ManagerDashboardController extends Controller
             today()
         )->sum('eggs_produced');
 
-
         $eggsYesterday = Production::whereDate(
             'production_date',
             today()->subDay()
         )->sum('eggs_produced');
 
-
         $eggsChange = $eggsYesterday > 0
             ? round((($eggsToday - $eggsYesterday) / $eggsYesterday) * 100, 1)
             : 0;
-
-
 
         // ============================
         // INVENTORY
@@ -50,15 +51,12 @@ class ManagerDashboardController extends Controller
             'Feeds'
         )->sum('current_stock');
 
-
         $feedMin = InventoryItem::where(
             'item_name',
             'Feeds'
         )->sum('min_level');
 
-
         $feedLow = $feedStock <= $feedMin;
-
 
         $vitamins = InventoryItem::where(
             'item_name',
@@ -72,18 +70,16 @@ class ManagerDashboardController extends Controller
 
         $vitaminLow = $vitamins <= $vitaminMin;
 
-
-        $eggTrays = (float) (InventoryItem::where('item_name', 'Egg Trays')->value('current_stock') ?? 0);
-
-
+        $eggTrays = (float) (
+            InventoryItem::where('item_name', 'Egg Trays')
+                ->value('current_stock') ?? 0
+        );
 
         // ============================
         // TOTAL PRODUCTION
         // ============================
 
         $eggsTotal = Production::leftoverStock();
-
-
 
         // ============================
         // DISPATCH
@@ -92,7 +88,6 @@ class ManagerDashboardController extends Controller
         $dispatchedTrays = DB::table('dispatch_items')
             ->sum('quantity');
 
-
         $pendingDeliveries = Dispatch::whereIn(
             'status',
             [
@@ -100,8 +95,6 @@ class ManagerDashboardController extends Controller
                 'On Transit'
             ]
         )->count();
-
-
 
         // ============================
         // REVENUE
@@ -122,107 +115,25 @@ class ManagerDashboardController extends Controller
             'min_level'
         )->count();
 
+        $forecastService = app(GenerateEggForecast::class);
+        $forecastSummary = $forecastService->summary();
+        $previousForecastSummary = $forecastService->previousSummary();
+        $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? 0);
+        $eggProductionChart = app(EggProductionChart::class)->forRequest($request);
 
+        Log::info('MANAGER FORECAST DIAGNOSTIC', [
+            'predicted_eggs' => $predictedEggs,
+            'summary_eggs' => $forecastSummary['predicted_eggs'] ?? null,
+            'database' => config('database.connections.mysql.database'),
+        ]);
 
         // ============================
-        // WEEKLY PRODUCTION CHART
+        // RETURN DASHBOARD
         // ============================
-
-        $selectedDate = $request->date
-            ? Carbon::parse($request->date)
-            : Carbon::today();
-
-
-        $weekStart = $selectedDate->copy()
-            ->startOfWeek(Carbon::MONDAY);
-
-
-        $weekEnd = $weekStart->copy()
-            ->addDays(6);
-
-
-        $today = $selectedDate;
-
-
-
-        $weekly = Production::selectRaw("
-                DATE(production_date) as production_date,
-                SUM(eggs_produced) as total
-            ")
-            ->whereBetween(
-                'production_date',
-                [
-                    $weekStart->copy()->startOfDay(),
-                    $weekEnd->copy()->endOfDay()
-                ]
-            )
-            ->groupBy(
-                DB::raw('DATE(production_date)')
-            )
-            ->orderBy(
-                'production_date'
-            )
-            ->get()
-            ->keyBy(function($row){
-
-                return Carbon::parse(
-                    $row->production_date
-                )->format('Y-m-d');
-
-            });
-
-
-
-        $eggChartLabels = [];
-        $eggChartData = [];
-
-
-        $cursor = $weekStart->copy();
-
-
-        while($cursor->lte($weekEnd)){
-
-            $key = $cursor->format('Y-m-d');
-
-
-            $eggChartLabels[] = $cursor->format('D');
-
-
-            if($cursor->lte($today)){
-
-                $total = $weekly->has($key)
-                    ? (int) $weekly[$key]->total
-                    : 0;
-
-                $eggChartData[] = $total > 0 ? $total : null;
-
-            }else{
-
-                $eggChartData[] = null;
-
-            }
-
-
-            $cursor->addDay();
-
-        }
-
-
-
-        $forecast = app(GenerateEggForecast::class)->forWeek($weekStart, $weekEnd);
-        $eggForecastLabels = $forecast['labels'];
-        $eggForecastData = $forecast['data'];
-        $forecastSummary = app(GenerateEggForecast::class)->summary();
-        $previousForecastSummary = app(GenerateEggForecast::class)->previousSummary();
-        $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? $forecast['predicted_eggs']);
-
-        $productionTrend = app(ProductionYearTrend::class)
-            ->forYear($request->query('trend_year'));
 
         return view(
             'manager.dashboard',
             compact(
-
                 'eggsToday',
                 'eggsChange',
 
@@ -244,18 +155,10 @@ class ManagerDashboardController extends Controller
 
                 'lowStockAlert',
 
-                'eggChartLabels',
-                'eggChartData',
-
-                'eggForecastLabels',
-                'eggForecastData',
-
                 'predictedEggs',
                 'forecastSummary',
                 'previousForecastSummary',
-
-                'productionTrend'
-
+                'eggProductionChart'
             )
         );
     }
