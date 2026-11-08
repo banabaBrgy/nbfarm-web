@@ -5,7 +5,7 @@
 
     <div class="transactions-controls">
       <div class="search-bar">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <i class="fas fa-search" aria-hidden="true"></i>
         <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search customer..." />
       </div>
 

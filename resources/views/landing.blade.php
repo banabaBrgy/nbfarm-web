@@ -30,6 +30,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ versioned_asset('css/landing.css') }}">
     @vite('resources/js/landing.js')
 </head>
@@ -119,14 +120,10 @@
                         <h2>Researchers</h2>
                         <div class="thesis-carousel-controls" data-researchers-controls>
                             <button class="thesis-carousel-button thesis-carousel-button--prev" type="button" data-carousel-prev aria-label="Previous researcher" disabled>
-                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <path d="m14.5 5-7 7 7 7"></path>
-                                </svg>
+                                <i class="fas fa-chevron-left" aria-hidden="true"></i>
                             </button>
                             <button class="thesis-carousel-button thesis-carousel-button--next" type="button" data-carousel-next aria-label="Next researcher">
-                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <path d="m9.5 5 7 7-7 7"></path>
-                                </svg>
+                                <i class="fas fa-chevron-right" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
@@ -329,42 +326,42 @@
 
                 <div class="feature-grid">
                     <article class="feature reveal">
-                        <div class="feature-icon" aria-hidden="true">🥚</div>
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-egg"></i></div>
                         <div class="feature-body">
                             <h3>Production Monitoring</h3>
                             <p>Log daily egg counts by batch and see how the flock is performing over time.</p>
                         </div>
                     </article>
                     <article class="feature reveal">
-                        <div class="feature-icon" aria-hidden="true">📦</div>
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-box"></i></div>
                         <div class="feature-body">
                             <h3>Inventory Management</h3>
                             <p>Keep feeds, vitamins, and trays on hand with stock history and low-stock alerts.</p>
                         </div>
                     </article>
                     <article class="feature reveal">
-                        <div class="feature-icon" aria-hidden="true">📱</div>
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-qrcode"></i></div>
                         <div class="feature-body">
                             <h3>QR Egg Tracking</h3>
                             <p>Generate and scan tray codes so eggs move in and out of the coop with a clear trail.</p>
                         </div>
                     </article>
                     <article class="feature reveal">
-                        <div class="feature-icon" aria-hidden="true">🚚</div>
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-truck"></i></div>
                         <div class="feature-body">
                             <h3>Dispatch & Sales</h3>
                             <p>Record outbound deliveries, update status, and keep sales history ready for review.</p>
                         </div>
                     </article>
                     <article class="feature reveal">
-                        <div class="feature-icon" aria-hidden="true">📈</div>
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-chart-line"></i></div>
                         <div class="feature-body">
                             <h3>Forecasting</h3>
                             <p>Look ahead at where production is heading so planning stays a step ahead of demand.</p>
                         </div>
                     </article>
                     <article class="feature reveal">
-                        <div class="feature-icon" aria-hidden="true">📋</div>
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-file-lines"></i></div>
                         <div class="feature-body">
                             <h3>Reports & Alerts</h3>
                             <p>Share operational reports, weather context, and push alerts when something needs attention.</p>

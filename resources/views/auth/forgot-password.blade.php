@@ -12,7 +12,7 @@
         <div class="field {{ $errors->has('username') ? 'is-invalid' : '' }}">
             <label class="field-label" for="username">Username <span class="req" aria-hidden="true">*</span></label>
             <div class="input-icon-wrap">
-                <span class="input-icon" aria-hidden="true">👤</span>
+                <span class="input-icon" aria-hidden="true"><i class="fas fa-user"></i></span>
                 <input
                     type="text"
                     id="username"

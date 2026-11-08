@@ -8,28 +8,28 @@
 
         <div class="module-list">
             <div class="module-row">
-                <div class="module-icon">🥚</div>
+                <div class="module-icon" aria-hidden="true"><i class="fas fa-egg"></i></div>
                 <div>
                     <strong>Production Monitoring</strong>
                     <small>Daily egg counts by batch</small>
                 </div>
             </div>
             <div class="module-row">
-                <div class="module-icon">📦</div>
+                <div class="module-icon" aria-hidden="true"><i class="fas fa-box"></i></div>
                 <div>
                     <strong>Inventory Management</strong>
                     <small>Feeds, vitamins, trays on hand</small>
                 </div>
             </div>
             <div class="module-row">
-                <div class="module-icon">📱</div>
+                <div class="module-icon" aria-hidden="true"><i class="fas fa-qrcode"></i></div>
                 <div>
                     <strong>QR Egg Tracking</strong>
                     <small>Scan trays in and out</small>
                 </div>
             </div>
             <div class="module-row">
-                <div class="module-icon">📈</div>
+                <div class="module-icon" aria-hidden="true"><i class="fas fa-chart-line"></i></div>
                 <div>
                     <strong>Forecasting</strong>
                     <small>Where production is heading next</small>

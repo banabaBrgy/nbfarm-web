@@ -111,16 +111,16 @@
   align-items: center;
   margin-top: 15px;
 }
-.search-bar svg {
+.search-bar > i {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
-  width: 14px;
-  height: 14px;
-  z-index: 1; /* siguraduhing hindi natatabunan */
+  font-size: 13px;
+  line-height: 1;
+  z-index: 1;
 }
 .search-bar input {
   width: 100%;
@@ -582,7 +582,7 @@
     box-shadow: 0 4px 10px rgba(59, 143, 71, 0.3);
 }
 
-.btn-primary-sm svg {
-    width: 12px;
-    height: 12px;
+.btn-primary-sm i {
+    font-size: 12px;
+    line-height: 1;
 }

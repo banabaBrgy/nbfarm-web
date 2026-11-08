@@ -4,10 +4,7 @@
     data-bs-toggle="modal"
     data-bs-target="#newTransactionModal">
 
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
+    <i class="fas fa-plus" aria-hidden="true"></i>
 
     New Transaction
 </button>

@@ -14,7 +14,7 @@
         <div class="field {{ $errors->has('password') ? 'is-invalid' : '' }}">
             <label class="field-label" for="password">New password <span class="req" aria-hidden="true">*</span></label>
             <div class="password-container input-icon-wrap">
-                <span class="input-icon" aria-hidden="true">🔒</span>
+                <span class="input-icon" aria-hidden="true"><i class="fas fa-lock"></i></span>
                 <input
                     type="password"
                     id="password"
@@ -35,7 +35,7 @@
         <div class="field {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}">
             <label class="field-label" for="password_confirmation">Confirm password <span class="req" aria-hidden="true">*</span></label>
             <div class="password-container input-icon-wrap">
-                <span class="input-icon" aria-hidden="true">🔒</span>
+                <span class="input-icon" aria-hidden="true"><i class="fas fa-lock"></i></span>
                 <input
                     type="password"
                     id="password_confirmation"

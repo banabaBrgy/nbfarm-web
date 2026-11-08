@@ -13,7 +13,7 @@
     <div class="field">
         <label class="field-label" for="username">Username</label>
         <div class="input-icon-wrap">
-            <span class="input-icon" aria-hidden="true">👤</span>
+            <span class="input-icon" aria-hidden="true"><i class="fas fa-user"></i></span>
             <input
                 type="text"
                 id="username"
@@ -30,7 +30,7 @@
         <div class="field {{ $errors->has('answer') ? 'is-invalid' : '' }}">
             <label class="field-label" for="answer">Security answer <span class="req" aria-hidden="true">*</span></label>
             <div class="input-icon-wrap">
-                <span class="input-icon" aria-hidden="true">🔑</span>
+                <span class="input-icon" aria-hidden="true"><i class="fas fa-key"></i></span>
                 <input
                     type="password"
                     id="answer"

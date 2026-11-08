@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ versioned_asset('css/login.css') }}">
 </head>
 
@@ -50,7 +51,7 @@
                 <div class="field {{ $errors->has('username') ? 'is-invalid' : '' }}" data-field="username">
                     <label class="field-label" for="username">Username <span class="req" aria-hidden="true">*</span></label>
                     <div class="input-icon-wrap">
-                        <span class="input-icon" aria-hidden="true">👤</span>
+                        <span class="input-icon" aria-hidden="true"><i class="fas fa-user"></i></span>
                         <input
                             type="text"
                             id="username"
@@ -75,7 +76,7 @@
                 <div class="field {{ $errors->has('password') ? 'is-invalid' : '' }}" data-field="password">
                     <label class="field-label" for="password">Password <span class="req" aria-hidden="true">*</span></label>
                     <div class="password-container input-icon-wrap">
-                        <span class="input-icon" aria-hidden="true">🔒</span>
+                        <span class="input-icon" aria-hidden="true"><i class="fas fa-lock"></i></span>
                         <input
                             type="password"
                             id="password"

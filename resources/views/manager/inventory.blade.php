@@ -41,9 +41,9 @@
     @foreach($alertItems as $alertItem)
         <div class="alert-low {{ $alertItem->status === 'WATCH' ? 'alert-watch' : '' }}">
             @if($alertItem->status === 'LOW')
-                ⚠ <strong>{{ $alertItem->item_name }} stock below reorder point</strong>
+                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> <strong>{{ $alertItem->item_name }} stock below reorder point</strong>
             @else
-                👁 <strong>{{ $alertItem->item_name }} stock approaching minimum level</strong>
+                <i class="fas fa-eye" aria-hidden="true"></i> <strong>{{ $alertItem->item_name }} stock approaching minimum level</strong>
             @endif
             — Current: {{ number_format($alertItem->current_stock, 2) }} {{ $alertItem->unit }} | Minimum: {{ number_format($alertItem->min_level, 2) }} {{ $alertItem->unit }}.
             {{ $alertItem->status === 'LOW' ? 'Immediate reorder suggested.' : 'Monitor closely.' }}
