@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Services\DailyInventory;
+use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
 use App\Services\Forecasting\GenerateEggForecast;
 
@@ -133,7 +134,7 @@ class ManagerDashboardController extends Controller
 
         return view(
             'manager.dashboard',
-            compact(
+            array_merge(compact(
                 'eggsToday',
                 'eggsChange',
 
@@ -159,7 +160,7 @@ class ManagerDashboardController extends Controller
                 'forecastSummary',
                 'previousForecastSummary',
                 'eggProductionChart'
-            )
+            ), app(DashboardKpis::class)->summary())
         );
     }
 }

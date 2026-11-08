@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use App\Models\Production;
 use App\Services\DailyInventory;
+use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
 use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Http\Request;
@@ -77,7 +78,7 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        return view('staff.dashboard', compact(
+        return view('staff.dashboard', array_merge(compact(
             'eggsToday',
             'eggsChange',
             'activeBatches',
@@ -94,6 +95,6 @@ class DashboardController extends Controller
             'forecastSummary',
             'previousForecastSummary',
             'eggProductionChart',
-        ));
+        ), app(DashboardKpis::class)->summary()));
     }
 }

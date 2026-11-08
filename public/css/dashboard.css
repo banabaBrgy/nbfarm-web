@@ -280,6 +280,66 @@
 
 }
 
+/* Farm KPI row: four totals above the existing today cards */
+.stats-grid.stats-grid--kpis {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stats-grid.stats-grid--kpis .stat-card {
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 15px;
+}
+
+.stats-grid.stats-grid--kpis .stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+}
+
+.stats-grid.stats-grid--kpis .stat-icon i {
+  font-size: 19px;
+}
+
+.stats-grid.stats-grid--kpis .stat-info {
+  width: 100%;
+  min-width: 0;
+}
+
+.stats-grid.stats-grid--kpis .stat-title,
+.stats-grid.stats-grid--kpis .stat-info small {
+  display: block;
+  white-space: normal;
+}
+
+.stats-grid.stats-grid--kpis .stat-title {
+  font-size: 13px;
+}
+
+.stats-grid.stats-grid--kpis .stat-info h2 {
+  font-size: 24px;
+  margin: 2px 0 4px;
+  white-space: nowrap;
+}
+
+.stats-grid.stats-grid--kpis .stat-info small {
+  font-size: 12px;
+}
+
+@media (max-width: 1200px) {
+  .stats-grid.stats-grid--kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .stats-grid.stats-grid--kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Five dashboard cards stay in one row on large screens */
 .stats-grid.stats-grid--five {
   grid-template-columns: repeat(5, minmax(0, 1fr));

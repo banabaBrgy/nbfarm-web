@@ -7,6 +7,7 @@ use App\Models\InventoryItem;
 use App\Models\Dispatch;
 use App\Models\Transaction;
 use App\Services\DailyInventory;
+use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
 use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Http\Request;
@@ -87,7 +88,7 @@ class OwnerDashboardController extends Controller
         // RETURN DASHBOARD
         // ============================
 
-        return view('owner.dashboard', compact(
+        return view('owner.dashboard', array_merge(compact(
             'eggsToday',
             'eggsChange',
             'feedStock',
@@ -106,6 +107,6 @@ class OwnerDashboardController extends Controller
             'forecastSummary',
             'previousForecastSummary',
             'eggProductionChart'
-        ));
+        ), app(DashboardKpis::class)->summary()));
     }
 }

@@ -4,6 +4,10 @@
 
 @section('content')
 
+    @push('styles')
+        <link rel="stylesheet" href="{{ versioned_asset('css/dashboard.css') }}">
+    @endpush
+
     @php
         $eggsChange = $eggsChange ?? 0;
         $feedStock = $feedStock ?? 0;
@@ -25,6 +29,8 @@
     </div>
 
     @include('dashboard.low-stock-alert')
+
+    @include('dashboard.farm-kpis')
 
     <div class="stats-grid stats-grid--five">
         <div class="stat-card stat-card--eggs">

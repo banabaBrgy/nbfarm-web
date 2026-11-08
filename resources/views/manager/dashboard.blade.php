@@ -53,11 +53,7 @@
 
     @include('dashboard.low-stock-alert')
 
-        
-    
-
-
-
+    @include('dashboard.farm-kpis')
 
     <div class="stats-grid stats-grid--five">
 
