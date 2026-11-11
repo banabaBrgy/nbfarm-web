@@ -51,12 +51,18 @@
 
 <body>
     @php
-        $role = \App\Models\User::routeRole();
-        $isFarmLead = auth()->user()?->isFarmLead() ?? false;
-        $alertUnread = $isFarmLead
-            ? \App\Models\StockNotification::query()->where('user_id', auth()->id())->unread()->count()
-            : 0;
-    @endphp
+    $role = \App\Models\User::routeRole();
+    $isFarmLead = auth()->user()?->isFarmLead() ?? false;
+
+    $canViewAlerts = in_array($role, ['owner', 'manager', 'staff'], true);
+
+    $alertUnread = $canViewAlerts
+        ? \App\Models\StockNotification::query()
+            ->where('user_id', auth()->id())
+            ->unread()
+            ->count()
+        : 0;
+@endphp
     <!-- MOBILE HEADER (visible only on ≤768px) -->
     <header class="mobile-header">
         <button class="header-menu-btn" id="headerMenuBtn" type="button" aria-controls="app-sidebar" aria-expanded="true" aria-label="Hide navigation">
@@ -68,7 +74,7 @@
                 <p class="header-subtitle">Poultry Management</p>
             </div>
         </div>
-        @if($isFarmLead)
+        @if($canViewAlerts)
             <button type="button" class="alert-bell alert-bell-header" data-alert-bell aria-label="Notifications" aria-expanded="false">
                 <i class="fas fa-bell"></i>
                 <span class="alert-badge" data-alert-badge @if($alertUnread < 1) hidden @endif>{{ $alertUnread > 9 ? '9+' : $alertUnread }}</span>
@@ -224,10 +230,9 @@
 
         <!-- MAIN -->
         <main class="main-content">
-
-
-            @yield('content')
-
+            <div data-page-body>
+                @yield('content')
+            </div>
         </main>
 
     </div>
@@ -238,7 +243,7 @@
         <span>Farm Management System</span>
     </footer>
 
-    @if($isFarmLead)
+    @if($canViewAlerts)
     <div id="alertPanel" class="alert-panel" hidden
          data-index="{{ route('alerts.index') }}"
          data-read-base="{{ url('/alerts') }}"
@@ -258,7 +263,9 @@
     </div>
     @endif
 
-    @stack('scripts')
+    <div data-page-scripts>
+        @stack('scripts')
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.2/dist/sweetalert2.all.min.js" integrity="sha384-kR2tS24oEqwHzfBnAN4yxA8ib4vGEOMaANrncAlq8i0lsgvGoOzSPXFbj5dHYUZK" crossorigin="anonymous"></script>
 <script>

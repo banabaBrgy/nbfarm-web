@@ -22,6 +22,11 @@
     background: var(--ui-bg);
 }
 
+[data-page-body][aria-busy="true"] {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
 .inventory-page,
 .users-page,
 .production-page,

@@ -162,11 +162,20 @@ class AlertController extends Controller
         return $alert->url ?: route(User::routeRole($user->role).'.inventory');
     }
 
-    private function farmLead(Request $request): User
-    {
-        $user = $request->user();
-        abort_unless($user instanceof User && $user->isFarmLead(), 403);
+ private function farmLead(Request $request): User
+{
+    $user = $request->user();
 
-        return $user;
-    }
+    abort_unless(
+        $user instanceof User &&
+        in_array(
+            User::routeRole($user->role),
+            ['owner', 'manager', 'staff'],
+            true
+        ),
+        403
+    );
+
+    return $user;
+}
 }

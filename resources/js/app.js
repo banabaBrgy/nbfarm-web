@@ -149,10 +149,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// Filter controls submit their form on change. Blur runs before a click, so
-// that submit was cancelling sidebar, pagination, and other links.
+// Filter dropdowns update the current page in place (AJAX) instead of a full reload.
 (function () {
     let suppressAutoSubmit = false;
+    let requestId = 0;
+
+    function isGetForm(form) {
+        return (form.getAttribute('method') || 'get').toLowerCase() === 'get';
+    }
+
+    function isEggSummaryForm(form) {
+        return form.matches('[data-egg-summary-form]') || Boolean(form.closest('[data-egg-summary-form]'));
+    }
+
+    function buildGetUrl(form) {
+        const url = new URL(form.getAttribute('action') || window.location.pathname, window.location.origin);
+        const current = new URL(window.location.href);
+
+        if (url.pathname === current.pathname) {
+            url.search = current.search;
+        }
+
+        new FormData(form).forEach((value, key) => {
+            url.searchParams.set(key, value);
+        });
+        url.searchParams.delete('page');
+
+        return url;
+    }
+
+    function runScripts(root) {
+        root.querySelectorAll('script').forEach((oldScript) => {
+            const script = document.createElement('script');
+
+            [...oldScript.attributes].forEach((attr) => {
+                script.setAttribute(attr.name, attr.value);
+            });
+            script.async = false;
+            script.textContent = oldScript.textContent;
+            oldScript.replaceWith(script);
+        });
+    }
+
+    function replaceRegion(selector, nextDoc) {
+        const current = document.querySelector(selector);
+        const next = nextDoc.querySelector(selector);
+
+        if (!current || !next) {
+            return false;
+        }
+
+        current.replaceWith(next);
+        runScripts(next);
+
+        return true;
+    }
+
+    function ajaxNavigate(form) {
+        const url = buildGetUrl(form);
+        const body = document.querySelector('[data-page-body]');
+
+        if (!body) {
+            window.location.assign(url);
+            return;
+        }
+
+        const id = ++requestId;
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
+
+        body.setAttribute('aria-busy', 'true');
+
+        fetch(url, {
+            headers: {
+                Accept: 'text/html',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Filter request failed');
+                }
+
+                return response.text();
+            })
+            .then((html) => {
+                if (id !== requestId) {
+                    return;
+                }
+
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                if (!replaceRegion('[data-page-body]', doc)) {
+                    window.location.assign(url);
+                    return;
+                }
+
+                replaceRegion('[data-page-scripts]', doc);
+                document.title = doc.title;
+                history.replaceState(null, '', url);
+                window.scrollTo(scrollX, scrollY);
+            })
+            .catch(() => {
+                if (id !== requestId) {
+                    return;
+                }
+
+                window.location.assign(url);
+            })
+            .finally(() => {
+                const current = document.querySelector('[data-page-body]');
+
+                if (current) {
+                    current.removeAttribute('aria-busy');
+                }
+            });
+    }
 
     document.addEventListener('pointerdown', (event) => {
         const link = event.target.closest('a[href]');
@@ -175,15 +288,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!field.matches('[data-auto-submit]') || !field.form || suppressAutoSubmit) {
             return;
         }
-        field.form.requestSubmit();
+        if (isEggSummaryForm(field.form) || !isGetForm(field.form)) {
+            return;
+        }
+        ajaxNavigate(field.form);
     });
 
     document.addEventListener('submit', (event) => {
-        if (!suppressAutoSubmit || event.submitter) {
+        if (suppressAutoSubmit && !event.submitter) {
+            event.preventDefault();
             return;
         }
+
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || event.defaultPrevented) {
+            return;
+        }
+        if (!isGetForm(form) || isEggSummaryForm(form) || !form.querySelector('[data-auto-submit]')) {
+            return;
+        }
+
         event.preventDefault();
-    }, true);
+        ajaxNavigate(form);
+    });
 
     const release = () => {
         setTimeout(() => {
@@ -192,4 +319,63 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('pointerup', release, true);
     window.addEventListener('pointercancel', release, true);
+})();
+// Preserve scroll position when dropdown filters submit their forms.
+(function () {
+    const storageKey = 'nb_poultry_scroll_position';
+
+    function saveScrollPosition() {
+        try {
+            sessionStorage.setItem(storageKey, JSON.stringify({
+                x: window.scrollX,
+                y: window.scrollY,
+                path: window.location.pathname
+            }));
+        } catch (error) {
+            console.warn('Unable to save scroll position.', error);
+        }
+    }
+
+    // Save before dropdown-triggered form submissions.
+    document.addEventListener('change', function (event) {
+        const field = event.target;
+
+        if (
+            field instanceof HTMLSelectElement &&
+            field.form
+        ) {
+            saveScrollPosition();
+        }
+    }, true);
+
+    // Also save before normal form submissions.
+    document.addEventListener('submit', function (event) {
+        if (!event.defaultPrevented) {
+            saveScrollPosition();
+        }
+    }, true);
+
+    // Restore the previous scroll position after page navigation.
+    window.addEventListener('pageshow', function () {
+        try {
+            const savedPosition = sessionStorage.getItem(storageKey);
+
+            if (!savedPosition) return;
+
+            sessionStorage.removeItem(storageKey);
+
+            const position = JSON.parse(savedPosition);
+
+            // Restore only when returning to the same page.
+            if (position.path !== window.location.pathname) return;
+
+            requestAnimationFrame(function () {
+                window.scrollTo(position.x, position.y);
+            });
+
+        } catch (error) {
+            console.warn('Unable to restore scroll position.', error);
+            sessionStorage.removeItem(storageKey);
+        }
+    });
 })();

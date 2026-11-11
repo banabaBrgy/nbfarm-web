@@ -7,6 +7,7 @@ use App\Models\QrRecord;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class QrRecordController extends Controller
 {
@@ -19,11 +20,15 @@ class QrRecordController extends Controller
 
     public function overview(Request $request)
     {
-        abort_unless(User::routeRole() === 'staff', 403);
+        abort_unless(
+    in_array(User::routeRole(), ['staff', 'manager'], true),
+    403
+);
 
         $eggSize = $this->resolvedEggSize($request->input('egg_size'));
         $batchId = $this->resolvedBatchId($request->input('batch_id'));
         $search = mb_substr(trim((string) $request->input('search', '')), 0, 80);
+
         $todayProductionIds = Production::query()
             ->whereDate('production_date', today())
             ->pluck('production_id');
@@ -46,21 +51,13 @@ class QrRecordController extends Controller
             $query->where('batch_id', $batchId);
         }
 
-        $safeSearch = str_replace(['%', '_'], '', $search);
-
-        if ($safeSearch !== '') {
-            $query->where('qr_code', 'like', '%'.$safeSearch.'%');
-        }
-
-        $rows = $query
+        // Retrieve and prepare all displayed QR records.
+        $allRows = $query
             ->orderBy('batch_id')
             ->orderByRaw("CASE egg_size WHEN 'Small' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Large' THEN 3 WHEN 'Extra Large' THEN 4 ELSE 5 END")
             ->orderBy('qr_code')
-            ->paginate(5)
-            ->withQueryString();
-
-        $rows->setCollection(
-            $rows->getCollection()->map(function (QrRecord $record) {
+            ->get()
+            ->map(function (QrRecord $record) {
                 $latest = $record->transactions->first();
                 $scanned = $latest !== null;
 
@@ -74,6 +71,40 @@ class QrRecordController extends Controller
                     'status' => $scanned ? 'Scanned' : 'Available',
                 ];
             })
+            ->values();
+
+        // Search across all displayed table columns.
+        if ($search !== '') {
+            $allRows = $allRows->filter(function (array $row) use ($search) {
+                foreach ([
+                    'qr_code',
+                    'batch_id',
+                    'egg_size',
+                    'quantity',
+                    'status',
+                ] as $field) {
+                    if (mb_stripos((string) $row[$field], $search) !== false) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })->values();
+        }
+
+        // Paginate the filtered results.
+        $perPage = 5;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+        $rows = new LengthAwarePaginator(
+            $allRows->forPage($currentPage, $perPage)->values(),
+            $allRows->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
         );
 
         return view('qr.overview', [

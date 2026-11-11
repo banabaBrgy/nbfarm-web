@@ -143,72 +143,7 @@
     <!-- TWO COLUMN: EGG TOTALS + RECENT MOVEMENTS -->
     <div class="bottom-grid">
 
-        <!-- EGG PRODUCTION SUMMARY (per size, hindi per batch) -->
-        <div class="inventory-table-wrapper">
-            <div class="egg-summary-filter" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <h2 class="section-title" style="margin:0;">Egg Production Summary</h2>
-
-                <form method="GET" style="display:flex; gap:8px; align-items:center;">
-                    <input type="hidden" name="search" value="{{ $search }}">
-                    <input type="hidden" name="status" value="{{ $statusFilter }}">
-
-                    <select name="year" class="sort-select" data-auto-submit>
-                        @foreach(($availableYears ?? $availableMonths->pluck('year')->unique()->sortDesc()) as $year)
-                            <option value="{{ $year }}" {{ (int) $year === (int) $selectedYear ? 'selected' : '' }}>
-                                {{ $year }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <select name="month" class="sort-select" data-auto-submit>
-                        @foreach(range(1, 12) as $m)
-                            <option value="{{ $m }}" {{ (int) $m === (int) $selectedMonth ? 'selected' : '' }}>
-                                {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
-
-            <table class="inventory-table">
-                <thead>
-                    <tr>
-                        <th>Egg Size</th>
-                        <th>Total Produced</th>
-                        <th>% of Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $sizes = [
-                            'Small' => $eggTotals->small ?? 0,
-                            'Medium' => $eggTotals->medium ?? 0,
-                            'Large' => $eggTotals->large ?? 0,
-                            'Extra Large' => $eggTotals->extra_large ?? 0,
-                        ];
-                    @endphp
-
-                    @foreach($sizes as $label => $value)
-                    <tr>
-                        <td>{{ $label }}</td>
-                        <td><strong>{{ number_format($value) }}</strong></td>
-                        <td>
-                            <div class="mini-bar">
-                                <div class="mini-bar-fill" style="width: {{ $grandTotal > 0 ? round(($value / $grandTotal) * 100, 1) : 0 }}%"></div>
-                            </div>
-                            <span class="mini-bar-label">{{ $grandTotal > 0 ? round(($value / $grandTotal) * 100, 1) : 0 }}%</span>
-                        </td>
-                    </tr>
-                    @endforeach
-
-                    <tr class="table-total-row">
-                        <td><strong>TOTAL</strong></td>
-                        <td><strong>{{ number_format($grandTotal) }}</strong></td>
-                        <td>100%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        @include('inventory.partials.egg-production-summary')
 
         <!-- RECENT STOCK MOVEMENTS -->
         <div class="inventory-table-wrapper">

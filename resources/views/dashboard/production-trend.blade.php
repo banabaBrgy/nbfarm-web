@@ -32,6 +32,7 @@
         <select
             id="trendView"
             name="trend_view"
+            data-auto-submit
             onchange="submitTrendView(this)"
         >
             <option value="historical" @selected($selectedView === 'historical')>
@@ -196,7 +197,6 @@
 
 <script>
     function submitTrendView(select) {
-        const form = select.form;
         const start = document.getElementById('startDate');
         const end = document.getElementById('endDate');
         const showDates = select.value === 'historical' || select.value === 'comparison';
@@ -204,10 +204,6 @@
         if (start && end) {
             start.disabled = !showDates;
             end.disabled = !showDates;
-        }
-
-        if (form) {
-            form.submit();
         }
     }
 </script>

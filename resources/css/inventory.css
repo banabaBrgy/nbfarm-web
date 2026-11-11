@@ -1601,6 +1601,16 @@
     flex-wrap: wrap;
 }
 
+#eggProductionSummary.is-loading .inventory-table {
+    opacity: 0.55;
+}
+
+.egg-summary-error {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #9b1c1c;
+}
+
 @media(max-width:768px) {
 
     .inventory-page {

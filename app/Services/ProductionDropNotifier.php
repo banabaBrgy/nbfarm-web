@@ -54,7 +54,7 @@ class ProductionDropNotifier
             number_format($percent, 1)
         );
 
-        foreach (User::farmLeads() as $user) {
+        foreach (User::notificationRecipients() as $user) {
             $created = null;
 
             DB::transaction(function () use ($user, $day, $body, &$created) {

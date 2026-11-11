@@ -1,3 +1,4 @@
+
 @extends('layouts.sidebar')
 
 @section('content')
@@ -34,9 +35,6 @@
             <p>Welcome back! Here's today's poultry farm overview.</p>
         </div>
         <div class="dashboard-header-tools">
-            @include('dashboard.system-effectiveness', [
-                'effectivenessAction' => route('owner.dashboard'),
-            ])
             <x-weather-widget />
         </div>
     </div>
@@ -46,7 +44,7 @@
     @include('dashboard.farm-kpis')
 
     <!-- Stat cards -->
-    <div class="stats-grid stats-grid--five">
+    <div class="stats-grid stats-grid--four">
 
         {{-- Eggs --}}
         <div class="stat-card stat-card--eggs">
@@ -80,27 +78,6 @@
                 <span class="stat-title">Predicted Eggs</span>
                 <h2>{{ number_format($predictedEggs) }}</h2>
                 <small>Next-day forecast · tap for sizes</small>
-            </div>
-        </div>
-
-        {{-- Feed --}}
-        <div class="stat-card stat-card--feed">
-            <div class="stat-icon">
-                <i class="fas fa-wheat-awn"></i>
-            </div>
-
-            <div class="stat-info">
-                <span class="stat-title">Feeds Available</span>
-
-                <h2>{{ number_format($feedStock) }}</h2>
-
-                <small>
-                    @if($feedLow)
-                        Low Stock
-                    @else
-                        Bags Remaining
-                    @endif
-                </small>
             </div>
         </div>
 

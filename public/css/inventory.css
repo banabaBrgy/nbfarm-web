@@ -1088,6 +1088,16 @@
     box-shadow: 0 0 0 2px rgba(59,143,71,.15);
 }
 
+#eggProductionSummary.is-loading .inventory-table {
+    opacity: 0.55;
+}
+
+.egg-summary-error {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #9b1c1c;
+}
+
 @media (max-width: 600px) {
     .inventory-table-wrapper .egg-summary-filter {
         flex-direction: column;

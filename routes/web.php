@@ -118,6 +118,9 @@ Route::prefix('manager')
         Route::get('/production/batch/{batch}', [BatchController::class, 'show'])
             ->name('batch.details');
 
+        Route::get('/qr/overview', [QrRecordController::class, 'overview'])
+            ->name('qr.overview');
+
         // Inventory
         Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
         Route::get('/inventory/{id}/history', [InventoryController::class, 'history'])->name('inventory.history');

@@ -47,9 +47,6 @@
             <p>Welcome back! Here's today's poultry farm overview.</p>
         </div>
         <div class="dashboard-header-tools">
-            @include('dashboard.system-effectiveness', [
-                'effectivenessAction' => route('manager.dashboard'),
-            ])
             <x-weather-widget />
         </div>
     </div>
@@ -58,9 +55,7 @@
 
     @include('dashboard.low-stock-alert')
 
-    @include('dashboard.farm-kpis')
-
-    <div class="stats-grid stats-grid--five">
+    <div class="stats-grid">
 
 
         {{-- TODAY EGGS --}}
@@ -105,46 +100,6 @@
                 <small>Next-day forecast · tap for sizes</small>
             </div>
         </div>
-
-        {{-- FEEDS --}}
-        <div class="stat-card stat-card--feed">
-
-            <div class="stat-icon">
-                <i class="fas fa-wheat-awn"></i>
-            </div>
-
-
-            <div class="stat-info">
-
-                <span class="stat-title">
-                    Feeds Available
-                </span>
-
-
-                <h2>
-                    {{ number_format($feedStock) }}
-                </h2>
-
-
-                <small>
-
-                    @if($feedLow)
-
-                        Low Stock
-
-                    @else
-
-                        Bags Remaining
-
-                    @endif
-
-                </small>
-
-            </div>
-
-        </div>
-
-
 
 
 

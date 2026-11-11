@@ -76,7 +76,7 @@
 
         <div class="qr-filter-group">
             <label for="egg_size">Egg size</label>
-            <select id="egg_size" name="egg_size" class="qr-filter-select" onchange="this.form.submit()">
+            <select id="egg_size" name="egg_size" class="qr-filter-select" data-auto-submit>
                 <option value="">All sizes</option>
                 @foreach($sizes as $size)
                     <option value="{{ $size }}" @selected($eggSize === $size)>{{ $size }}</option>
@@ -86,7 +86,7 @@
 
         <div class="qr-filter-group">
             <label for="batch_id">Batch</label>
-            <select id="batch_id" name="batch_id" class="qr-filter-select" onchange="this.form.submit()">
+            <select id="batch_id" name="batch_id" class="qr-filter-select" data-auto-submit>
                 <option value="">All batches</option>
                 @foreach($batches as $id)
                     <option value="{{ $id }}" @selected($batchId === $id)>Batch {{ $id }}</option>

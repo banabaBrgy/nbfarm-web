@@ -18,6 +18,10 @@ class InventoryController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->wantsJson()) {
+            return response()->json($this->eggProductionSummaryPayload($request));
+        }
+
         app(DailyInventory::class)->applyForToday();
 
         $search = $request->query('search');
@@ -71,6 +75,79 @@ class InventoryController extends Controller
             ->whereDate('production_date', today()->subDay())
             ->sum('eggs_produced');
 
+        $summary = $this->eggProductionSummary($request);
+        $eggTotals = $summary['eggTotals'];
+        $grandTotal = $summary['grandTotal'];
+        $selectedMonth = $summary['selectedMonth'];
+        $selectedYear = $summary['selectedYear'];
+        $availableYears = $summary['availableYears'];
+        $availableMonths = $summary['availableMonths'];
+        $summaryRows = $summary['summaryRows'];
+
+        // Recent stock movements (simple log base sa updated_at ng inventory_items)
+        $recentMovements = DB::table('inventory_items')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $role = User::routeRole();
+
+        $inventoryForecast = app(InventoryForecast::class)->summary($feed, $vitamins, $eggTrays);
+
+        return view($role . '.inventory', compact(
+            'items',
+            'feed',
+            'eggTrays',
+            'vitamins',
+            'eggsStock',
+            'eggTraysDisplay',
+            'eggsToday',
+            'eggsYesterday',
+            'eggTotals',
+            'grandTotal',
+            'recentMovements',
+            'search',
+            'statusFilter',
+            'selectedMonth',
+            'selectedYear',
+            'availableYears',
+            'availableMonths',
+            'summaryRows',
+            'inventoryForecast'
+        ));
+    }
+
+    /**
+     * Egg Production Summary for one month. JSON requests return this alone
+     * so the month/year dropdowns can update the table without a page reload.
+     *
+     * @return array{year: int, month: int, rows: list<array{label: string, value: string, percent: float|int}>, grandTotal: string}
+     */
+    private function eggProductionSummaryPayload(Request $request): array
+    {
+        $summary = $this->eggProductionSummary($request);
+
+        return [
+            'year' => $summary['selectedYear'],
+            'month' => $summary['selectedMonth'],
+            'rows' => $summary['summaryRows'],
+            'grandTotal' => number_format($summary['grandTotal']),
+        ];
+    }
+
+    /**
+     * @return array{
+     *     eggTotals: object|null,
+     *     grandTotal: int,
+     *     selectedMonth: int,
+     *     selectedYear: int,
+     *     availableYears: \Illuminate\Support\Collection,
+     *     availableMonths: \Illuminate\Support\Collection,
+     *     summaryRows: list<array{label: string, value: string, percent: float|int}>
+     * }
+     */
+    private function eggProductionSummary(Request $request): array
+    {
         $yearExpression = DB::connection()->getDriverName() === 'sqlite'
             ? "strftime('%Y', production_date)"
             : 'YEAR(production_date)';
@@ -81,7 +158,9 @@ class InventoryController extends Controller
         $availableYears = DB::table('production')
             ->selectRaw("DISTINCT {$yearExpression} as year")
             ->orderByDesc('year')
-            ->pluck('year');
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->values();
 
         $selectedYear = (int) $request->query('year', now()->year);
         if ($availableYears->isNotEmpty() && ! $availableYears->contains($selectedYear)) {
@@ -117,40 +196,32 @@ class InventoryController extends Controller
             ]]);
         }
 
-        $grandTotal = ($eggTotals->small ?? 0)
-            + ($eggTotals->medium ?? 0)
-            + ($eggTotals->large ?? 0)
-            + ($eggTotals->extra_large ?? 0);
+        $sizes = [
+            'Small' => (int) ($eggTotals->small ?? 0),
+            'Medium' => (int) ($eggTotals->medium ?? 0),
+            'Large' => (int) ($eggTotals->large ?? 0),
+            'Extra Large' => (int) ($eggTotals->extra_large ?? 0),
+        ];
+        $grandTotal = array_sum($sizes);
+        $summaryRows = [];
 
-        $recentMovements = DB::table('inventory_items')
-            ->orderBy('updated_at', 'desc')
-            ->limit(5)
-            ->get();
+        foreach ($sizes as $label => $value) {
+            $summaryRows[] = [
+                'label' => $label,
+                'value' => number_format($value),
+                'percent' => $grandTotal > 0 ? round(($value / $grandTotal) * 100, 1) : 0,
+            ];
+        }
 
-        $role = User::routeRole();
-
-        $inventoryForecast = app(InventoryForecast::class)->summary($feed, $vitamins, $eggTrays);
-
-        return view($role . '.inventory', compact(
-            'items',
-            'feed',
-            'eggTrays',
-            'vitamins',
-            'eggsStock',
-            'eggTraysDisplay',
-            'eggsToday',
-            'eggsYesterday',
-            'eggTotals',
-            'grandTotal',
-            'recentMovements',
-            'search',
-            'statusFilter',
-            'selectedMonth',
-            'selectedYear',
-            'availableYears',
-            'availableMonths',
-            'inventoryForecast'
-        ));
+        return [
+            'eggTotals' => $eggTotals,
+            'grandTotal' => $grandTotal,
+            'selectedMonth' => $selectedMonth,
+            'selectedYear' => $selectedYear,
+            'availableYears' => $availableYears,
+            'availableMonths' => $availableMonths,
+            'summaryRows' => $summaryRows,
+        ];
     }
 
     public function addStock(Request $request)

@@ -159,7 +159,18 @@ class User extends Authenticatable
             ->filter(fn (self $user) => $user->isFarmLead())
             ->values();
     }
-
+/** @return \Illuminate\Support\Collection<int, self> */
+public static function notificationRecipients()
+{
+    return static::query()
+        ->get()
+        ->filter(fn (self $user) => in_array(
+            self::routeRole($user->role),
+            ['owner', 'manager', 'staff'],
+            true
+        ))
+        ->values();
+}
     /** @return \Illuminate\Support\Collection<int, self> */
     public static function owners()
     {

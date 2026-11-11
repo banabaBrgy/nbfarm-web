@@ -1,3 +1,4 @@
+
 @extends('layouts.sidebar')
 
 @section('title', 'Scanned QR Overview')
@@ -26,7 +27,7 @@
         </a>
     </div>
 
-    <form method="GET" action="{{ route($overviewRoute) }}" class="qr-filter-bar">
+    <form method="GET" action="{{ route($overviewRoute) }}" class="qr-filter-bar" id="qrOverviewFilterForm">
         <div class="qr-filter-group qr-filter-group--search">
             <label for="qr-overview-search">Search</label>
             <input
@@ -44,7 +45,9 @@
             <select id="egg_size" name="egg_size" class="qr-filter-select" aria-label="By size">
                 <option value="">All sizes</option>
                 @foreach($sizes as $size)
-                    <option value="{{ $size }}" @selected($eggSize === $size)>{{ $size }}</option>
+                    <option value="{{ $size }}" @selected($eggSize === $size)>
+                        {{ $size }}
+                    </option>
                 @endforeach
             </select>
         </div>
@@ -54,22 +57,11 @@
             <select id="batch_id" name="batch_id" class="qr-filter-select" aria-label="By batch">
                 <option value="">All batches</option>
                 @foreach($batches as $id)
-                    <option value="{{ $id }}" @selected($batchId === $id)>Batch {{ $id }}</option>
+                    <option value="{{ $id }}" @selected($batchId === $id)>
+                        Batch {{ $id }}
+                    </option>
                 @endforeach
             </select>
-        </div>
-
-        <div class="qr-filter-actions">
-            <button type="submit" class="qr-btn qr-btn-print">
-                <i class="fas fa-search"></i>
-                Search
-            </button>
-
-            @if($hasFilters)
-                <a href="{{ route($overviewRoute) }}" class="qr-btn qr-btn-ghost">
-                    Clear
-                </a>
-            @endif
         </div>
     </form>
 
@@ -145,3 +137,46 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('qrOverviewFilterForm');
+    const searchInput = document.getElementById('qr-overview-search');
+    const sizeFilter = document.getElementById('egg_size');
+    const batchFilter = document.getElementById('batch_id');
+
+    if (!form) return;
+
+
+    // Automatically update when selecting egg size.
+    sizeFilter.addEventListener('change', function () {
+        form.requestSubmit();
+    });
+
+    // Automatically update when selecting batch.
+    batchFilter.addEventListener('change', function () {
+        form.requestSubmit();
+    });
+
+    // Search only when Enter is pressed.
+searchInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        form.requestSubmit();
+    }
+}); 
+// Reset filters and search when the browser reload button is used.
+const navigation = performance.getEntriesByType('navigation')[0];
+
+if (navigation && navigation.type === 'reload') {
+    const url = new URL(window.location.href);
+
+    if (url.search) {
+        url.search = '';
+        window.location.replace(url.toString());
+    }
+}
+});
+</script>
+@endpush

@@ -1,3 +1,4 @@
+
 @extends('layouts.sidebar')
 
 @section('title', 'Dashboard')
@@ -30,9 +31,7 @@
 
     @include('dashboard.low-stock-alert')
 
-    @include('dashboard.farm-kpis')
-
-    <div class="stats-grid stats-grid--five">
+    <div class="stats-grid stats-grid--three">
         <div class="stat-card stat-card--eggs">
             <div class="stat-icon">
                 <i class="fas fa-egg"></i>
@@ -69,28 +68,6 @@
                 <span class="stat-title">Active Batches</span>
                 <h2>{{ $activeBatches }}</h2>
                 <small>Currently producing</small>
-            </div>
-        </div>
-
-        <div class="stat-card stat-card--feed">
-            <div class="stat-icon">
-                <i class="fas fa-wheat-awn"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-title">Feeds Available</span>
-                <h2>{{ number_format($feedStock) }}</h2>
-                <small>{{ $feedLow ? 'Low Stock' : 'Bags Remaining' }}</small>
-            </div>
-        </div>
-
-        <div class="stat-card stat-card--inventory">
-            <div class="stat-icon">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-title">Egg Trays</span>
-                <h2>{{ number_format($eggTrays) }}</h2>
-                <small>Available</small>
             </div>
         </div>
     </div>

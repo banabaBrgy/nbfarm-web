@@ -47,7 +47,7 @@ class LowStockNotifier
             $this->qty($min)
         );
 
-        foreach (User::farmLeads() as $user) {
+        foreach (User::notificationRecipients() as $user) {
             $created = null;
 
             DB::transaction(function () use ($user, $item, $stock, $min, $priority, $title, $body, &$created) {
