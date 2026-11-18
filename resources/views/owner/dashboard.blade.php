@@ -41,6 +41,8 @@
 
     @include('dashboard.low-stock-alert')
 
+    @include('dashboard.role-todo')
+
     @include('dashboard.farm-kpis')
 
     <!-- Stat cards -->

@@ -34,16 +34,16 @@
                         data: row.data,
                         borderColor: isForecast ? forecastOrange : green,
                         backgroundColor: isForecast ? 'transparent' : greenFill,
-                        borderDash: isForecast ? [7, 5] : [],
-                        borderWidth: compact ? 2 : 2.5,
-                        pointRadius: compact ? (isForecast ? 2.5 : 3.5) : (isForecast ? 3 : 4),
+                        borderDash: [],
+                        borderWidth: isForecast ? (compact ? 2.5 : 3) : (compact ? 2 : 2.5),
+                        pointRadius: compact ? 3.5 : 4,
                         pointHoverRadius: compact ? 5 : (isForecast ? 4 : 6),
                         pointBackgroundColor: isForecast ? forecastOrange : green,
                         pointBorderColor: isForecast ? forecastOrange : '#fff',
                         pointBorderWidth: 1.5,
                         fill: !isForecast,
-                        tension: 0.15,
-                        spanGaps: false,
+                        tension: isForecast ? 0.35 : 0.15,
+                        spanGaps: isForecast,
                         order: isForecast ? 1 : 2,
                     };
                 }),
@@ -62,7 +62,23 @@
 
             const dataMin = chartValues.length ? Math.min(...chartValues) : 0;
             const dataMax = chartValues.length ? Math.max(...chartValues) : 12000;
-            const dataRange = Math.max(dataMax - dataMin, 1);
+            const midpoint = chartValues.length ? (dataMin + dataMax) / 2 : 0;
+            const minSpan = Math.max(1000, Math.abs(midpoint) * 0.12);
+            let plotMin = dataMin;
+            let plotMax = dataMax;
+
+            if ((plotMax - plotMin) < minSpan) {
+                const extra = (minSpan - (plotMax - plotMin)) / 2;
+                plotMin -= extra;
+                plotMax += extra;
+            }
+
+            if (plotMin < 0 && dataMin >= 0) {
+                plotMax += -plotMin;
+                plotMin = 0;
+            }
+
+            const dataRange = Math.max(plotMax - plotMin, 1);
             const roughStep = dataRange / 5;
             const stepMagnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
             const normalizedStep = roughStep / stepMagnitude;
@@ -75,8 +91,12 @@
                         ? 5 * stepMagnitude
                         : 10 * stepMagnitude;
 
-            const axisMin = Math.floor(dataMin / stepSize) * stepSize;
-            const axisMax = Math.ceil(dataMax / stepSize) * stepSize;
+            const axisMin = Math.floor(plotMin / stepSize) * stepSize;
+            const axisMax = Math.ceil(plotMax / stepSize) * stepSize;
+
+            const hasForecastLine = data.datasets.some(function (dataset) {
+                return dataset.label === 'Forecast';
+            });
 
             const chart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
@@ -102,7 +122,7 @@
 
                     plugins: {
                         legend: {
-                            display: data.datasets.length > 1,
+                            display: hasForecastLine || data.datasets.length > 1,
                             position: 'top',
                             align: 'center',
                             labels: {
@@ -201,10 +221,10 @@
                 chart.data.datasets.forEach(function (dataset) {
                     const isForecast = dataset.label === 'Forecast';
 
-                    dataset.borderWidth = isCompact ? 2 : 2.5;
-                    dataset.pointRadius = isCompact
-                        ? (isForecast ? 2.5 : 3.5)
-                        : (isForecast ? 3 : 4);
+                    dataset.borderWidth = isForecast
+                        ? (isCompact ? 2.5 : 3)
+                        : (isCompact ? 2 : 2.5);
+                    dataset.pointRadius = isCompact ? 3.5 : 4;
                     dataset.pointHoverRadius = isCompact ? 5 : (isForecast ? 4 : 6);
                 });
 

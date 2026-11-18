@@ -31,6 +31,8 @@
 
     @include('dashboard.low-stock-alert')
 
+    @include('dashboard.role-todo')
+
     <div class="stats-grid stats-grid--three">
         <div class="stat-card stat-card--eggs">
             <div class="stat-icon">

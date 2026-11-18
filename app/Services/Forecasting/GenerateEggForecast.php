@@ -158,6 +158,97 @@ class GenerateEggForecast
     }
 
     /**
+     * Read-only egg totals for an arbitrary set of dates.
+     * Does not write forecast rows. Zero means the model had nothing to use.
+     *
+     * @param  list<string>  $dates
+     * @return array<string, int>
+     */
+    public function totalsForDates(array $dates): array
+    {
+        $totals = [];
+        foreach ($this->breakdownForDates($dates) as $date => $row) {
+            $totals[$date] = $row['eggs'];
+        }
+
+        return $totals;
+    }
+
+    /**
+     * Read-only forecast total and size mix for chart dates.
+     * Does not write forecast rows. Dates the model cannot predict are omitted.
+     *
+     * @param  list<string>  $dates
+     * @return array<string, array{eggs: int, sizes: array{small: int, medium: int, large: int, extra_large: int, cracked: int}}>
+     */
+    public function breakdownForDates(array $dates): array
+    {
+        $normalized = [];
+        foreach ($dates as $date) {
+            if (! is_string($date) || $date === '') {
+                continue;
+            }
+            try {
+                $normalized[] = Carbon::parse($date)->toDateString();
+            } catch (Throwable) {
+                continue;
+            }
+        }
+
+        $normalized = array_values(array_unique($normalized));
+        sort($normalized);
+        if ($normalized === []) {
+            return [];
+        }
+
+        $stamp = Production::query()
+            ->selectRaw('COUNT(*) as row_count, COALESCE(SUM(eggs_produced), 0) as eggs, MAX(production_date) as latest')
+            ->first();
+        $cacheKey = 'egg-forecast:chart-breakdown:'.md5(implode('|', [
+            (string) ($stamp->row_count ?? 0),
+            (string) ($stamp->eggs ?? 0),
+            (string) ($stamp->latest ?? 'none'),
+            implode(',', $normalized),
+        ]));
+
+        return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($normalized) {
+            $rows = [];
+            foreach (array_chunk($normalized, 90) as $chunk) {
+                try {
+                    $predicted = $this->predictDates($chunk);
+                } catch (Throwable $e) {
+                    Log::warning('Chart date forecast chunk failed', [
+                        'message' => $e->getMessage(),
+                    ]);
+                    $predicted = [];
+                }
+
+                foreach ($chunk as $date) {
+                    $point = $predicted[$date] ?? null;
+                    $eggs = (int) ($point['eggs'] ?? 0);
+                    if ($eggs <= 0 || ! is_array($point)) {
+                        continue;
+                    }
+
+                    $sizes = is_array($point['sizes'] ?? null) ? $point['sizes'] : [];
+                    $rows[$date] = [
+                        'eggs' => $eggs,
+                        'sizes' => [
+                            'small' => (int) ($sizes['small'] ?? 0),
+                            'medium' => (int) ($sizes['medium'] ?? 0),
+                            'large' => (int) ($sizes['large'] ?? 0),
+                            'extra_large' => (int) ($sizes['extra_large'] ?? 0),
+                            'cracked' => (int) ($sizes['cracked'] ?? 0),
+                        ],
+                    ];
+                }
+            }
+
+            return $rows;
+        });
+    }
+
+    /**
      * Monthly forecast totals for a calendar year (dashboard year chart).
      * Only days that have production records are predicted and summed,
      * so the series lines up with Actual monthly harvest totals.

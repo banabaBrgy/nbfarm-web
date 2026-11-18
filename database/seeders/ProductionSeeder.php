@@ -10,6 +10,7 @@ class ProductionSeeder extends Seeder
     {
         $this->call([
             HistoricalProductionSeeder::class,
+            FillMissedProductionSeeder::class,
             WeeklyProductionSeeder::class,
             WeeklyDispatchSeeder::class,
         ]);

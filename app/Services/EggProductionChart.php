@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Services\Forecasting\GenerateEggForecast;
+use App\Services\Forecasting\SmoothForecastSeries;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -23,6 +24,7 @@ class EggProductionChart
     public function __construct(
         private ProductionYearTrend $trends,
         private GenerateEggForecast $forecasts,
+        private SmoothForecastSeries $smoother,
     ) {}
 
     /**
@@ -47,7 +49,7 @@ class EggProductionChart
                 $view,
                 $request->query('start_date'),
                 $request->query('end_date'),
-                false
+                true
             ),
             'comparison' => $this->past(
                 $view,
@@ -100,16 +102,10 @@ class EggProductionChart
         $endDate = is_string($endDate) ? $endDate : null;
 
         if ($startDate === null || $startDate === '' || $endDate === null || $endDate === '') {
-            return $this->emptyPayload(
-                $view,
-                $title,
-                true,
-                null,
-                null,
-                $includeForecast
-                    ? 'Choose a start and end date to compare actual production with the forecast.'
-                    : 'Choose a start and end date to see past production.'
-            );
+            $end = Carbon::yesterday()->startOfDay();
+            $start = $end->copy()->subDays(29);
+            $startDate = $start->toDateString();
+            $endDate = $end->toDateString();
         }
 
         try {
@@ -204,10 +200,20 @@ class EggProductionChart
                 $datasets,
                 fn (array $dataset) => ! $dataset['forecast']
             ));
-            $notice = 'No forecast was saved for these dates. The chart shows actual production only.';
+            $notice = 'No forecast could be made for these dates. The chart shows actual production only.';
         }
 
-        return [
+        if (! $hasActual) {
+            $datasets = array_values(array_filter(
+                $datasets,
+                fn (array $dataset) => ($dataset['label'] ?? '') !== 'Actual Production'
+            ));
+        }
+
+        $tomorrowLabel = Carbon::tomorrow()->format('M d, Y');
+        $tomorrowIndex = array_search($tomorrowLabel, array_values($range['labels'] ?? []), true);
+
+        return $this->withSmoothForecast([
             'view' => $view,
             'period' => $period,
             'needsDates' => true,
@@ -217,7 +223,7 @@ class EggProductionChart
             'notice' => $notice,
             'labels' => array_values($range['labels'] ?? []),
             'datasets' => $datasets,
-        ];
+        ], $tomorrowIndex === false ? null : $tomorrowIndex);
     }
 
     /**
@@ -248,8 +254,9 @@ class EggProductionChart
         foreach ($rows as $row) {
             $date = Carbon::parse($row['date'])->startOfDay();
             $labels[] = $date->format('M j');
-            $eggs = is_numeric($row['eggs'] ?? null) ? (float) $row['eggs'] : 0.0;
-            $data[] = $eggs;
+            $eggs = is_numeric($row['eggs'] ?? null) ? (int) $row['eggs'] : 0;
+            // Zero is "no model result", not a harvest of zero. Leave a gap the line can span.
+            $data[] = $eggs > 0 ? $eggs : null;
             if ($eggs > 0) {
                 $hasValue = true;
             }
@@ -275,7 +282,7 @@ class EggProductionChart
             );
         }
 
-        return [
+        return $this->withSmoothForecast([
             'view' => $view,
             'period' => $period,
             'needsDates' => false,
@@ -291,7 +298,27 @@ class EggProductionChart
                     'forecast' => true,
                 ],
             ],
-        ];
+        ], 0);
+    }
+
+    /**
+     * @param  array{datasets?: list<array{forecast?: bool, data?: list<int|float|null>}>}  $payload
+     * @return array{datasets?: list<array{forecast?: bool, data?: list<int|float|null>}>}
+     */
+    private function withSmoothForecast(array $payload, ?int $lockIndex = null): array
+    {
+        foreach ($payload['datasets'] ?? [] as $index => $dataset) {
+            if (! ($dataset['forecast'] ?? false)) {
+                continue;
+            }
+
+            $payload['datasets'][$index]['data'] = $this->smoother->apply(
+                $dataset['data'] ?? [],
+                $lockIndex
+            );
+        }
+
+        return $payload;
     }
 
     /**

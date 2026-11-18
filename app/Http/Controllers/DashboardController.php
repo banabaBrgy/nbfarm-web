@@ -8,6 +8,7 @@ use App\Services\DailyInventory;
 use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
 use App\Services\Forecasting\GenerateEggForecast;
+use App\Services\RoleTodoList;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -71,6 +72,7 @@ class DashboardController extends Controller
         $previousForecastSummary = $forecastService->previousSummary();
         $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? 0);
         $eggProductionChart = app(EggProductionChart::class)->forRequest($request);
+        $roleTodos = app(RoleTodoList::class)->forUser(auth()->user());
 
         /*
         |--------------------------------------------------------------------------
@@ -95,6 +97,7 @@ class DashboardController extends Controller
             'forecastSummary',
             'previousForecastSummary',
             'eggProductionChart',
+            'roleTodos',
         ), app(DashboardKpis::class)->summary()));
     }
 }

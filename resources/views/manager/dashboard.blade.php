@@ -55,6 +55,8 @@
 
     @include('dashboard.low-stock-alert')
 
+    @include('dashboard.role-todo')
+
     <div class="stats-grid">
 
 

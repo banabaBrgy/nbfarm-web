@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Models\Forecast;
 use App\Models\Production;
 use App\Models\User;
+use App\Services\EggProductionChart;
 use App\Services\Forecasting\ForecastEngine;
 use App\Services\WeatherService;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -101,15 +103,45 @@ class EggProductionChartViewTest extends TestCase
         $this->assertFalse($backtestCalled);
     }
 
-    public function test_historical_view_asks_for_dates_before_drawing_a_chart(): void
+    public function test_selecting_historical_opens_the_recent_range(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);
 
         $this->actingAs($owner)
             ->get(route('owner.dashboard', ['trend_view' => 'historical']))
             ->assertOk()
-            ->assertSee('Choose a start and end date to see past production.')
+            ->assertSee('value="2026-10-09"', false)
+            ->assertSee('value="2026-11-07"', false)
+            ->assertSee('No actual production or forecast values in this range.', false)
             ->assertDontSee('id="eggChart"', false);
+    }
+
+    public function test_selecting_historical_shows_the_forecast_when_one_exists(): void
+    {
+        foreach ([2023, 2024, 2025] as $year) {
+            $this->harvest($year.'-11-01', 6900);
+        }
+        $this->harvest('2026-11-01', 7000);
+
+        $owner = User::factory()->create(['role' => 'owner']);
+
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard', ['trend_view' => 'historical']))
+            ->assertOk()
+            ->assertSee('id="eggChart"', false)
+            ->assertSee('"label":"Forecast"', false)
+            ->assertSee('"label":"Actual Production"', false)
+            ->assertSee('7000', false)
+            ->assertSee('6900', false)
+            ->assertSee('borderDash: []', false)
+            ->assertSee('hasForecastLine || data.datasets.length > 1', false);
+
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard', ['trend_view' => 'comparison']))
+            ->assertOk()
+            ->assertSee('id="eggChart"', false)
+            ->assertSee('"label":"Forecast"', false)
+            ->assertSee('6900', false);
     }
 
     public function test_comparison_view_plots_actual_and_forecast_for_the_same_dates(): void
@@ -209,6 +241,90 @@ class EggProductionChartViewTest extends TestCase
             ->assertDontSee('id="eggChart"', false);
     }
 
+    public function test_a_date_range_includes_a_forecast_for_every_day(): void
+    {
+        foreach ([2023, 2024, 2025] as $year) {
+            $this->harvest($year.'-11-01', 6900);
+            $this->harvest($year.'-11-02', 6900);
+            $this->harvest($year.'-11-03', 6900);
+        }
+        $this->harvest('2026-11-01', 7000);
+
+        $owner = User::factory()->create(['role' => 'owner']);
+
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard', [
+                'trend_view' => 'historical',
+                'start_date' => '2026-11-01',
+                'end_date' => '2026-11-03',
+            ]))
+            ->assertOk()
+            ->assertSee('"label":"Actual Production"', false)
+            ->assertSee('"label":"Forecast"', false)
+            ->assertSee('[7000,null,null]', false)
+            ->assertSee('[6900,6900,6900]', false)
+            ->assertSee('spanGaps: isForecast', false)
+            ->assertDontSee('No forecast could be made for these dates.', false);
+
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard', [
+                'trend_view' => 'comparison',
+                'start_date' => '2026-11-01',
+                'end_date' => '2026-11-03',
+            ]))
+            ->assertOk()
+            ->assertSee('"label":"Forecast"', false)
+            ->assertSee('[6900,6900,6900]', false);
+    }
+
+    public function test_time_series_shrinks_a_spike_and_keeps_the_first_day_exact(): void
+    {
+        foreach ([2023, 2024, 2025] as $year) {
+            $this->harvest($year.'-11-09', 6000);
+            $this->harvest($year.'-11-10', 9000);
+            $this->harvest($year.'-11-11', 6000);
+        }
+
+        $chart = app(EggProductionChart::class)->forRequest(
+            Request::create('/dashboard', 'GET', ['trend_view' => 'timeseries'])
+        );
+
+        $data = $chart['datasets'][0]['data'];
+
+        $this->assertSame(6000, $data[0]);
+        $this->assertGreaterThanOrEqual(8820, $data[1]);
+        $this->assertLessThan(9000, $data[1]);
+        $this->assertGreaterThanOrEqual(5880, $data[2]);
+        $this->assertLessThanOrEqual(6120, $data[2]);
+    }
+
+    public function test_a_saved_forecast_far_from_the_model_does_not_spike_the_chart(): void
+    {
+        foreach ([2023, 2024, 2025] as $year) {
+            $this->harvest($year.'-11-01', 6900);
+        }
+
+        Forecast::query()->create([
+            'forecast_date' => '2026-11-01',
+            'predicted_eggs' => 2000,
+            'series' => [
+                ['date' => '2026-11-01', 'eggs' => 2000],
+            ],
+        ]);
+
+        $owner = User::factory()->create(['role' => 'owner']);
+
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard', [
+                'trend_view' => 'comparison',
+                'start_date' => '2026-11-01',
+                'end_date' => '2026-11-01',
+            ]))
+            ->assertOk()
+            ->assertSee('[6900]', false)
+            ->assertDontSee('[2000]', false);
+    }
+
     public function test_comparison_without_forecast_values_keeps_the_actual_line_only(): void
     {
         $this->harvest('2026-11-01', 1800);
@@ -222,7 +338,7 @@ class EggProductionChartViewTest extends TestCase
                 'end_date' => '2026-11-01',
             ]))
             ->assertOk()
-            ->assertSee('No forecast was saved for these dates.', false)
+            ->assertSee('No forecast could be made for these dates.', false)
             ->assertSee('"label":"Actual Production"', false)
             ->assertDontSee('"label":"Forecast"', false);
     }

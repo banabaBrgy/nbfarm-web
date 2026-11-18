@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Services\DailyInventory;
 use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
+use App\Services\RoleTodoList;
 use App\Services\SystemEffectiveness;
 use App\Services\Forecasting\GenerateEggForecast;
 
@@ -125,6 +126,7 @@ class ManagerDashboardController extends Controller
         $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? 0);
         $eggProductionChart = app(EggProductionChart::class)->forRequest($request);
         $effectiveness = app(SystemEffectiveness::class)->forRequest($request);
+        $roleTodos = app(RoleTodoList::class)->forUser(auth()->user());
 
         Log::info('MANAGER FORECAST DIAGNOSTIC', [
             'predicted_eggs' => $predictedEggs,
@@ -164,7 +166,8 @@ class ManagerDashboardController extends Controller
                 'forecastSummary',
                 'previousForecastSummary',
                 'eggProductionChart',
-                'effectiveness'
+                'effectiveness',
+                'roleTodos'
             ), app(DashboardKpis::class)->summary())
         );
     }

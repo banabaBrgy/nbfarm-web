@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Forecast;
 use App\Models\Production;
 use App\Services\Forecasting\GenerateEggForecast;
+use App\Services\Forecasting\SmoothForecastSeries;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,6 +27,7 @@ class ProductionYearTrend
 
     public function __construct(
         private GenerateEggForecast $forecast,
+        private SmoothForecastSeries $smoother,
     ) {}
 
     /**
@@ -100,6 +102,25 @@ class ProductionYearTrend
                     ) {
                         $forecastByDate[$date] = $eggs;
                     }
+                }
+            }
+
+            $days = [];
+            for ($cursor = $start->copy(); $cursor->lte($end); $cursor->addDay()) {
+                $days[] = $cursor->toDateString();
+            }
+
+            foreach ($this->forecast->totalsForDates($days) as $day => $live) {
+                if (! isset($forecastByDate[$day])) {
+                    $forecastByDate[$day] = $live;
+
+                    continue;
+                }
+
+                // A saved total far from the live model would draw a cliff.
+                // Keep the saved total when it already sits on the model.
+                if (! $this->smoother->isNearModel((int) $forecastByDate[$day], (int) $live)) {
+                    $forecastByDate[$day] = $live;
                 }
             }
         }
