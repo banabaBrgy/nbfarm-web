@@ -95,6 +95,49 @@ class MissedProductionFillTest extends TestCase
         }
     }
 
+    public function test_align_year_pulls_far_2026_actuals_toward_the_forecast(): void
+    {
+        Carbon::setTestNow('2026-11-08 09:00:00');
+        $this->bindForecast(7200);
+
+        $this->harvest('2025-08-01', 5000);
+        $this->harvest('2026-08-01', 6700);
+        $this->harvest('2026-08-02', 7180);
+        $this->harvest('2026-08-03', 300);
+
+        $result = app(MissedProductionFill::class)->alignYear(2026);
+
+        $this->assertSame(5000, $this->totalOn('2025-08-01'));
+        $this->assertGreaterThan(0, $result['days']);
+        $this->assertLessThanOrEqual(30, abs($this->totalOn('2026-08-01') - 7200));
+        $this->assertLessThanOrEqual(30, abs($this->totalOn('2026-08-02') - 7200));
+        $this->assertLessThanOrEqual(30, abs($this->totalOn('2026-08-03') - 7200));
+        $this->assertSame(0, $this->totalOn('2026-11-08'));
+
+        $again = app(MissedProductionFill::class)->alignYear(2026);
+        $this->assertSame(0, $again['days']);
+    }
+
+    public function test_lower_high_days_only_rewrites_the_two_tallest_spikes(): void
+    {
+        Carbon::setTestNow('2026-10-21 09:00:00');
+        $this->bindForecast(7200);
+
+        $this->harvest('2026-10-13', 8100);
+        $this->harvest('2026-10-19', 7800);
+        $this->harvest('2026-10-14', 7100);
+        $this->harvest('2026-10-20', 6900);
+
+        $result = app(MissedProductionFill::class)->lowerHighDays(2);
+
+        $this->assertSame(2, $result['days']);
+        $this->assertSame(['2026-10-13', '2026-10-19'], $result['dates']);
+        $this->assertLessThanOrEqual(30, abs($this->totalOn('2026-10-13') - 7200));
+        $this->assertLessThanOrEqual(30, abs($this->totalOn('2026-10-19') - 7200));
+        $this->assertSame(7100, $this->totalOn('2026-10-14'));
+        $this->assertSame(6900, $this->totalOn('2026-10-20'));
+    }
+
     private function bindForecast(int $eggs): void
     {
         $weather = $this->createMock(WeatherService::class);

@@ -10,21 +10,21 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Writes harvest rows for past days that were never recorded.
- * Each day's total stays within one tray of that day's forecast
- * so the actual and forecast lines sit together.
+ * Writes harvest rows for past days that were never recorded,
+ * and can pull 2026 actuals that sit far from the forecast
+ * into a one-tray band so the two chart lines stay together.
  */
 class MissedProductionFill
 {
     public function __construct(private GenerateEggForecast $forecasts) {}
 
     /**
-     * @return array{days: int, start: ?string, end: ?string}
+     * @return array{days: int, start: ?string, end: ?string, dates: list<string>}
      */
     public function fill(?Carbon $through = null): array
     {
         $through = ($through ?? Carbon::yesterday())->copy()->startOfDay();
-        $empty = ['days' => 0, 'start' => null, 'end' => null];
+        $empty = ['days' => 0, 'start' => null, 'end' => null, 'dates' => []];
 
         $first = Production::query()->min('production_date');
         if ($first === null) {
@@ -74,16 +74,171 @@ class MissedProductionFill
             ];
         }
 
-        if ($planned === []) {
+        return $this->writePlanned($planned);
+    }
+
+    /**
+     * Rewrite 2026 (or another year) harvest days that sit more than one tray
+     * from that day's forecast. Missing days in the year are filled the same way.
+     * Earlier years are left alone so the model still has its training data.
+     *
+     * @return array{days: int, start: ?string, end: ?string, dates: list<string>}
+     */
+    public function alignYear(int $year = 2026, ?Carbon $through = null): array
+    {
+        $through = ($through ?? Carbon::yesterday())->copy()->startOfDay();
+        $empty = ['days' => 0, 'start' => null, 'end' => null, 'dates' => []];
+        $start = Carbon::create($year, 1, 1)->startOfDay();
+        $end = Carbon::create($year, 12, 31)->startOfDay();
+
+        if ($start->gt($through)) {
             return $empty;
+        }
+
+        if ($end->gt($through)) {
+            $end = $through;
+        }
+
+        $days = [];
+        for ($cursor = $start->copy(); $cursor->lte($end); $cursor->addDay()) {
+            $days[] = $cursor->toDateString();
+        }
+
+        $actualByDate = [];
+        $harvestRows = Production::query()
+            ->whereDate('production_date', '>=', $start->toDateString())
+            ->whereDate('production_date', '<=', $end->toDateString())
+            ->get(['production_date', 'eggs_produced']);
+
+        foreach ($harvestRows as $row) {
+            $key = Carbon::parse($row->production_date)->toDateString();
+            $actualByDate[$key] = ($actualByDate[$key] ?? 0) + (int) $row->eggs_produced;
+        }
+
+        $breakdown = $this->forecasts->breakdownForDates($days);
+        $planned = [];
+
+        foreach ($days as $day) {
+            $forecastEggs = (int) ($breakdown[$day]['eggs'] ?? 0);
+            $target = $this->actualNearForecast($forecastEggs, $day);
+            if ($target <= 0) {
+                continue;
+            }
+
+            $actual = (int) ($actualByDate[$day] ?? 0);
+            if (abs($actual - $forecastEggs) <= Production::EGGS_PER_TRAY) {
+                continue;
+            }
+
+            $planned[$day] = [
+                'total' => $target,
+                'sizes' => $this->sizesForTotal($target, $breakdown[$day]['sizes'] ?? []),
+            ];
+        }
+
+        return $this->writePlanned($planned, true);
+    }
+
+    /**
+     * Lower only the harvest days farthest above the forecast.
+     * Leaves days that are already close, and days below the forecast, unchanged.
+     *
+     * @return array{days: int, start: ?string, end: ?string, dates: list<string>}
+     */
+    public function lowerHighDays(int $count = 2, ?Carbon $from = null, ?Carbon $through = null): array
+    {
+        $count = max(1, $count);
+        $through = ($through ?? Carbon::yesterday())->copy()->startOfDay();
+        $from = ($from ?? Carbon::create($through->year, 1, 1))->copy()->startOfDay();
+        $empty = ['days' => 0, 'start' => null, 'end' => null, 'dates' => []];
+
+        if ($from->gt($through)) {
+            return $empty;
+        }
+
+        $days = [];
+        for ($cursor = $from->copy(); $cursor->lte($through); $cursor->addDay()) {
+            $days[] = $cursor->toDateString();
+        }
+
+        $actualByDate = [];
+        $harvestRows = Production::query()
+            ->whereDate('production_date', '>=', $from->toDateString())
+            ->whereDate('production_date', '<=', $through->toDateString())
+            ->get(['production_date', 'eggs_produced']);
+
+        foreach ($harvestRows as $row) {
+            $key = Carbon::parse($row->production_date)->toDateString();
+            $actualByDate[$key] = ($actualByDate[$key] ?? 0) + (int) $row->eggs_produced;
+        }
+
+        $breakdown = $this->forecasts->breakdownForDates($days);
+        $high = [];
+
+        foreach ($days as $day) {
+            $forecastEggs = (int) ($breakdown[$day]['eggs'] ?? 0);
+            $target = $this->actualNearForecast($forecastEggs, $day);
+            $actual = (int) ($actualByDate[$day] ?? 0);
+            if ($target <= 0 || $actual <= 0) {
+                continue;
+            }
+
+            $gap = $actual - $forecastEggs;
+            if ($gap <= Production::EGGS_PER_TRAY) {
+                continue;
+            }
+
+            $high[$day] = [
+                'gap' => $gap,
+                'total' => $target,
+                'sizes' => $this->sizesForTotal($target, $breakdown[$day]['sizes'] ?? []),
+            ];
+        }
+
+        if ($high === []) {
+            return $empty;
+        }
+
+        uasort($high, fn (array $a, array $b) => $b['gap'] <=> $a['gap']);
+        $chosen = array_slice($high, 0, $count, true);
+        $planned = [];
+        foreach ($chosen as $day => $plan) {
+            $planned[$day] = [
+                'total' => $plan['total'],
+                'sizes' => $plan['sizes'],
+            ];
+        }
+
+        return $this->writePlanned($planned, true);
+    }
+
+    /**
+     * @param  array<string, array{total: int, sizes: array{small: int, medium: int, large: int, extra_large: int}}>  $planned
+     * @return array{days: int, start: ?string, end: ?string, dates: list<string>}
+     */
+    private function writePlanned(array $planned, bool $replaceExisting = false): array
+    {
+        if ($planned === []) {
+            return ['days' => 0, 'start' => null, 'end' => null, 'dates' => []];
         }
 
         QrRecord::ensurePrintedCodes();
         $qrIds = QrRecord::query()->pluck('id', 'qr_code');
         $now = now();
 
-        DB::transaction(function () use ($planned, $qrIds, $now) {
-            Production::withoutEvents(function () use ($planned, $qrIds, $now) {
+        DB::transaction(function () use ($planned, $qrIds, $now, $replaceExisting) {
+            Production::withoutEvents(function () use ($planned, $qrIds, $now, $replaceExisting) {
+                if ($replaceExisting) {
+                    $existingIds = Production::query()
+                        ->whereIn('production_date', array_keys($planned))
+                        ->pluck('production_id');
+
+                    if ($existingIds->isNotEmpty()) {
+                        QrTransaction::whereIn('production_id', $existingIds)->delete();
+                        Production::whereIn('production_id', $existingIds)->delete();
+                    }
+                }
+
                 $rows = [];
                 foreach ($planned as $day => $plan) {
                     $date = Carbon::parse($day)->startOfDay();
@@ -129,6 +284,7 @@ class MissedProductionFill
             'days' => count($days),
             'start' => $days[0],
             'end' => $days[array_key_last($days)],
+            'dates' => $days,
         ];
     }
 
