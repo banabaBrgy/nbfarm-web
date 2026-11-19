@@ -12,7 +12,7 @@ class HistoricalProductionSeeder extends Seeder
     use SeedsHarvestQr;
 
     /**
-     * Client harvest for 2023–2026. Each year comes from the farm PDF.
+     * Client harvest for 2023–2026. PDF days, plus later days filled from the same-day trend.
      */
     public function run(): void
     {
@@ -23,7 +23,7 @@ class HistoricalProductionSeeder extends Seeder
         $this->command?->info("Client harvest 2023–2026: {$count} days loaded from the updated PDFs.");
     }
 
-    public function seedClientFile(?int $year = null): int
+    public function seedClientFile(?int $year = null, ?string $onOrAfter = null): int
     {
         $path = database_path('seeders/data/client_egg_production.json');
         $days = json_decode((string) file_get_contents($path), true);
@@ -37,6 +37,13 @@ class HistoricalProductionSeeder extends Seeder
             $days = array_values(array_filter(
                 $days,
                 fn (array $day): bool => str_starts_with((string) $day['date'], $prefix)
+            ));
+        }
+
+        if ($onOrAfter !== null) {
+            $days = array_values(array_filter(
+                $days,
+                fn (array $day): bool => (string) $day['date'] >= $onOrAfter
             ));
         }
 

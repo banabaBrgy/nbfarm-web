@@ -26,7 +26,7 @@ class PythonForecastEngine implements ForecastEngine
             'predict_dates' => $predictDates,
             'window' => $window,
             'temperatures' => $temperatures,
-            'model' => 'three_year_linear_regression',
+            'model' => (string) config('forecasting.model', 'arima_2_1_1'),
             'history_years' => (int) config('forecasting.history_years', 3),
             'neutral_temperature' => (float) config('forecasting.neutral_temperature', 28),
             'temp_shift_per_degree' => (float) config('forecasting.temp_shift_per_degree', 0.015),

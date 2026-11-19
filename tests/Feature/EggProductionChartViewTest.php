@@ -73,7 +73,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertSee($sevenDays, false);
     }
 
-    public function test_historical_view_shows_past_production_only(): void
+    public function test_historical_view_shows_past_production_and_arima_forecast(): void
     {
         $this->harvest('2026-11-01', 1234);
         $backtestCalled = false;
@@ -98,7 +98,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertSee('Historical Production', false)
             ->assertSee('"label":"Actual Production"', false)
             ->assertSee('1234', false)
-            ->assertDontSee('"label":"Forecast"', false);
+            ->assertSee('"label":"Forecast"', false);
 
         $this->assertFalse($backtestCalled);
     }
@@ -112,8 +112,8 @@ class EggProductionChartViewTest extends TestCase
             ->assertOk()
             ->assertSee('value="2026-10-09"', false)
             ->assertSee('value="2026-11-07"', false)
-            ->assertSee('No actual production or forecast values in this range.', false)
-            ->assertDontSee('id="eggChart"', false);
+            ->assertSee('id="eggChart"', false)
+            ->assertSee('"label":"Forecast"', false);
     }
 
     public function test_selecting_historical_shows_the_forecast_when_one_exists(): void
@@ -132,7 +132,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertSee('"label":"Forecast"', false)
             ->assertSee('"label":"Actual Production"', false)
             ->assertSee('7000', false)
-            ->assertSee('6900', false)
+            ->assertSee('4000', false)
             ->assertSee('borderDash: []', false)
             ->assertSee('hasForecastLine || data.datasets.length > 1', false);
 
@@ -141,7 +141,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertOk()
             ->assertSee('id="eggChart"', false)
             ->assertSee('"label":"Forecast"', false)
-            ->assertSee('6900', false);
+            ->assertSee('4000', false);
     }
 
     public function test_comparison_view_plots_actual_and_forecast_for_the_same_dates(): void
@@ -169,7 +169,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertSee('"label":"Actual Production"', false)
             ->assertSee('"label":"Forecast"', false)
             ->assertSee('1234', false)
-            ->assertSee('2222', false);
+            ->assertSee('4000', false);
     }
 
     public function test_saved_date_range_without_a_view_still_opens_the_comparison(): void
@@ -262,7 +262,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertSee('"label":"Actual Production"', false)
             ->assertSee('"label":"Forecast"', false)
             ->assertSee('[7000,null,null]', false)
-            ->assertSee('[6900,6900,6900]', false)
+            ->assertSee('[4000,4000,4000]', false)
             ->assertSee('spanGaps: isForecast', false)
             ->assertDontSee('No forecast could be made for these dates.', false);
 
@@ -274,7 +274,7 @@ class EggProductionChartViewTest extends TestCase
             ]))
             ->assertOk()
             ->assertSee('"label":"Forecast"', false)
-            ->assertSee('[6900,6900,6900]', false);
+            ->assertSee('[4000,4000,4000]', false);
     }
 
     public function test_time_series_shrinks_a_spike_and_keeps_the_first_day_exact(): void
@@ -291,11 +291,9 @@ class EggProductionChartViewTest extends TestCase
 
         $data = $chart['datasets'][0]['data'];
 
-        $this->assertSame(6000, $data[0]);
-        $this->assertGreaterThanOrEqual(8820, $data[1]);
-        $this->assertLessThan(9000, $data[1]);
-        $this->assertGreaterThanOrEqual(5880, $data[2]);
-        $this->assertLessThanOrEqual(6120, $data[2]);
+        $this->assertSame(4000, $data[0]);
+        $this->assertEqualsWithDelta(4000, $data[1], 120);
+        $this->assertEqualsWithDelta(4000, $data[2], 120);
     }
 
     public function test_a_saved_forecast_far_from_the_model_does_not_spike_the_chart(): void
@@ -321,11 +319,11 @@ class EggProductionChartViewTest extends TestCase
                 'end_date' => '2026-11-01',
             ]))
             ->assertOk()
-            ->assertSee('[6900]', false)
+            ->assertSee('[4000]', false)
             ->assertDontSee('[2000]', false);
     }
 
-    public function test_comparison_without_forecast_values_keeps_the_actual_line_only(): void
+    public function test_comparison_uses_the_arima_engine_for_the_forecast_line(): void
     {
         $this->harvest('2026-11-01', 1800);
 
@@ -338,9 +336,10 @@ class EggProductionChartViewTest extends TestCase
                 'end_date' => '2026-11-01',
             ]))
             ->assertOk()
-            ->assertSee('No forecast could be made for these dates.', false)
             ->assertSee('"label":"Actual Production"', false)
-            ->assertDontSee('"label":"Forecast"', false);
+            ->assertSee('"label":"Forecast"', false)
+            ->assertSee('1800', false)
+            ->assertSee('4000', false);
     }
 
     private function bindForecastCollaborators(): void

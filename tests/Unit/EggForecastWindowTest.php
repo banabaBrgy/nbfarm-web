@@ -83,6 +83,7 @@ class EggForecastWindowTest extends TestCase
 
     public function test_falls_back_to_local_model_when_python_fails(): void
     {
+        config(['forecasting.model' => 'three_year_linear_regression']);
         Carbon::setTestNow('2026-10-04');
 
         $this->harvestDay('2023-10-05', 6000, 900, 2100, 2400, 600, 0);
@@ -122,6 +123,7 @@ class EggForecastWindowTest extends TestCase
 
     public function test_rolling_window_in_2027_uses_2024_through_2026(): void
     {
+        config(['forecasting.model' => 'three_year_linear_regression']);
         Carbon::setTestNow('2027-01-01');
 
         $this->harvestDay('2023-01-02', 6000, 900, 2100, 2400, 600, 0);
@@ -242,14 +244,16 @@ class EggForecastWindowTest extends TestCase
 
         $this->assertSame(34.0, $captured->temperatures['2026-10-05']);
         $this->assertSame(34.0, $captured->temperatures['2026-10-06']);
+        $this->assertSame('arima_2_1_1', $captured->options['model']);
         $this->assertSame('2023-01-01', $captured->options['archive_start']);
-        $this->assertSame('2025-12-31', $captured->options['archive_end']);
+        $this->assertSame('2026-10-04', $captured->options['archive_end']);
 
         Carbon::setTestNow();
     }
 
     public function test_rolling_window_in_2026_still_uses_2023_through_2025(): void
     {
+        config(['forecasting.model' => 'three_year_linear_regression']);
         Carbon::setTestNow('2026-10-04');
 
         $this->harvestDay('2023-10-05', 6000, 900, 2100, 2400, 600, 0);
@@ -278,6 +282,40 @@ class EggForecastWindowTest extends TestCase
         $this->assertSame('2023-01-01', $summary['history_start']);
         $this->assertSame('2025-12-31', $summary['history_end']);
         $this->assertSame(7800, $summary['predicted_eggs']);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_arima_does_not_fall_back_to_three_year_when_python_fails(): void
+    {
+        config(['forecasting.model' => 'arima_2_1_1']);
+        Carbon::setTestNow('2026-10-04');
+
+        $this->harvestDay('2023-10-05', 6000, 900, 2100, 2400, 600, 0);
+        $this->harvestDay('2024-10-05', 6600, 900, 2100, 2700, 900, 0);
+        $this->harvestDay('2025-10-05', 7200, 900, 2400, 3000, 900, 0);
+
+        $weather = $this->createMock(WeatherService::class);
+        $weather->method('temperatureForDate')->willReturn(28.0);
+        $this->app->instance(WeatherService::class, $weather);
+
+        $this->app->instance(ForecastEngine::class, new class implements ForecastEngine
+        {
+            public function predict(
+                array $history,
+                array $predictDates,
+                int $window = 7,
+                array $temperatures = [],
+                array $options = [],
+            ): array {
+                throw new \RuntimeException('API down');
+            }
+        });
+
+        $summary = app(GenerateEggForecast::class)->summary();
+
+        $this->assertSame(0, $summary['predicted_eggs']);
+        $this->assertSame(0, $summary['sample_days']);
 
         Carbon::setTestNow();
     }

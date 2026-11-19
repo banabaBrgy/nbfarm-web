@@ -14,7 +14,7 @@ class DashboardKpiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_every_dashboard_shows_farm_totals_from_saved_records(): void
+    public function test_farm_owner_dashboard_does_not_show_lifetime_total_cards(): void
     {
         $this->harvest(today()->toDateString(), 90, 15);
         $this->harvest(today()->subDays(10)->toDateString(), 300, 0);
@@ -39,44 +39,17 @@ class DashboardKpiTest extends TestCase
             'price' => 40,
             'status' => 'Paid',
         ]);
-        Transaction::create([
-            'customer' => 'Old Store',
-            'transaction_date' => today()->subDays(30)->toDateString(),
-            'quantity' => 1,
-            'price' => 150.50,
-            'status' => 'Pending',
-        ]);
 
         $owner = User::factory()->create(['role' => 'owner']);
-        $manager = User::factory()->create(['role' => 'manager']);
-        $staff = User::factory()->create(['role' => 'staff']);
 
-        $users = [
-            'owner.dashboard' => $owner,
-            'manager.dashboard' => $manager,
-            'staff.dashboard' => $staff,
-        ];
-
-        foreach ($users as $route => $user) {
-            $this->actingAs($user)
-                ->get(route($route))
-                ->assertOk()
-                ->assertSeeInOrder([
-                    'Total Egg Production',
-                    '390',
-                    'Eggs produced',
-                    'Available Inventory',
-                    '30',
-                    'Available egg stocks',
-                    'Total Dispatch',
-                    '60',
-                    'Dispatched eggs',
-                    'Total Revenue',
-                    '₱190.50',
-                    'Recorded sales revenue',
-                    'Total Eggs Today',
-                ]);
-        }
+        $this->actingAs($owner)
+            ->get(route('owner.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Total Egg Production')
+            ->assertDontSee('Available Inventory')
+            ->assertDontSee('Total Dispatch')
+            ->assertDontSee('Total Revenue')
+            ->assertSee('Total Eggs Today');
     }
 
     private function harvest(string $date, int $largeEggs, int $crackedEggs): void

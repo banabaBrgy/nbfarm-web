@@ -7,7 +7,6 @@ use App\Models\InventoryItem;
 use App\Models\Dispatch;
 use App\Models\Transaction;
 use App\Services\DailyInventory;
-use App\Services\DashboardKpis;
 use App\Services\EggProductionChart;
 use App\Services\RoleTodoList;
 use App\Services\SystemEffectiveness;
@@ -94,7 +93,7 @@ class OwnerDashboardController extends Controller
         // RETURN DASHBOARD
         // ============================
 
-        return view('owner.dashboard', array_merge(compact(
+        return view('owner.dashboard', compact(
             'eggsToday',
             'eggsChange',
             'feedStock',
@@ -115,6 +114,6 @@ class OwnerDashboardController extends Controller
             'eggProductionChart',
             'effectiveness',
             'roleTodos'
-        ), app(DashboardKpis::class)->summary()));
+        ));
     }
 }

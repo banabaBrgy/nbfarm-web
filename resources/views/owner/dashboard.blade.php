@@ -43,8 +43,6 @@
 
     @include('dashboard.role-todo')
 
-    @include('dashboard.farm-kpis')
-
     <!-- Stat cards -->
     <div class="stats-grid stats-grid--four">
 

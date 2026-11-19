@@ -681,7 +681,7 @@ class GenerateEggForecast
     }
 
     /**
-     * Prefer the Python service; fall back to the local PHP model if the API is down.
+     * Prefer the Python service. ARIMA does not fall back to the 3-year PHP model.
      *
      * @param  list<string>  $predictDates
      * @return array<string, array{
@@ -702,6 +702,7 @@ class GenerateEggForecast
         }
 
         $archive = $this->archiveBoundsForDates($predictDates);
+        $requestedModel = $this->forecastModel();
 
         try {
             $payload = $this->engine->predict(
@@ -710,7 +711,7 @@ class GenerateEggForecast
                 7,
                 $temperatures,
                 [
-                    'model' => 'three_year_linear_regression',
+                    'model' => $requestedModel,
                     'history_years' => (int) config('forecasting.history_years', 3),
                     'archive_start' => $archive['start'],
                     'archive_end' => $archive['end'],
@@ -721,9 +722,13 @@ class GenerateEggForecast
                 ]
             );
 
+            if (! empty($payload['error'])) {
+                throw new \RuntimeException((string) $payload['error']);
+            }
+
             $model = (string) ($payload['model'] ?? '');
-            if ($model !== '' && ! str_contains($model, 'three_year')) {
-                throw new \RuntimeException('Forecast API returned legacy model: '.$model);
+            if ($model !== '' && ! $this->isAcceptedForecastModel($model)) {
+                throw new \RuntimeException('Forecast API returned unsupported model: '.$model);
             }
 
             $byDate = [];
@@ -758,10 +763,19 @@ class GenerateEggForecast
             if ($byDate !== []) {
                 return $byDate;
             }
+
+            if ($this->usesArima()) {
+                throw new \RuntimeException('ARIMA returned no forecast values.');
+            }
         } catch (Throwable $e) {
-            Log::warning('Python egg forecast unavailable, using local fallback', [
+            Log::warning('Python egg forecast unavailable', [
                 'message' => $e->getMessage(),
+                'model' => $requestedModel,
             ]);
+
+            if ($this->usesArima()) {
+                return [];
+            }
         }
 
         $fallback = [];
@@ -1269,6 +1283,10 @@ class GenerateEggForecast
      */
     private function archiveBoundsForDates(array $predictDates): array
     {
+        if ($this->usesArima()) {
+            return $this->arimaArchiveBounds($predictDates);
+        }
+
         if ($predictDates === []) {
             return $this->archiveBounds();
         }
@@ -1285,6 +1303,69 @@ class GenerateEggForecast
             'start' => min($starts),
             'end' => max($ends),
         ];
+    }
+
+    /**
+     * ARIMA needs a consecutive daily series that ends before the last forecast day
+     * so each past chart day can walk forward from the actuals before it.
+     *
+     * @param  list<string>  $predictDates
+     * @return array{start: string, end: string}
+     */
+    private function arimaArchiveBounds(array $predictDates): array
+    {
+        $floor = Carbon::parse((string) config(
+            'forecasting.archive_start',
+            Production::sampleStartDate()
+        ))->startOfDay();
+
+        $latest = null;
+        foreach ($predictDates as $date) {
+            try {
+                $parsed = Carbon::parse($date)->startOfDay();
+            } catch (Throwable) {
+                continue;
+            }
+            if ($latest === null || $parsed->gt($latest)) {
+                $latest = $parsed;
+            }
+        }
+
+        $end = Carbon::today()->startOfDay();
+        if ($latest !== null) {
+            $end = $latest->copy()->subDay();
+        }
+        if ($end->gt(Carbon::today()->startOfDay())) {
+            $end = Carbon::today()->startOfDay();
+        }
+        if ($end->lt($floor)) {
+            $end = $floor->copy();
+        }
+
+        return [
+            'start' => $floor->toDateString(),
+            'end' => $end->toDateString(),
+        ];
+    }
+
+    private function forecastModel(): string
+    {
+        $model = strtolower(trim((string) config('forecasting.model', 'arima_2_1_1')));
+
+        return $model !== '' ? $model : 'arima_2_1_1';
+    }
+
+    private function usesArima(): bool
+    {
+        return str_contains($this->forecastModel(), 'arima');
+    }
+
+    private function isAcceptedForecastModel(string $model): bool
+    {
+        $normalized = strtolower($model);
+
+        return str_contains($normalized, 'arima')
+            || str_contains($normalized, 'three_year');
     }
 
     /**
