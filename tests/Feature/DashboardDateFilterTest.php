@@ -111,7 +111,8 @@ class DashboardDateFilterTest extends TestCase
             ->assertSee('value="historical" selected', false)
             ->assertSee('id="trendDateRange"', false)
             ->assertSee('style="display:none;"', false)
-            ->assertDontSee('value="forecast"', false)
+            ->assertSee('value="forecast"', false)
+            ->assertSee('value="timeseries"', false)
             ->assertSee('Stock In', false)
             ->assertSee('Stock Out', false);
     }

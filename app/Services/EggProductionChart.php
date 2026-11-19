@@ -44,8 +44,15 @@ class EggProductionChart
         $filter ??= DashboardDateFilter::fromRequest($request);
         $lockDates = ! $filter->isToday();
         $view = $this->view($request);
+        $requested = $request->query('trend_view', '');
+        $requested = is_string($requested) ? $requested : '';
 
-        if ($lockDates && $filter->isRange() && ! in_array($view, ['historical', 'comparison'], true)) {
+        if (
+            $lockDates
+            && $filter->isRange()
+            && ! in_array($requested, ['timeseries', 'forecast'], true)
+            && ! in_array($view, ['historical', 'comparison'], true)
+        ) {
             $view = 'historical';
         }
 
