@@ -122,17 +122,74 @@ class GenerateEggForecast
     }
 
     /**
-     * Egg totals for the next N days starting tomorrow.
+     * Next-day prediction relative to a dashboard reference date.
+     * Today keeps the saved tomorrow forecast. Past dates stay read-only.
+     *
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    public function summaryFrom(?Carbon $asOf = null): array
+    {
+        $asOf = $asOf?->copy()->startOfDay() ?? Carbon::today();
+
+        if ($asOf->greaterThanOrEqualTo(Carbon::today())) {
+            return $this->summary();
+        }
+
+        $forecastDate = $asOf->copy()->addDay();
+
+        if ($forecastDate->equalTo(Carbon::today())) {
+            return $this->previousSummary();
+        }
+
+        return $this->savedSummary($forecastDate);
+    }
+
+    /**
+     * Forecast for the selected date itself (the day before the next-day card).
+     *
+     * @return array{
+     *     predicted_eggs: int,
+     *     forecast_date: string,
+     *     temperature: float|null,
+     *     history_years: int,
+     *     history_start: string,
+     *     history_end: string,
+     *     sample_days: int,
+     *     engine: string,
+     *     sizes: list<array{key: string, label: string, eggs: int, trays: int, share: float}>
+     * }
+     */
+    public function previousSummaryFrom(?Carbon $asOf = null): array
+    {
+        if ($asOf === null || $asOf->copy()->startOfDay()->greaterThanOrEqualTo(Carbon::today())) {
+            return $this->previousSummary();
+        }
+
+        return $this->savedSummary($asOf->copy()->startOfDay());
+    }
+
+    /**
+     * Egg totals for the next N days starting tomorrow, or from a given date.
      * Read-only: does not write forecast rows. The saved row for a date
      * stays the expected number the production-drop alert compares later.
      *
      * @return list<array{date: string, eggs: int}>
      */
-    public function upcomingDays(int $days = 7): array
+    public function upcomingDays(int $days = 7, ?Carbon $startFrom = null): array
     {
         $days = max(1, $days);
         $dates = [];
-        $cursor = Carbon::tomorrow()->startOfDay();
+        $cursor = ($startFrom ?? Carbon::tomorrow())->copy()->startOfDay();
 
         for ($i = 0; $i < $days; $i++) {
             $dates[] = $cursor->toDateString();

@@ -30,6 +30,7 @@ class EggProductionChart
      *     view: string,
      *     period: string,
      *     needsDates: bool,
+     *     rangeLocked: bool,
      *     startDate: ?string,
      *     endDate: ?string,
      *     emptyMessage: ?string,
@@ -38,26 +39,32 @@ class EggProductionChart
      *     datasets: list<array{label: string, data: list<int|float|null>, forecast: bool}>
      * }
      */
-    public function forRequest(Request $request): array
+    public function forRequest(Request $request, ?DashboardDateFilter $filter = null): array
     {
+        $filter ??= DashboardDateFilter::fromRequest($request);
+        $lockDates = ! $filter->isToday();
         $view = $this->view($request);
 
-        return match ($view) {
-            'historical' => $this->past(
-                $view,
-                $request->query('start_date'),
-                $request->query('end_date'),
-                true
-            ),
-            'comparison' => $this->past(
-                $view,
-                $request->query('start_date'),
-                $request->query('end_date'),
-                true
-            ),
-            'timeseries' => $this->forward('timeseries', self::TIME_SERIES_DAYS),
-            default => $this->forward('forecast', self::SEVEN_DAYS),
+        if ($lockDates && $filter->isRange() && ! in_array($view, ['historical', 'comparison'], true)) {
+            $view = 'historical';
+        }
+
+        $startDate = $lockDates ? $filter->startDate() : $request->query('start_date');
+        $endDate = $lockDates ? $filter->endDate() : $request->query('end_date');
+
+        $payload = match ($view) {
+            'historical' => $this->past($view, $startDate, $endDate, true),
+            'comparison' => $this->past($view, $startDate, $endDate, true),
+            'timeseries' => $this->forward('timeseries', self::TIME_SERIES_DAYS, $filter->forecastStart()),
+            default => $this->forward('forecast', self::SEVEN_DAYS, $filter->forecastStart()),
         };
+
+        $payload['rangeLocked'] = $filter->isRange();
+        if ($lockDates) {
+            $payload['needsDates'] = false;
+        }
+
+        return $payload;
     }
 
     private function view(Request $request): string
@@ -85,6 +92,7 @@ class EggProductionChart
      *     view: string,
      *     period: string,
      *     needsDates: bool,
+     *     rangeLocked: bool,
      *     startDate: ?string,
      *     endDate: ?string,
      *     emptyMessage: ?string,
@@ -214,6 +222,7 @@ class EggProductionChart
             'view' => $view,
             'period' => $period,
             'needsDates' => true,
+            'rangeLocked' => false,
             'startDate' => $start->toDateString(),
             'endDate' => $end->toDateString(),
             'emptyMessage' => null,
@@ -228,6 +237,7 @@ class EggProductionChart
      *     view: string,
      *     period: string,
      *     needsDates: bool,
+     *     rangeLocked: bool,
      *     startDate: ?string,
      *     endDate: ?string,
      *     emptyMessage: ?string,
@@ -236,12 +246,13 @@ class EggProductionChart
      *     datasets: list<array{label: string, data: list<int|float|null>, forecast: bool}>
      * }
      */
-    private function forward(string $view, int $days): array
+    private function forward(string $view, int $days, ?Carbon $startFrom = null): array
     {
+        $origin = ($startFrom ?? Carbon::tomorrow())->copy()->startOfDay();
         $rows = Cache::remember(
-            'egg-production-chart:'.$view.':'.Carbon::tomorrow()->toDateString(),
+            'egg-production-chart:'.$view.':'.$origin->toDateString(),
             now()->addMinutes(5),
-            fn () => $this->forecasts->upcomingDays($days)
+            fn () => $this->forecasts->upcomingDays($days, $origin)
         );
 
         $labels = [];
@@ -261,7 +272,7 @@ class EggProductionChart
 
         $start = isset($rows[0]['date'])
             ? Carbon::parse($rows[0]['date'])->startOfDay()
-            : Carbon::tomorrow()->startOfDay();
+            : $origin->copy();
         $end = isset($rows[array_key_last($rows)]['date'])
             ? Carbon::parse($rows[array_key_last($rows)]['date'])->startOfDay()
             : $start->copy()->addDays($days - 1);
@@ -283,6 +294,7 @@ class EggProductionChart
             'view' => $view,
             'period' => $period,
             'needsDates' => false,
+            'rangeLocked' => false,
             'startDate' => $start->toDateString(),
             'endDate' => $end->toDateString(),
             'emptyMessage' => null,
@@ -305,6 +317,7 @@ class EggProductionChart
      *     view: string,
      *     period: string,
      *     needsDates: bool,
+     *     rangeLocked: bool,
      *     startDate: ?string,
      *     endDate: ?string,
      *     emptyMessage: ?string,
@@ -325,6 +338,7 @@ class EggProductionChart
             'view' => $view,
             'period' => $period,
             'needsDates' => $needsDates,
+            'rangeLocked' => false,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'emptyMessage' => $message,

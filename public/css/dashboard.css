@@ -456,22 +456,190 @@
 
 .dashboard-header-tools {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 0 1 auto;
+  width: max-content;
+  max-width: 100%;
+  margin-left: auto;
+}
+
+.dashboard-header-tools__main {
+  display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  flex: 1 1 280px;
-  min-width: 0;
-  margin-left: auto;
   flex-wrap: wrap;
 }
 
-.dashboard-header-tools .farm-weather {
-  flex: 0 1 auto;
-  width: auto;
-  height: auto;
+.dashboard-date-filter-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  width: max-content;
   max-width: 100%;
-  margin-left: 0;
+}
+
+.dashboard-date-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
   justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid #e3ebe6;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(37, 99, 62, 0.06);
+}
+
+.dashboard-date-filter__modes {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 12px;
+  background: #f2f6f3;
+}
+
+.dashboard-date-filter__modes button {
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #66736c;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-date-filter__modes button:hover:not(.is-on) {
+  color: #1b3d2f;
+}
+
+.dashboard-date-filter__modes button.is-on {
+  background: #25633e;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(37, 99, 62, 0.22);
+}
+
+.dashboard-date-filter__modes button:focus-visible,
+.dashboard-date-filter__field input:focus-visible,
+.dashboard-date-filter__apply:focus-visible {
+  outline: 2px solid #34853f;
+  outline-offset: 2px;
+}
+
+.dashboard-date-filter__native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dashboard-date-filter__range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-date-filter__field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.dashboard-date-filter__field label {
+  margin: 0;
+  flex: 0 0 auto;
+  color: #5f6f68;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dashboard-date-filter__field input[type="date"] {
+  height: 36px;
+  width: 148px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid #e3ebe5;
+  border-radius: 10px;
+  background: #fbfcfb;
+  color: #1b3d2f;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dashboard-date-filter__field input[type="date"]:hover,
+.dashboard-date-filter__field input[type="date"]:focus {
+  border-color: #b7d0bf;
+  background: #fff;
+}
+
+.dashboard-date-filter__apply {
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #1b3d2f;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dashboard-date-filter__apply:hover {
+  background: #25633e;
+}
+
+.dashboard-date-filter__error {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.inventory-levels-asof {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.dashboard-header-tools .farm-weather {
+  flex: 0 0 auto;
+  align-self: center;
+  width: auto;
+  height: 56px;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  justify-content: flex-end;
+}
+
+.dashboard-header-tools .farm-weather__trigger {
+  height: 56px;
+  min-height: 56px;
 }
 
 .effectiveness-open {
@@ -479,18 +647,20 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  flex: 0 1 auto;
-  min-width: 0;
-  max-width: 100%;
+  flex: 0 0 auto;
+  align-self: center;
+  height: 56px;
   min-height: 56px;
+  max-height: 56px;
   margin-top: 0;
   border: none;
   border-radius: 14px;
   background: #25633e;
   color: #fff;
   font-size: 13px;
-  font-weight: 600;
-  padding: 8px 14px;
+  font-weight: 700;
+  padding: 0 16px;
+  box-shadow: 0 8px 20px rgba(37, 99, 62, 0.18);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -631,18 +801,52 @@
 @media (max-width: 768px) {
   .dashboard-header-tools {
     flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
     margin-left: 0;
-    flex-direction: column;
     align-items: stretch;
   }
 
-  .dashboard-header-tools .effectiveness-open,
-  .dashboard-header-tools .farm-weather {
-    flex: 0 0 auto;
+  .dashboard-header-tools__main,
+  .dashboard-date-filter-wrap,
+  .dashboard-date-filter {
     width: 100%;
-    height: auto;
-    max-width: none;
-    justify-content: flex-start;
+  }
+
+  .dashboard-header-tools .farm-weather,
+  .dashboard-header-tools .farm-weather__trigger,
+  .dashboard-header-tools .effectiveness-open {
+    width: 100%;
+  }
+
+  .dashboard-date-filter {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .dashboard-date-filter__modes {
+    width: 100%;
+  }
+
+  .dashboard-date-filter__modes button {
+    flex: 1;
+  }
+
+  .dashboard-date-filter__range {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .dashboard-date-filter__field,
+  .dashboard-date-filter__apply {
+    width: 100%;
+  }
+
+  .dashboard-date-filter__field input[type="date"] {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
   }
 }
 

@@ -36,6 +36,12 @@
         $lowStockAlert = $lowStockAlert ?? null;
 
         $predictedEggs = $predictedEggs ?? 0;
+        $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
+        $eggsTitle = $eggsTitle ?? 'Total Eggs Today';
+        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
+        $predictedSubtitle = $predictedSubtitle ?? 'Next-day forecast · tap for sizes';
+        $revenueTitle = $revenueTitle ?? 'Revenue Today';
+        $revenueSubtitle = $revenueSubtitle ?? "Today's Income";
 
     @endphp
 
@@ -44,10 +50,14 @@
     <div class="dashboard-header">
         <div>
             <h2>Manager Dashboard</h2>
-            <p>Welcome back! Here's today's poultry farm overview.</p>
+            <p>{{ $overviewSubtitle }}</p>
         </div>
         <div class="dashboard-header-tools">
-            <x-weather-widget />
+            <div class="dashboard-header-tools__main">
+                @include('dashboard.system-effectiveness')
+                <x-weather-widget />
+            </div>
+            @include('dashboard.date-filter')
         </div>
     </div>
 
@@ -70,7 +80,7 @@
             <div class="stat-info">
 
                 <span class="stat-title">
-                    Total Eggs Today
+                    {{ $eggsTitle }}
                 </span>
 
                 <h2>
@@ -78,7 +88,7 @@
                 </h2>
 
                 <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">
-                    {{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% vs yesterday
+                    {{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% {{ $eggsChangeLabel }}
                 </small>
 
             </div>
@@ -99,7 +109,7 @@
             <div class="stat-info">
                 <span class="stat-title">Predicted Eggs</span>
                 <h2>{{ number_format($predictedEggs) }}</h2>
-                <small>Next-day forecast · tap for sizes</small>
+                <small>{{ $predictedSubtitle }}</small>
             </div>
         </div>
 
@@ -154,7 +164,7 @@
 
 
                     <span class="stat-title">
-                        Revenue Today
+                        {{ $revenueTitle }}
                     </span>
 
 
@@ -164,7 +174,7 @@
 
 
                     <small>
-                        Today's Income
+                        {{ $revenueSubtitle }}
                     </small>
 
 

@@ -12,6 +12,7 @@
     $feedPct = min(100, ($feedStock / max($feedMin, 1)) * 50);
     $traysPct = min(100, ($eggTrays / 5) * 100);
     $vitaminsPct = min(100, ($vitamins / max($vitaminMin, 1)) * 50);
+    $inventoryAsOfLabel = $inventoryAsOfLabel ?? null;
 @endphp
 
 <div class="panel-card inventory-levels-card">
@@ -19,7 +20,12 @@
         <span class="inventory-levels-head-icon" aria-hidden="true">
             <i class="fas fa-box-open"></i>
         </span>
-        <h3 class="inventory-levels-title">Inventory Levels</h3>
+        <div>
+            <h3 class="inventory-levels-title">Inventory Levels</h3>
+            @if($inventoryAsOfLabel)
+                <p class="inventory-levels-asof">{{ $inventoryAsOfLabel }}</p>
+            @endif
+        </div>
     </div>
 
     <div class="inventory-levels-list">

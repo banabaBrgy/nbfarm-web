@@ -19,14 +19,24 @@
         $vitamins = $vitamins ?? 0;
         $vitaminMin = $vitaminMin ?? 0;
         $vitaminLow = $vitaminLow ?? false;
+        $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
+        $eggsTitle = $eggsTitle ?? 'Total Eggs Today';
+        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
+        $predictedSubtitle = $predictedSubtitle ?? 'Next-day forecast · tap for sizes';
+        $activeBatchesSubtitle = $activeBatchesSubtitle ?? 'Currently producing';
     @endphp
 
     <div class="dashboard-header">
         <div>
             <h2>Staff Dashboard</h2>
-            <p>Welcome back! Here's today's poultry farm overview.</p>
+            <p>{{ $overviewSubtitle }}</p>
         </div>
-        <x-weather-widget />
+        <div class="dashboard-header-tools">
+            <div class="dashboard-header-tools__main">
+                <x-weather-widget />
+            </div>
+            @include('dashboard.date-filter')
+        </div>
     </div>
 
     @include('dashboard.low-stock-alert')
@@ -39,9 +49,9 @@
                 <i class="fas fa-egg"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-title">Total Eggs Today</span>
+                <span class="stat-title">{{ $eggsTitle }}</span>
                 <h2>{{ number_format($eggsToday) }}</h2>
-                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">{{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% vs yesterday</small>
+                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">{{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% {{ $eggsChangeLabel }}</small>
             </div>
         </div>
 
@@ -58,7 +68,7 @@
             <div class="stat-info">
                 <span class="stat-title">Predicted Eggs</span>
                 <h2>{{ number_format($predictedEggs ?? 0) }}</h2>
-                <small>Next-day forecast · tap for sizes</small>
+                <small>{{ $predictedSubtitle }}</small>
             </div>
         </div>
 
@@ -69,7 +79,7 @@
             <div class="stat-info">
                 <span class="stat-title">Active Batches</span>
                 <h2>{{ $activeBatches }}</h2>
-                <small>Currently producing</small>
+                <small>{{ $activeBatchesSubtitle }}</small>
             </div>
         </div>
     </div>

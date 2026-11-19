@@ -2,118 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Production;
-use App\Models\InventoryItem;
-use App\Models\Dispatch;
-use App\Models\Transaction;
 use App\Services\DailyInventory;
-use App\Services\EggProductionChart;
+use App\Services\DashboardDateFilter;
+use App\Services\DashboardOverview;
 use App\Services\RoleTodoList;
 use App\Services\SystemEffectiveness;
-use App\Services\Forecasting\GenerateEggForecast;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class OwnerDashboardController extends Controller
 {
     public function index(Request $request)
-{
-    $request->validate([
-        'start_date' => 'nullable|required_with:end_date|date',
-        'end_date' => 'nullable|required_with:start_date|date|after_or_equal:start_date',
-        'effectiveness_from' => 'nullable|required_with:effectiveness_to|date',
-        'effectiveness_to' => 'nullable|required_with:effectiveness_from|date|after_or_equal:effectiveness_from',
-    ]);
+    {
+        $request->validate(array_merge(
+            DashboardDateFilter::rules(),
+            DashboardDateFilter::chartRules(),
+            DashboardDateFilter::effectivenessRules(),
+        ));
 
-    app(DailyInventory::class)->applyForToday();
+        app(DailyInventory::class)->applyForToday();
 
-        $eggsToday = Production::whereDate('production_date', today())
-            ->sum('eggs_produced');
-
-        $eggsYesterday = Production::whereDate(
-            'production_date',
-            today()->subDay()
-        )->sum('eggs_produced');
-
-        $eggsChange = $eggsYesterday > 0
-            ? round((($eggsToday - $eggsYesterday) / $eggsYesterday) * 100, 1)
-            : 0;
-
-        $feedStock = InventoryItem::where('item_name', 'Feeds')
-            ->sum('current_stock');
-
-        $feedMin = InventoryItem::where('item_name', 'Feeds')
-            ->sum('min_level');
-
-        $feedLow = $feedStock <= $feedMin;
-
-        $vitamins = InventoryItem::where('item_name', 'Vitamins')
-            ->sum('current_stock');
-
-        $vitaminMin = InventoryItem::where('item_name', 'Vitamins')
-            ->sum('min_level');
-
-        $vitaminLow = $vitamins <= $vitaminMin;
-
-        $eggTrays = (float) (
-            InventoryItem::where('item_name', 'Egg Trays')
-                ->value('current_stock') ?? 0
-        );
-
-        $eggsTotal = Production::leftoverStock();
-
-        $dispatchedTrays = DB::table('dispatch_items')
-            ->sum('quantity');
-
-        $pendingDeliveries = Dispatch::whereIn('status', [
-            'Pending',
-            'On Transit'
-        ])->count();
-
-        $revenueToday = Transaction::whereDate(
-            'transaction_date',
-            today()
-        )->sum('price');
-
-        $lowStockAlert = InventoryItem::whereColumn(
-            'current_stock',
-            '<=',
-            'min_level'
-        )->count();
-
-        $forecastService = app(GenerateEggForecast::class);
-        $forecastSummary = $forecastService->summary();
-        $previousForecastSummary = $forecastService->previousSummary();
-        $predictedEggs = (int) ($forecastSummary['predicted_eggs'] ?? 0);
-        $eggProductionChart = app(EggProductionChart::class)->forRequest($request);
+        $overview = app(DashboardOverview::class)->forRequest($request);
         $effectiveness = app(SystemEffectiveness::class)->forRequest($request);
         $roleTodos = app(RoleTodoList::class)->forUser(auth()->user());
 
-        // ============================
-        // RETURN DASHBOARD
-        // ============================
-
-        return view('owner.dashboard', compact(
-            'eggsToday',
-            'eggsChange',
-            'feedStock',
-            'feedMin',
-            'feedLow',
-            'dispatchedTrays',
-            'pendingDeliveries',
-            'revenueToday',
-            'eggsTotal',
-            'eggTrays',
-            'vitamins',
-            'vitaminMin',
-            'vitaminLow',
-            'lowStockAlert',
-            'predictedEggs',
-            'forecastSummary',
-            'previousForecastSummary',
-            'eggProductionChart',
-            'effectiveness',
-            'roleTodos'
+        return view('owner.dashboard', array_merge(
+            $overview,
+            compact('effectiveness', 'roleTodos')
         ));
     }
 }

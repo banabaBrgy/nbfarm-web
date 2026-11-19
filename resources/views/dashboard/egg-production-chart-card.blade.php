@@ -3,6 +3,7 @@
         'view' => 'forecast',
         'period' => 'Seven-Day Forecast',
         'needsDates' => false,
+        'rangeLocked' => false,
         'startDate' => null,
         'endDate' => null,
         'emptyMessage' => null,

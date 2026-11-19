@@ -2,6 +2,7 @@
     $eggProductionChart = $eggProductionChart ?? [
         'view' => 'forecast',
         'needsDates' => false,
+        'rangeLocked' => false,
         'startDate' => null,
         'endDate' => null,
     ];
@@ -9,6 +10,7 @@
     $trendAction = $trendAction ?? url()->current();
     $selectedView = $eggProductionChart['view'] ?? 'forecast';
     $showDates = (bool) ($eggProductionChart['needsDates'] ?? false);
+    $rangeLocked = (bool) ($eggProductionChart['rangeLocked'] ?? false);
 @endphp
 
 <form method="GET"
@@ -43,13 +45,15 @@
                 Actual vs. Forecast
             </option>
 
-            <option value="timeseries" @selected($selectedView === 'timeseries')>
-                Time Series Forecast
-            </option>
+            @unless($rangeLocked)
+                <option value="timeseries" @selected($selectedView === 'timeseries')>
+                    Time Series Forecast
+                </option>
 
-            <option value="forecast" @selected($selectedView === 'forecast')>
-                Seven-Day Forecast
-            </option>
+                <option value="forecast" @selected($selectedView === 'forecast')>
+                    Seven-Day Forecast
+                </option>
+            @endunless
         </select>
     </div>
 

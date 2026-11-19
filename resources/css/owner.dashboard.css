@@ -697,6 +697,13 @@ body{
     letter-spacing:0.01em;
 }
 
+.inventory-levels-asof{
+    margin:2px 0 0;
+    font-size:12px;
+    font-weight:500;
+    color:#6b7280;
+}
+
 .inventory-levels-list{
     display:flex;
     flex-direction:column;

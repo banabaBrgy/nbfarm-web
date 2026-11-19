@@ -94,7 +94,7 @@ class ProductionYearTrend
             $forecastData[] = $forecastByDate[$day] ?? null;
         }
 
-        if ($includeForecast) {
+        if ($includeForecast && config('app.debug')) {
             Log::info('HISTORICAL BACKTEST CHART DATA', [
                 'start_date' => $startDay,
                 'end_date' => $endDay,

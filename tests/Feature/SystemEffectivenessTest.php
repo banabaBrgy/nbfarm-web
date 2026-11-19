@@ -254,6 +254,15 @@ class SystemEffectivenessTest extends TestCase
             ]))
             ->assertSessionHasErrors('effectiveness_to');
 
+        $this->actingAs($owner)
+            ->from(route('owner.dashboard'))
+            ->get(route('owner.dashboard', [
+                'effectiveness_from' => '2025-01-01',
+                'effectiveness_to' => '2026-01-02',
+            ]))
+            ->assertRedirect(route('owner.dashboard'))
+            ->assertSessionHasErrors('effectiveness_to');
+
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))
             ->assertOk()
