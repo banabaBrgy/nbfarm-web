@@ -7,6 +7,13 @@
                 return;
             }
 
+            if (typeof Chart.getChart === 'function') {
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+            }
+
             const labels = chartView.labels || [];
             const sourceSets = chartView.datasets || [];
 
