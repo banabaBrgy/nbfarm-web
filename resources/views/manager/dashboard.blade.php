@@ -56,8 +56,8 @@
             <div class="dashboard-header-tools__main">
                 @include('dashboard.system-effectiveness')
                 <x-weather-widget />
+                @include('dashboard.date-filter')
             </div>
-            @include('dashboard.date-filter')
         </div>
     </div>
 

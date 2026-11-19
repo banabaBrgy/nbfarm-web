@@ -34,6 +34,17 @@ class HistoricalInventoryTest extends TestCase
         $this->assertSame(40.0, $inventory->namedStock('Feeds', Carbon::parse('2026-11-01'), false));
         $this->assertSame(30.0, $inventory->namedStock('Feeds', Carbon::parse('2026-11-05'), false));
 
+        $range = $inventory->movements(Carbon::parse('2026-11-01'), Carbon::parse('2026-11-05'));
+        $feeds = collect($range)->firstWhere('name', 'Feeds');
+        $this->assertSame('Eggs', $range[0]['name']);
+        $this->assertSame(40.0, $feeds['stockIn']);
+        $this->assertSame(10.0, $feeds['stockOut']);
+
+        $day = $inventory->movements(Carbon::parse('2026-11-01'), Carbon::parse('2026-11-01'));
+        $feedsOnDay = collect($day)->firstWhere('name', 'Feeds');
+        $this->assertSame(40.0, $feedsOnDay['stockIn']);
+        $this->assertSame(0.0, $feedsOnDay['stockOut']);
+
         Carbon::setTestNow();
     }
 

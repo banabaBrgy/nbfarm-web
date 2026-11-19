@@ -101,7 +101,8 @@ class DashboardOverview
                 ? 'Next-day forecast · tap for sizes'
                 : 'Forecast from '.$filter->asOf()->format('M j, Y').' · tap for sizes',
             'activeBatchesSubtitle' => $filter->isToday() ? 'Currently producing' : 'Producing in this period',
-            'inventoryAsOfLabel' => $filter->isToday() ? null : 'As of '.$filter->toView()['asOfLabel'],
+            'inventoryAsOfLabel' => $filter->formatPeriod(),
+            'inventoryMovements' => $this->inventory->movements($filter->start, $filter->end),
             'eggsToday' => $eggsToday,
             'eggsChange' => $eggsChange,
             'activeBatches' => $activeBatches,

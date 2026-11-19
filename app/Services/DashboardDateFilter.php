@@ -121,6 +121,14 @@ class DashboardDateFilter
         }
 
         try {
+            if ($request->filled(self::QUERY_FROM) && $request->filled(self::QUERY_TO)) {
+                return self::between(
+                    $request->input(self::QUERY_FROM),
+                    $request->input(self::QUERY_TO),
+                    $today,
+                );
+            }
+
             if ($period === self::PERIOD_DATE && $request->filled(self::QUERY_DATE)) {
                 $date = Carbon::parse($request->input(self::QUERY_DATE))->startOfDay();
                 if ($date->gt($today) || $date->equalTo($today)) {
@@ -129,38 +137,43 @@ class DashboardDateFilter
 
                 return new self(self::PERIOD_DATE, $date, $date->copy());
             }
-
-            if ($period === self::PERIOD_RANGE && $request->filled(self::QUERY_FROM) && $request->filled(self::QUERY_TO)) {
-                $start = Carbon::parse($request->input(self::QUERY_FROM))->startOfDay();
-                $end = Carbon::parse($request->input(self::QUERY_TO))->startOfDay();
-
-                if ($start->gt($end)) {
-                    [$start, $end] = [$end, $start];
-                }
-
-                if ($end->gt($today)) {
-                    $end = $today->copy();
-                }
-
-                if ($start->gt($end)) {
-                    $start = $end->copy();
-                }
-
-                if ($start->copy()->addDays(self::MAX_RANGE_DAYS - 1)->lt($end)) {
-                    $start = $end->copy()->subDays(self::MAX_RANGE_DAYS - 1);
-                }
-
-                if ($start->equalTo($today) && $end->equalTo($today)) {
-                    return new self(self::PERIOD_TODAY, $today, $today->copy());
-                }
-
-                return new self(self::PERIOD_RANGE, $start, $end);
-            }
         } catch (Throwable) {
             // Incomplete or invalid input falls back to today.
         }
 
         return new self(self::PERIOD_TODAY, $today, $today->copy());
+    }
+
+    private static function between(mixed $from, mixed $to, Carbon $today): self
+    {
+        $start = Carbon::parse(is_string($from) ? $from : '')->startOfDay();
+        $end = Carbon::parse(is_string($to) ? $to : '')->startOfDay();
+
+        if ($start->gt($end)) {
+            [$start, $end] = [$end, $start];
+        }
+
+        if ($end->gt($today)) {
+            $end = $today->copy();
+        }
+
+        if ($start->gt($end)) {
+            $start = $end->copy();
+        }
+
+        if ($start->copy()->addDays(self::MAX_RANGE_DAYS - 1)->lt($end)) {
+            $start = $end->copy()->subDays(self::MAX_RANGE_DAYS - 1);
+        }
+
+        if ($start->equalTo($end)) {
+            if ($start->equalTo($today)) {
+                return new self(self::PERIOD_TODAY, $today, $today->copy());
+            }
+
+            return new self(self::PERIOD_DATE, $start, $end);
+        }
+
+        return new self(self::PERIOD_RANGE, $start, $end);
     }
 
     public function isToday(): bool

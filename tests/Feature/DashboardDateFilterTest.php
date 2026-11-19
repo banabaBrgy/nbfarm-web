@@ -41,8 +41,9 @@ class DashboardDateFilterTest extends TestCase
         $this->actingAs($staff)
             ->get(route('staff.dashboard'))
             ->assertOk()
-            ->assertSee('id="dashPeriod"', false)
-            ->assertSee('value="today" selected', false)
+            ->assertSee('id="dashFrom"', false)
+            ->assertSee('id="dashTo"', false)
+            ->assertDontSee('data-period="today"', false)
             ->assertSee("Welcome back! Here's today's poultry farm overview.")
             ->assertSee('Total Eggs Today')
             ->assertSee('id="trendView"', false)
@@ -51,13 +52,13 @@ class DashboardDateFilterTest extends TestCase
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))
             ->assertOk()
-            ->assertSee('id="dashPeriod"', false)
+            ->assertSee('id="dashFrom"', false)
             ->assertSee('Revenue Today');
 
         $this->actingAs($owner)
             ->get(route('owner.dashboard'))
             ->assertOk()
-            ->assertSee('id="dashPeriod"', false)
+            ->assertSee('id="dashTo"', false)
             ->assertSee('Total Eggs Today');
     }
 
@@ -111,7 +112,8 @@ class DashboardDateFilterTest extends TestCase
             ->assertSee('id="trendDateRange"', false)
             ->assertSee('style="display:none;"', false)
             ->assertDontSee('value="forecast"', false)
-            ->assertSee('As of Nov 2, 2026');
+            ->assertSee('Stock In', false)
+            ->assertSee('Stock Out', false);
     }
 
     public function test_inventory_panel_uses_history_for_past_dates_not_current_stock(): void
@@ -146,8 +148,11 @@ class DashboardDateFilterTest extends TestCase
                 'dash_date' => '2026-11-01',
             ]))
             ->assertOk()
+            ->assertSee('Eggs', false)
+            ->assertSee('Stock In', false)
             ->assertSee('40.00')
-            ->assertSee('As of Nov 1, 2026');
+            ->assertSee('0.00')
+            ->assertDontSee('100.00');
     }
 
     public function test_manager_revenue_and_dispatch_follow_a_past_date(): void
@@ -223,7 +228,7 @@ class DashboardDateFilterTest extends TestCase
             ->assertOk()
             ->assertSee("Welcome back! Here's today's poultry farm overview.")
             ->assertSee('Total Eggs Today')
-            ->assertSee('value="today" selected', false)
+            ->assertSee('value="2026-11-08"', false)
             ->assertSee('value="forecast"', false);
     }
 

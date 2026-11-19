@@ -68,4 +68,24 @@ class DashboardDateFilterTest extends TestCase
         $this->assertSame('2026-11-03', $filter->endDate());
         $this->assertSame('2026-11-04', $filter->forecastStart()->toDateString());
     }
+
+    public function test_from_and_to_work_without_the_period_tabs(): void
+    {
+        $single = DashboardDateFilter::fromRequest(Request::create('/dashboard', 'GET', [
+            'dash_from' => '2026-11-01',
+            'dash_to' => '2026-11-01',
+        ]));
+
+        $this->assertSame('date', $single->period);
+        $this->assertFalse($single->isRange());
+        $this->assertSame('2026-11-02', $single->forecastStart()->toDateString());
+
+        $today = DashboardDateFilter::fromRequest(Request::create('/dashboard', 'GET', [
+            'dash_from' => '2026-11-08',
+            'dash_to' => '2026-11-08',
+        ]));
+
+        $this->assertTrue($today->isToday());
+        $this->assertSame('today', $today->period);
+    }
 }
