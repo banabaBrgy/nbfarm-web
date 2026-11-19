@@ -223,7 +223,7 @@ class SystemEffectivenessTest extends TestCase
         }
     }
 
-    public function test_owner_and_manager_dashboards_show_the_section_and_staff_does_not(): void
+    public function test_dashboards_do_not_show_system_effectiveness(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);
         $manager = User::factory()->create(['role' => 'manager']);
@@ -232,20 +232,7 @@ class SystemEffectivenessTest extends TestCase
         $this->actingAs($owner)
             ->get(route('owner.dashboard'))
             ->assertOk()
-            ->assertSee('data-bs-target="#systemEffectivenessModal"', false)
-            ->assertSee('System Effectiveness')
-            ->assertSee('Production recording')
-            ->assertSee('No production records in this period.')
-            ->assertSee('value="2026-11-01"', false)
-            ->assertSee('value="2026-11-30"', false);
-
-        $this->actingAs($owner)
-            ->get(route('owner.dashboard', [
-                'effectiveness_from' => '2026-10-01',
-                'effectiveness_to' => '2026-10-31',
-            ]))
-            ->assertOk()
-            ->assertSee('Oct 1, 2026 to Oct 31, 2026');
+            ->assertDontSee('System Effectiveness');
 
         $this->actingAs($owner)
             ->get(route('owner.dashboard', [
@@ -266,9 +253,7 @@ class SystemEffectivenessTest extends TestCase
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))
             ->assertOk()
-            ->assertSee('data-bs-target="#systemEffectivenessModal"', false)
-            ->assertSee('System Effectiveness')
-            ->assertSee('Dispatch processing');
+            ->assertDontSee('System Effectiveness');
 
         $this->actingAs($staff)
             ->get(route('staff.dashboard'))

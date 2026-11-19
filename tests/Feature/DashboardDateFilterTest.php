@@ -47,7 +47,9 @@ class DashboardDateFilterTest extends TestCase
             ->assertSee("Welcome back! Here's today's poultry farm overview.")
             ->assertSee('Total Eggs Today')
             ->assertSee('id="trendView"', false)
-            ->assertSee('value="forecast" selected', false);
+            ->assertSee('value="forecast" selected', false)
+            ->assertSee('Inventory Levels')
+            ->assertDontSee('Stock In');
 
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))

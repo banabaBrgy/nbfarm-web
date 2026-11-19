@@ -33,8 +33,8 @@
         </div>
         <div class="dashboard-header-tools">
             <div class="dashboard-header-tools__main">
-                <x-weather-widget />
                 @include('dashboard.date-filter')
+                <x-weather-widget />
             </div>
         </div>
     </div>
