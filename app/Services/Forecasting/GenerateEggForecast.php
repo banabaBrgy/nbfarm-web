@@ -29,8 +29,8 @@ class GenerateEggForecast
 
     /**
      * Card total plus a size summary for the forecast modal.
-     * Total: linear regression on the same calendar day across up to 3 years.
-     * Sizes: that historical mix, shifted by tomorrow's temperature.
+     * Total: ARIMA(2,1,1) on daily harvest history.
+     * Sizes: historical mix, shifted by tomorrow's temperature.
      *
      * @return array{
      *     predicted_eggs: int,
@@ -204,7 +204,7 @@ class GenerateEggForecast
         $stamp = Production::query()
             ->selectRaw('COUNT(*) as row_count, COALESCE(SUM(eggs_produced), 0) as eggs, MAX(production_date) as latest')
             ->first();
-        $cacheKey = 'egg-forecast:chart-breakdown:'.md5(implode('|', [
+        $cacheKey = 'egg-forecast:chart-breakdown:v7day:'.md5(implode('|', [
             (string) ($stamp->row_count ?? 0),
             (string) ($stamp->eggs ?? 0),
             (string) ($stamp->latest ?? 'none'),
@@ -213,7 +213,7 @@ class GenerateEggForecast
 
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($normalized) {
             $rows = [];
-            foreach (array_chunk($normalized, 90) as $chunk) {
+            foreach (array_chunk($normalized, 28) as $chunk) {
                 try {
                     $predicted = $this->predictDates($chunk);
                 } catch (Throwable $e) {
@@ -250,11 +250,11 @@ class GenerateEggForecast
 
     /**
      * Monthly forecast totals for a calendar year (dashboard year chart).
-     * Only days that have production records are predicted and summed,
-     * so the series lines up with Actual monthly harvest totals.
+     * Days with harvest records are predicted in 7-day-ahead ARIMA blocks
+     * and summed so the series lines up with Actual monthly harvest dates.
      *
-     * 2023 (archive start year) has no prior calendar year, so those days
-     * use a within-year prior-7-day average instead of the year-over-year model.
+     * 2023 (archive start year) has no earlier history for ARIMA, so those days
+     * use a within-year prior-7-day average.
      *
      * @return list<int|null>
      */
@@ -282,7 +282,7 @@ class GenerateEggForecast
         }
 
         $maxDate = max($dates);
-        $cacheKey = 'egg-forecast:monthly-year:v2:'.$year.':'.$maxDate;
+        $cacheKey = 'egg-forecast:monthly-year:v3:'.$year.':'.$maxDate;
 
         return Cache::remember($cacheKey, now()->addHour(), function () use ($dates, $empty, $year) {
             $archiveStartYear = Carbon::parse((string) config(
@@ -293,7 +293,7 @@ class GenerateEggForecast
             $byDate = [];
 
             if ($year > $archiveStartYear) {
-                foreach (array_chunk($dates, 90) as $chunk) {
+                foreach (array_chunk($dates, 28) as $chunk) {
                     try {
                         $byDate += $this->predictDates($chunk);
                     } catch (Throwable $e) {
@@ -681,7 +681,7 @@ class GenerateEggForecast
     }
 
     /**
-     * Prefer the Python service. ARIMA does not fall back to the 3-year PHP model.
+     * Forecast totals come from the Python ARIMA(2,1,1) service.
      *
      * @param  list<string>  $predictDates
      * @return array<string, array{
@@ -731,6 +731,11 @@ class GenerateEggForecast
                 throw new \RuntimeException('Forecast API returned unsupported model: '.$model);
             }
 
+            $warnings = $payload['warnings'] ?? [];
+            if (is_array($warnings) && $warnings !== []) {
+                Log::warning('ARIMA skipped some forecast dates', ['warnings' => $warnings]);
+            }
+
             $byDate = [];
             foreach ($payload['series'] ?? [] as $point) {
                 $date = (string) ($point['date'] ?? '');
@@ -764,26 +769,15 @@ class GenerateEggForecast
                 return $byDate;
             }
 
-            if ($this->usesArima()) {
-                throw new \RuntimeException('ARIMA returned no forecast values.');
-            }
+            throw new \RuntimeException('ARIMA returned no forecast values.');
         } catch (Throwable $e) {
-            Log::warning('Python egg forecast unavailable', [
+            Log::warning('Python ARIMA forecast unavailable', [
                 'message' => $e->getMessage(),
-                'model' => $requestedModel,
+                'model' => 'arima_2_1_1',
             ]);
 
-            if ($this->usesArima()) {
-                return [];
-            }
+            return [];
         }
-
-        $fallback = [];
-        foreach ($predictDates as $date) {
-            $fallback[$date] = $this->localPredictForDate(Carbon::parse($date)->startOfDay());
-        }
-
-        return $fallback;
     }
 
     /**
@@ -827,413 +821,6 @@ class GenerateEggForecast
         }
 
         return $history;
-    }
-
-    /**
-     * Local PHP copy: linear regression on 3-year archive + temperature size mix.
-     *
-     * @return array{
-     *     eggs: int,
-     *     temperature: float|null,
-     *     sample_days: int,
-     *     sizes: array{small: int, medium: int, large: int, extra_large: int, cracked: int},
-     *     engine: string
-     * }
-     */
-    private function localPredictForDate(Carbon $forecastDate): array
-    {
-        $forecastDate = $forecastDate->copy()->startOfDay();
-        $temperature = $this->sizeShiftTemperature($forecastDate);
-        $dated = $this->sameCalendarDayDatedSamples($forecastDate);
-
-        if ($dated === []) {
-            $samples = $this->sameCalendarDaySamples($forecastDate);
-            if ($samples === []) {
-                return [
-                    'eggs' => 0,
-                    'temperature' => $temperature,
-                    'sample_days' => 0,
-                    'sizes' => [
-                        'small' => 0,
-                        'medium' => 0,
-                        'large' => 0,
-                        'extra_large' => 0,
-                        'cracked' => 0,
-                    ],
-                    'engine' => 'php',
-                ];
-            }
-            $years = [];
-            $ys = [];
-            $count = count($samples);
-            foreach (array_reverse($samples) as $index => $sample) {
-                $years[] = (float) ($forecastDate->year - $count + $index);
-                $ys[] = (float) $sample['eggs'];
-            }
-        } else {
-            $years = array_map(fn ($row) => (float) $row['year'], $dated);
-            $ys = array_map(fn ($row) => (float) $row['eggs'], $dated);
-            $samples = array_map(fn ($row) => $row['mix'], $dated);
-        }
-
-        if (count($ys) === 1) {
-            $predicted = (int) (round($ys[0] / Production::EGGS_PER_TRAY) * Production::EGGS_PER_TRAY);
-        } else {
-            [$slope, $intercept] = $this->fitLine($years, $ys);
-            $predicted = (int) max(0, round($slope * $forecastDate->year + $intercept));
-            $predicted = (int) (round($predicted / Production::EGGS_PER_TRAY) * Production::EGGS_PER_TRAY);
-            if ($predicted <= 0) {
-                $avgEggs = array_sum($ys) / count($ys);
-                $predicted = (int) (round($avgEggs / Production::EGGS_PER_TRAY) * Production::EGGS_PER_TRAY);
-            }
-        }
-
-        $baseMix = [
-            'small' => 0,
-            'medium' => 0,
-            'large' => 0,
-            'extra_large' => 0,
-            'cracked' => 0,
-        ];
-        foreach ($samples as $sample) {
-            foreach ($baseMix as $key => $_) {
-                $baseMix[$key] += (int) ($sample[$key] ?? 0);
-            }
-        }
-
-        $shifted = $this->shiftMixForTemperature($baseMix, $temperature);
-        $sizes = $this->allocateByMix($predicted, $shifted);
-
-        return [
-            'eggs' => $predicted,
-            'temperature' => $temperature,
-            'sample_days' => count($samples),
-            'sizes' => $sizes,
-            'engine' => 'php',
-        ];
-    }
-
-    /**
-     * @return list<array{year: int, eggs: int, mix: array{small: int, medium: int, large: int, extra_large: int, cracked: int}}>
-     */
-    private function sameCalendarDayDatedSamples(Carbon $forecastDate): array
-    {
-        $archive = $this->archiveBounds($forecastDate);
-        $startYear = Carbon::parse($archive['start'])->year;
-        $endYear = Carbon::parse($archive['end'])->year;
-        $limit = max(1, (int) config('forecasting.history_years', 3));
-        $rows = [];
-
-        for ($year = $startYear; $year <= $endYear; $year++) {
-            if (! checkdate($forecastDate->month, $forecastDate->day, $year)) {
-                continue;
-            }
-            $date = Carbon::create($year, $forecastDate->month, $forecastDate->day)->startOfDay();
-            if ($date->gte($forecastDate) || $date->gt(Carbon::parse($archive['end']))) {
-                continue;
-            }
-
-            $row = Production::query()
-                ->whereDate('production_date', $date->toDateString())
-                ->selectRaw('
-                    COALESCE(SUM(eggs_produced), 0) as eggs,
-                    COALESCE(SUM(small_eggs), 0) as small_eggs,
-                    COALESCE(SUM(medium_eggs), 0) as medium_eggs,
-                    COALESCE(SUM(large_eggs), 0) as large_eggs,
-                    COALESCE(SUM(extra_large_eggs), 0) as extra_large_eggs,
-                    COALESCE(SUM(cracked_eggs), 0) as cracked_eggs
-                ')
-                ->first();
-
-            $eggs = (int) ($row->eggs ?? 0);
-            if ($eggs <= 0) {
-                continue;
-            }
-
-            $rows[] = [
-                'year' => $year,
-                'eggs' => $eggs,
-                'mix' => [
-                    'small' => (int) ($row->small_eggs ?? 0),
-                    'medium' => (int) ($row->medium_eggs ?? 0),
-                    'large' => (int) ($row->large_eggs ?? 0),
-                    'extra_large' => (int) ($row->extra_large_eggs ?? 0),
-                    'cracked' => (int) ($row->cracked_eggs ?? 0),
-                ],
-            ];
-        }
-
-        if ($rows === []) {
-            return [];
-        }
-
-        return array_slice($rows, -$limit);
-    }
-
-    /**
-     * @param  list<float|int>  $x
-     * @param  list<float|int>  $y
-     * @return array{0: float, 1: float}
-     */
-    private function fitLine(array $x, array $y): array
-    {
-        $n = count($x);
-        if ($n === 0) {
-            return [0.0, 0.0];
-        }
-        if ($n === 1) {
-            return [0.0, (float) $y[0]];
-        }
-
-        $sumX = array_sum($x);
-        $sumY = array_sum($y);
-        $sumXy = 0.0;
-        $sumXx = 0.0;
-        for ($i = 0; $i < $n; $i++) {
-            $sumXy += $x[$i] * $y[$i];
-            $sumXx += $x[$i] * $x[$i];
-        }
-        $denominator = $n * $sumXx - $sumX * $sumX;
-        if ($denominator == 0.0) {
-            return [0.0, $sumY / $n];
-        }
-
-        $slope = ($n * $sumXy - $sumX * $sumY) / $denominator;
-        $intercept = ($sumY - $slope * $sumX) / $n;
-
-        return [$slope, $intercept];
-    }
-
-    /**
-     * Same month/day across the archive years (skips the forecast date itself).
-     *
-     * @return list<array{eggs: int, small: int, medium: int, large: int, extra_large: int, cracked: int}>
-     */
-    private function sameCalendarDaySamples(Carbon $forecastDate): array
-    {
-        $archive = $this->archiveBounds($forecastDate);
-        $startYear = Carbon::parse($archive['start'])->year;
-        $endYear = Carbon::parse($archive['end'])->year;
-        $limit = max(1, (int) config('forecasting.history_years', 3));
-
-        $byYear = [];
-        for ($year = $startYear; $year <= $endYear; $year++) {
-            if (! checkdate($forecastDate->month, $forecastDate->day, $year)) {
-                continue;
-            }
-
-            $date = Carbon::create($year, $forecastDate->month, $forecastDate->day)->startOfDay();
-            if ($date->gte($forecastDate) || $date->gt(Carbon::parse($archive['end']))) {
-                continue;
-            }
-
-            $row = Production::query()
-                ->whereDate('production_date', $date->toDateString())
-                ->selectRaw('
-                    COALESCE(SUM(eggs_produced), 0) as eggs,
-                    COALESCE(SUM(small_eggs), 0) as small_eggs,
-                    COALESCE(SUM(medium_eggs), 0) as medium_eggs,
-                    COALESCE(SUM(large_eggs), 0) as large_eggs,
-                    COALESCE(SUM(extra_large_eggs), 0) as extra_large_eggs,
-                    COALESCE(SUM(cracked_eggs), 0) as cracked_eggs
-                ')
-                ->first();
-
-            $eggs = (int) ($row->eggs ?? 0);
-            if ($eggs <= 0) {
-                continue;
-            }
-
-            $byYear[$year] = [
-                'eggs' => $eggs,
-                'small' => (int) ($row->small_eggs ?? 0),
-                'medium' => (int) ($row->medium_eggs ?? 0),
-                'large' => (int) ($row->large_eggs ?? 0),
-                'extra_large' => (int) ($row->extra_large_eggs ?? 0),
-                'cracked' => (int) ($row->cracked_eggs ?? 0),
-            ];
-        }
-
-        if ($byYear !== []) {
-            krsort($byYear);
-
-            return array_values(array_slice($byYear, 0, $limit, true));
-        }
-
-        return $this->nearbyDayOfYearSamples($forecastDate, $startYear, $endYear, $archive['end'], $limit);
-    }
-
-    /**
-     * Fallback: average nearby day-of-year rows when the exact calendar day is missing.
-     *
-     * @return list<array{eggs: int, small: int, medium: int, large: int, extra_large: int, cracked: int}>
-     */
-    private function nearbyDayOfYearSamples(
-        Carbon $forecastDate,
-        int $startYear,
-        int $endYear,
-        string $archiveEnd,
-        int $limit
-    ): array {
-        $targetDoy = $forecastDate->dayOfYear;
-        $byYear = [];
-
-        for ($year = $startYear; $year <= $endYear; $year++) {
-            $yearEggs = 0;
-            $yearMix = [
-                'small' => 0,
-                'medium' => 0,
-                'large' => 0,
-                'extra_large' => 0,
-                'cracked' => 0,
-            ];
-            $hits = 0;
-
-            for ($offset = -3; $offset <= 3; $offset++) {
-                $date = Carbon::create($year, 1, 1)->startOfDay()->addDays($targetDoy - 1 + $offset);
-                if ($date->year !== $year || $date->gte($forecastDate) || $date->gt(Carbon::parse($archiveEnd))) {
-                    continue;
-                }
-
-                $row = Production::query()
-                    ->whereDate('production_date', $date->toDateString())
-                    ->selectRaw('
-                        COALESCE(SUM(eggs_produced), 0) as eggs,
-                        COALESCE(SUM(small_eggs), 0) as small_eggs,
-                        COALESCE(SUM(medium_eggs), 0) as medium_eggs,
-                        COALESCE(SUM(large_eggs), 0) as large_eggs,
-                        COALESCE(SUM(extra_large_eggs), 0) as extra_large_eggs,
-                        COALESCE(SUM(cracked_eggs), 0) as cracked_eggs
-                    ')
-                    ->first();
-
-                $eggs = (int) ($row->eggs ?? 0);
-                if ($eggs <= 0) {
-                    continue;
-                }
-
-                $yearEggs += $eggs;
-                $yearMix['small'] += (int) ($row->small_eggs ?? 0);
-                $yearMix['medium'] += (int) ($row->medium_eggs ?? 0);
-                $yearMix['large'] += (int) ($row->large_eggs ?? 0);
-                $yearMix['extra_large'] += (int) ($row->extra_large_eggs ?? 0);
-                $yearMix['cracked'] += (int) ($row->cracked_eggs ?? 0);
-                $hits++;
-            }
-
-            if ($hits === 0) {
-                continue;
-            }
-
-            $byYear[$year] = [
-                'eggs' => (int) round($yearEggs / $hits),
-                'small' => (int) round($yearMix['small'] / $hits),
-                'medium' => (int) round($yearMix['medium'] / $hits),
-                'large' => (int) round($yearMix['large'] / $hits),
-                'extra_large' => (int) round($yearMix['extra_large'] / $hits),
-                'cracked' => (int) round($yearMix['cracked'] / $hits),
-            ];
-        }
-
-        krsort($byYear);
-
-        return array_values(array_slice($byYear, 0, $limit, true));
-    }
-
-    /**
-     * Hotter than neutral → more Small, fewer Large/XL.
-     * Cooler than neutral → more Large, fewer Small.
-     *
-     * @param  array{small: int, medium: int, large: int, extra_large: int, cracked: int}  $mix
-     * @return array{small: int, medium: int, large: int, extra_large: int, cracked: int}
-     */
-    private function shiftMixForTemperature(array $mix, ?float $temperature): array
-    {
-        if ($temperature === null) {
-            return $mix;
-        }
-
-        $neutral = (float) config('forecasting.neutral_temperature', 28);
-        $perDegree = (float) config('forecasting.temp_shift_per_degree', 0.015);
-        $cap = (float) config('forecasting.temp_shift_cap', 0.20);
-        $shift = max(-$cap, min($cap, ($temperature - $neutral) * $perDegree));
-
-        if (abs($shift) < 0.0001) {
-            return $mix;
-        }
-
-        $transferable = $mix['small'] + $mix['large'] + $mix['extra_large'];
-        if ($transferable <= 0) {
-            return $mix;
-        }
-
-        $move = (int) round($transferable * abs($shift));
-        if ($move <= 0) {
-            return $mix;
-        }
-
-        $result = $mix;
-
-        if ($shift > 0) {
-            // Hotter: Large/XL → Small
-            $fromLarge = min($result['large'], (int) round($move * 0.7));
-            $fromXl = min($result['extra_large'], $move - $fromLarge);
-            $result['large'] -= $fromLarge;
-            $result['extra_large'] -= $fromXl;
-            $result['small'] += $fromLarge + $fromXl;
-        } else {
-            // Cooler: Small → Large
-            $fromSmall = min($result['small'], $move);
-            $result['small'] -= $fromSmall;
-            $result['large'] += $fromSmall;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param  array{small: int, medium: int, large: int, extra_large: int, cracked: int}  $mix
-     * @return array{small: int, medium: int, large: int, extra_large: int, cracked: int}
-     */
-    private function allocateByMix(int $total, array $mix): array
-    {
-        $keys = ['small', 'medium', 'large', 'extra_large', 'cracked'];
-        $empty = array_fill_keys($keys, 0);
-
-        if ($total <= 0) {
-            return $empty;
-        }
-
-        $weightSum = array_sum($mix);
-        if ($weightSum <= 0) {
-            $empty['medium'] = $total;
-
-            return $empty;
-        }
-
-        $parts = [];
-        $assigned = 0;
-        $remainders = [];
-
-        foreach ($keys as $key) {
-            $exact = $total * ($mix[$key] / $weightSum);
-            $base = (int) floor($exact);
-            $parts[$key] = $base;
-            $assigned += $base;
-            $remainders[$key] = $exact - $base;
-        }
-
-        $left = $total - $assigned;
-        arsort($remainders);
-        foreach (array_keys($remainders) as $key) {
-            if ($left <= 0) {
-                break;
-            }
-            $parts[$key]++;
-            $left--;
-        }
-
-        return $parts;
     }
 
     /**
@@ -1283,60 +870,33 @@ class GenerateEggForecast
      */
     private function archiveBoundsForDates(array $predictDates): array
     {
-        if ($this->usesArima()) {
-            return $this->arimaArchiveBounds($predictDates);
-        }
-
-        if ($predictDates === []) {
-            return $this->archiveBounds();
-        }
-
-        $starts = [];
-        $ends = [];
-        foreach ($predictDates as $date) {
-            $bounds = $this->archiveBounds(Carbon::parse($date)->startOfDay());
-            $starts[] = $bounds['start'];
-            $ends[] = $bounds['end'];
-        }
-
-        return [
-            'start' => min($starts),
-            'end' => max($ends),
-        ];
+        return $this->arimaArchiveBounds($predictDates);
     }
 
     /**
-     * ARIMA needs a consecutive daily series that ends before the last forecast day
-     * so each past chart day can walk forward from the actuals before it.
+     * Consecutive daily harvests through today. Python then trains each
+     * 7-day block only on days before that block, so a past chart week
+     * cannot see its own actuals.
      *
      * @param  list<string>  $predictDates
      * @return array{start: string, end: string}
      */
     private function arimaArchiveBounds(array $predictDates): array
     {
+        unset($predictDates);
+
         $floor = Carbon::parse((string) config(
             'forecasting.archive_start',
             Production::sampleStartDate()
         ))->startOfDay();
 
-        $latest = null;
-        foreach ($predictDates as $date) {
-            try {
-                $parsed = Carbon::parse($date)->startOfDay();
-            } catch (Throwable) {
-                continue;
-            }
-            if ($latest === null || $parsed->gt($latest)) {
-                $latest = $parsed;
-            }
-        }
-
         $end = Carbon::today()->startOfDay();
-        if ($latest !== null) {
-            $end = $latest->copy()->subDay();
-        }
-        if ($end->gt(Carbon::today()->startOfDay())) {
-            $end = Carbon::today()->startOfDay();
+        $configuredEnd = trim((string) config('forecasting.archive_end', ''));
+        if ($configuredEnd !== '') {
+            $cap = Carbon::parse($configuredEnd)->startOfDay();
+            if ($end->gt($cap)) {
+                $end = $cap;
+            }
         }
         if ($end->lt($floor)) {
             $end = $floor->copy();
@@ -1350,22 +910,12 @@ class GenerateEggForecast
 
     private function forecastModel(): string
     {
-        $model = strtolower(trim((string) config('forecasting.model', 'arima_2_1_1')));
-
-        return $model !== '' ? $model : 'arima_2_1_1';
-    }
-
-    private function usesArima(): bool
-    {
-        return str_contains($this->forecastModel(), 'arima');
+        return 'arima_2_1_1';
     }
 
     private function isAcceptedForecastModel(string $model): bool
     {
-        $normalized = strtolower($model);
-
-        return str_contains($normalized, 'arima')
-            || str_contains($normalized, 'three_year');
+        return str_contains(strtolower($model), 'arima');
     }
 
     /**

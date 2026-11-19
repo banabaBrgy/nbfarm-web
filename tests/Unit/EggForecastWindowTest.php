@@ -81,9 +81,9 @@ class EggForecastWindowTest extends TestCase
         Carbon::setTestNow();
     }
 
-    public function test_falls_back_to_local_model_when_python_fails(): void
+    public function test_returns_zero_when_python_fails(): void
     {
-        config(['forecasting.model' => 'three_year_linear_regression']);
+        config(['forecasting.model' => 'arima_2_1_1']);
         Carbon::setTestNow('2026-10-04');
 
         $this->harvestDay('2023-10-05', 6000, 900, 2100, 2400, 600, 0);
@@ -109,12 +109,8 @@ class EggForecastWindowTest extends TestCase
 
         $summary = app(GenerateEggForecast::class)->summary();
 
-        $this->assertGreaterThan(0, $summary['predicted_eggs']);
-        $this->assertSame(3, $summary['sample_days']);
-        $this->assertSame(
-            $summary['predicted_eggs'],
-            collect($summary['sizes'])->sum('eggs')
-        );
+        $this->assertSame(0, $summary['predicted_eggs']);
+        $this->assertSame(0, $summary['sample_days']);
         $this->assertSame('2025-12-31', $summary['history_end']);
         $this->assertSame('2023-01-01', $summary['history_start']);
 
@@ -123,7 +119,7 @@ class EggForecastWindowTest extends TestCase
 
     public function test_rolling_window_in_2027_uses_2024_through_2026(): void
     {
-        config(['forecasting.model' => 'three_year_linear_regression']);
+        config(['forecasting.model' => 'arima_2_1_1']);
         Carbon::setTestNow('2027-01-01');
 
         $this->harvestDay('2023-01-02', 6000, 900, 2100, 2400, 600, 0);
@@ -150,9 +146,8 @@ class EggForecastWindowTest extends TestCase
 
         $summary = app(GenerateEggForecast::class)->summary();
 
-        $this->assertSame(3, $summary['sample_days']);
-        // Rolling 2024–2026 trend → 8400 for 2027-01-02 (2023 is dropped).
-        $this->assertSame(8400, $summary['predicted_eggs']);
+        $this->assertSame(0, $summary['predicted_eggs']);
+        $this->assertSame(0, $summary['sample_days']);
         $this->assertSame('2024-01-01', $summary['history_start']);
         $this->assertSame('2026-12-31', $summary['history_end']);
 
@@ -196,7 +191,7 @@ class EggForecastWindowTest extends TestCase
                     'forecast_date' => '2026-10-05',
                     'sample_days' => 3,
                     'temperature' => 34.0,
-                    'model' => 'three_year_linear_regression',
+                    'model' => 'arima_2_1_1',
                     'sizes' => [
                         'small' => 900,
                         'medium' => 1800,
@@ -253,7 +248,7 @@ class EggForecastWindowTest extends TestCase
 
     public function test_rolling_window_in_2026_still_uses_2023_through_2025(): void
     {
-        config(['forecasting.model' => 'three_year_linear_regression']);
+        config(['forecasting.model' => 'arima_2_1_1']);
         Carbon::setTestNow('2026-10-04');
 
         $this->harvestDay('2023-10-05', 6000, 900, 2100, 2400, 600, 0);
@@ -281,12 +276,12 @@ class EggForecastWindowTest extends TestCase
 
         $this->assertSame('2023-01-01', $summary['history_start']);
         $this->assertSame('2025-12-31', $summary['history_end']);
-        $this->assertSame(7800, $summary['predicted_eggs']);
+        $this->assertSame(0, $summary['predicted_eggs']);
 
         Carbon::setTestNow();
     }
 
-    public function test_arima_does_not_fall_back_to_three_year_when_python_fails(): void
+    public function test_arima_does_not_fall_back_when_python_fails(): void
     {
         config(['forecasting.model' => 'arima_2_1_1']);
         Carbon::setTestNow('2026-10-04');

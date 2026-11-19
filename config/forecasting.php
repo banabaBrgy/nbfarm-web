@@ -4,8 +4,7 @@ return [
 
     /*
     | Python forecasting API (folder: ../forecasting).
-    | Live dashboard orange line uses this model. ARIMA(2,1,1) is the default.
-    | three_year_linear_regression remains the PHP fallback if the API is down.
+    | Live dashboard orange line uses ARIMA(2,1,1).
     */
     'api_url' => rtrim((string) env('FORECAST_API_URL', 'http://127.0.0.1:8001'), '/'),
 
@@ -13,8 +12,8 @@ return [
 
     'timeout' => (int) env('FORECAST_TIMEOUT', 30),
 
-    /** arima_2_1_1 or three_year_linear_regression */
-    'model' => (string) env('FORECAST_MODEL', 'arima_2_1_1'),
+    /** Live model is ARIMA(2,1,1). */
+    'model' => 'arima_2_1_1',
 
     /*
     | Rolling window: last N *completed* calendar years before the forecast year.

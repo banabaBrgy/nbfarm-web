@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        {{-- Predicted eggs (Python linear regression) --}}
+        {{-- Predicted eggs (Python ARIMA 2,1,1) --}}
         <div
             class="stat-card stat-card--predicted stat-card--clickable"
             role="button"

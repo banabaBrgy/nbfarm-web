@@ -64,6 +64,17 @@ class SmoothForecastSeriesTest extends TestCase
         $this->assertGreaterThanOrEqual(6664, $smoothed[0]);
     }
 
+    public function test_lock_from_keeps_tomorrow_and_later_on_the_model(): void
+    {
+        $raw = [7320, 7200, 7080, 6870, 6870, 6870];
+        $smoothed = (new SmoothForecastSeries)->apply($raw, 3, true);
+
+        $this->assertSame(6870, $smoothed[3]);
+        $this->assertSame(6870, $smoothed[4]);
+        $this->assertSame(6870, $smoothed[5]);
+        $this->assertNotSame($raw[0], $smoothed[0]);
+    }
+
     public function test_missing_days_stay_missing(): void
     {
         $smoothed = (new SmoothForecastSeries)->apply([6800, null, 7200, 'n/a']);

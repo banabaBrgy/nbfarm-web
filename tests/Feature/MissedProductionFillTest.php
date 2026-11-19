@@ -173,7 +173,7 @@ class MissedProductionFillTest extends TestCase
                 }
 
                 return [
-                    'model' => 'three_year_linear_regression',
+                    'model' => 'arima_2_1_1',
                     'series' => $series,
                     'error' => null,
                 ];

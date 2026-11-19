@@ -30,7 +30,7 @@ class SmoothForecastSeries
      * @param  list<int|float|null>  $values
      * @return list<int|null>
      */
-    public function apply(array $values, ?int $lockIndex = null): array
+    public function apply(array $values, ?int $lockIndex = null, bool $lockFrom = false): array
     {
         $result = [];
         foreach ($values as $value) {
@@ -45,10 +45,9 @@ class SmoothForecastSeries
                 $start = $i;
             }
             if (! $numeric && $start !== null) {
-                $lockLocal = $lockIndex !== null && $lockIndex >= $start && $lockIndex <= ($i - 1)
-                    ? $lockIndex - $start
-                    : null;
-                $this->smoothSlice($result, $start, $i - 1, $lockLocal);
+                $end = $i - 1;
+                $lockLocal = $this->lockLocal($lockIndex, $lockFrom, $start, $end);
+                $this->smoothSlice($result, $start, $end, $lockLocal, $lockFrom && $lockLocal !== null);
                 $start = null;
             }
         }
@@ -56,10 +55,27 @@ class SmoothForecastSeries
         return $result;
     }
 
+    private function lockLocal(?int $lockIndex, bool $lockFrom, int $start, int $end): ?int
+    {
+        if ($lockIndex === null) {
+            return null;
+        }
+
+        if ($lockFrom && $lockIndex < $start) {
+            return 0;
+        }
+
+        if ($lockIndex >= $start && $lockIndex <= $end) {
+            return $lockIndex - $start;
+        }
+
+        return null;
+    }
+
     /**
      * @param  list<int|null>  $result
      */
-    private function smoothSlice(array &$result, int $from, int $to, ?int $lockLocal): void
+    private function smoothSlice(array &$result, int $from, int $to, ?int $lockLocal, bool $lockFrom = false): void
     {
         if ($to - $from < 1) {
             return;
@@ -79,7 +95,7 @@ class SmoothForecastSeries
         for ($pass = 0; $pass < self::PASSES; $pass++) {
             $blended = $current;
             for ($i = 0; $i < $length; $i++) {
-                if ($lockLocal === $i) {
+                if ($this->isLocked($i, $lockLocal, $lockFrom)) {
                     $blended[$i] = $raw[$i];
 
                     continue;
@@ -93,12 +109,21 @@ class SmoothForecastSeries
                 $target = ($current[$i] * 0.4) + ($neighbor * 0.6);
                 $blended[$i] = $this->clampToModel($target, $raw[$i]);
             }
-            $current = $this->capSteps($blended, $raw, $lockLocal);
+            $current = $this->capSteps($blended, $raw, $lockLocal, $lockFrom);
         }
 
         for ($i = 0; $i < $length; $i++) {
             $result[$from + $i] = (int) round($current[$i]);
         }
+    }
+
+    private function isLocked(int $index, ?int $lockLocal, bool $lockFrom): bool
+    {
+        if ($lockLocal === null) {
+            return false;
+        }
+
+        return $lockFrom ? $index >= $lockLocal : $lockLocal === $index;
     }
 
     /**
@@ -121,13 +146,13 @@ class SmoothForecastSeries
      * @param  list<float>  $raw
      * @return list<float>
      */
-    private function capSteps(array $values, array $raw, ?int $lockLocal): array
+    private function capSteps(array $values, array $raw, ?int $lockLocal, bool $lockFrom = false): array
     {
         $count = count($values);
         $out = [];
 
         for ($i = 0; $i < $count; $i++) {
-            if ($lockLocal === $i) {
+            if ($this->isLocked($i, $lockLocal, $lockFrom)) {
                 $out[$i] = $raw[$i];
 
                 continue;

@@ -277,7 +277,7 @@ class EggProductionChartViewTest extends TestCase
             ->assertSee('[4000,4000,4000]', false);
     }
 
-    public function test_time_series_shrinks_a_spike_and_keeps_the_first_day_exact(): void
+    public function test_time_series_uses_the_model_totals(): void
     {
         foreach ([2023, 2024, 2025] as $year) {
             $this->harvest($year.'-11-09', 6000);
@@ -292,8 +292,132 @@ class EggProductionChartViewTest extends TestCase
         $data = $chart['datasets'][0]['data'];
 
         $this->assertSame(4000, $data[0]);
-        $this->assertEqualsWithDelta(4000, $data[1], 120);
-        $this->assertEqualsWithDelta(4000, $data[2], 120);
+        $this->assertSame(4000, $data[1]);
+        $this->assertSame(4000, $data[2]);
+    }
+
+    public function test_comparison_shows_arima_spike_without_smoothing(): void
+    {
+        $this->app->instance(ForecastEngine::class, new class implements ForecastEngine
+        {
+            public function predict(
+                array $history,
+                array $predictDates,
+                int $window = 7,
+                array $temperatures = [],
+                array $options = [],
+            ): array {
+                $values = [6800, 9000, 6800];
+                $series = [];
+                foreach (array_values($predictDates) as $index => $date) {
+                    $eggs = $values[$index] ?? 6800;
+                    $series[] = [
+                        'date' => $date,
+                        'eggs' => $eggs,
+                        'sample_days' => 3,
+                        'temperature' => 28.0,
+                        'sizes' => [
+                            'small' => 0,
+                            'medium' => $eggs,
+                            'large' => 0,
+                            'extra_large' => 0,
+                            'cracked' => 0,
+                        ],
+                    ];
+                }
+
+                return [
+                    'predicted_eggs' => $series[0]['eggs'] ?? 0,
+                    'forecast_date' => $predictDates[0] ?? '2026-11-01',
+                    'sample_days' => 3,
+                    'temperature' => 28.0,
+                    'model' => 'arima_2_1_1',
+                    'series' => $series,
+                    'error' => null,
+                ];
+            }
+        });
+
+        $this->harvest('2026-11-01', 7000);
+        $this->harvest('2026-11-02', 7100);
+        $this->harvest('2026-11-03', 6900);
+
+        $chart = app(EggProductionChart::class)->forRequest(
+            Request::create('/dashboard', 'GET', [
+                'trend_view' => 'comparison',
+                'start_date' => '2026-11-01',
+                'end_date' => '2026-11-03',
+            ])
+        );
+
+        $forecast = collect($chart['datasets'])->firstWhere('label', 'Forecast');
+
+        $this->assertNotNull($forecast);
+        $this->assertSame([6800, 9000, 6800], $forecast['data']);
+        $this->assertStringContainsString('seven-day-ahead', (string) $chart['notice']);
+    }
+
+    public function test_comparison_sends_history_through_today_not_the_range_end(): void
+    {
+        $captured = new \stdClass;
+        $this->app->instance(ForecastEngine::class, new class($captured) implements ForecastEngine
+        {
+            public function __construct(private \stdClass $captured) {}
+
+            public function predict(
+                array $history,
+                array $predictDates,
+                int $window = 7,
+                array $temperatures = [],
+                array $options = [],
+            ): array {
+                $this->captured->options = $options;
+                $this->captured->dates = $predictDates;
+                $series = [];
+                foreach ($predictDates as $date) {
+                    $series[] = [
+                        'date' => $date,
+                        'eggs' => 4000,
+                        'sample_days' => 3,
+                        'temperature' => 28.0,
+                        'sizes' => [
+                            'small' => 1000,
+                            'medium' => 1000,
+                            'large' => 1000,
+                            'extra_large' => 1000,
+                            'cracked' => 0,
+                        ],
+                    ];
+                }
+
+                return [
+                    'predicted_eggs' => 4000,
+                    'forecast_date' => $predictDates[0] ?? '2026-11-01',
+                    'sample_days' => 3,
+                    'temperature' => 28.0,
+                    'model' => 'arima_2_1_1',
+                    'series' => $series,
+                    'error' => null,
+                ];
+            }
+        });
+
+        $this->harvest('2026-11-01', 1800);
+        $this->harvest('2026-11-08', 1900);
+
+        app(EggProductionChart::class)->forRequest(
+            Request::create('/dashboard', 'GET', [
+                'trend_view' => 'comparison',
+                'start_date' => '2026-11-01',
+                'end_date' => '2026-11-07',
+            ])
+        );
+
+        $this->assertSame('2026-11-08', $captured->options['archive_end'] ?? null);
+        $this->assertSame(
+            ['2026-11-01', '2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07'],
+            $captured->dates ?? null
+        );
     }
 
     public function test_a_saved_forecast_far_from_the_model_does_not_spike_the_chart(): void
@@ -321,6 +445,66 @@ class EggProductionChartViewTest extends TestCase
             ->assertOk()
             ->assertSee('[4000]', false)
             ->assertDontSee('[2000]', false);
+    }
+
+    public function test_a_saved_forecast_near_the_model_still_uses_the_live_total(): void
+    {
+        $this->harvest('2026-11-01', 1800);
+
+        Forecast::query()->create([
+            'forecast_date' => '2026-11-09',
+            'predicted_eggs' => 3870,
+            'series' => [
+                ['date' => '2026-11-09', 'eggs' => 3870],
+            ],
+        ]);
+
+        $chart = app(EggProductionChart::class)->forRequest(
+            Request::create('/dashboard', 'GET', [
+                'trend_view' => 'historical',
+                'start_date' => '2026-11-09',
+                'end_date' => '2026-11-09',
+            ])
+        );
+
+        $this->assertSame([4000], $chart['datasets'][0]['data']);
+    }
+
+    public function test_historical_future_day_matches_seven_day_forecast(): void
+    {
+        $this->harvest('2026-11-01', 1800);
+
+        Forecast::query()->create([
+            'forecast_date' => '2026-11-09',
+            'predicted_eggs' => 3899,
+            'series' => [
+                ['date' => '2026-11-09', 'eggs' => 3899],
+                ['date' => '2026-11-10', 'eggs' => 3899],
+            ],
+        ]);
+
+        $historical = app(EggProductionChart::class)->forRequest(
+            Request::create('/dashboard', 'GET', [
+                'trend_view' => 'historical',
+                'start_date' => '2026-11-08',
+                'end_date' => '2026-11-12',
+            ])
+        );
+        $sevenDay = app(EggProductionChart::class)->forRequest(
+            Request::create('/dashboard', 'GET', ['trend_view' => 'forecast'])
+        );
+
+        $historicalForecast = collect($historical['datasets'])->firstWhere('label', 'Forecast');
+        $sevenDayForecast = collect($sevenDay['datasets'])->firstWhere('label', 'Forecast');
+
+        $this->assertNotNull($historicalForecast);
+        $this->assertNotNull($sevenDayForecast);
+        $this->assertSame(4000, $sevenDayForecast['data'][0]);
+        $this->assertSame(
+            $sevenDayForecast['data'][0],
+            $historicalForecast['data'][1],
+            'Nov 9 live ARIMA should match Seven-Day Forecast hover'
+        );
     }
 
     public function test_comparison_uses_the_arima_engine_for_the_forecast_line(): void

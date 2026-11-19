@@ -42,7 +42,7 @@
                         pointBorderColor: isForecast ? forecastOrange : '#fff',
                         pointBorderWidth: 1.5,
                         fill: !isForecast,
-                        tension: isForecast ? 0.35 : 0.15,
+                        tension: isForecast ? 0 : 0.15,
                         spanGaps: isForecast,
                         order: isForecast ? 1 : 2,
                     };

@@ -85,7 +85,7 @@
                         NB Poultry Farm still records egg production, stock, dispatch, and sales
                         in logbooks and ledgers. This study develops a web-based management system
                         that replaces those records, tracks egg batches with QR codes, and forecasts
-                        egg production using Linear Regression.
+                        egg production using ARIMA(2,1,1).
                     </p>
                 </div>
             </section>

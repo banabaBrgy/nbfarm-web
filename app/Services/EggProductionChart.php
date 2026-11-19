@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Services\Forecasting\GenerateEggForecast;
-use App\Services\Forecasting\SmoothForecastSeries;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +23,6 @@ class EggProductionChart
     public function __construct(
         private ProductionYearTrend $trends,
         private GenerateEggForecast $forecasts,
-        private SmoothForecastSeries $smoother,
     ) {}
 
     /**
@@ -201,6 +199,8 @@ class EggProductionChart
                 fn (array $dataset) => ! $dataset['forecast']
             ));
             $notice = 'No forecast could be made for these dates. The chart shows actual production only.';
+        } elseif ($includeForecast && $hasForecast) {
+            $notice = 'ARIMA(2,1,1) seven-day-ahead: each week is predicted only from harvests before that week.';
         }
 
         if (! $hasActual) {
@@ -210,10 +210,7 @@ class EggProductionChart
             ));
         }
 
-        $tomorrowLabel = Carbon::tomorrow()->format('M d, Y');
-        $tomorrowIndex = array_search($tomorrowLabel, array_values($range['labels'] ?? []), true);
-
-        return $this->withSmoothForecast([
+        return [
             'view' => $view,
             'period' => $period,
             'needsDates' => true,
@@ -223,7 +220,7 @@ class EggProductionChart
             'notice' => $notice,
             'labels' => array_values($range['labels'] ?? []),
             'datasets' => $datasets,
-        ], $tomorrowIndex === false ? null : $tomorrowIndex);
+        ];
     }
 
     /**
@@ -282,7 +279,7 @@ class EggProductionChart
             );
         }
 
-        return $this->withSmoothForecast([
+        return [
             'view' => $view,
             'period' => $period,
             'needsDates' => false,
@@ -298,27 +295,7 @@ class EggProductionChart
                     'forecast' => true,
                 ],
             ],
-        ], 0);
-    }
-
-    /**
-     * @param  array{datasets?: list<array{forecast?: bool, data?: list<int|float|null>}>}  $payload
-     * @return array{datasets?: list<array{forecast?: bool, data?: list<int|float|null>}>}
-     */
-    private function withSmoothForecast(array $payload, ?int $lockIndex = null): array
-    {
-        foreach ($payload['datasets'] ?? [] as $index => $dataset) {
-            if (! ($dataset['forecast'] ?? false)) {
-                continue;
-            }
-
-            $payload['datasets'][$index]['data'] = $this->smoother->apply(
-                $dataset['data'] ?? [],
-                $lockIndex
-            );
-        }
-
-        return $payload;
+        ];
     }
 
     /**
