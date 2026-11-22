@@ -19,7 +19,7 @@
     <div class="page-header">
         <div>
             <h2>Scanned QR Overview</h2>
-            <p>Today’s QR codes, with batch, size, quantity, and whether each one is scanned or still available.</p>
+            <p>Today’s saved tally for each size QR — scans, trays, and eggs after Confirm &amp; Save. Pending review lists are not counted yet.</p>
         </div>
         <a href="{{ route($role . '.production') }}" class="scan-back-button">
             <i class="fas fa-arrow-left"></i>
@@ -71,16 +71,18 @@
                 <col class="qr-overview-col-code">
                 <col class="qr-overview-col-batch">
                 <col class="qr-overview-col-size">
-                <col class="qr-overview-col-qty">
-                <col class="qr-overview-col-status">
+                <col class="qr-overview-col-scans">
+                <col class="qr-overview-col-trays">
+                <col class="qr-overview-col-eggs">
             </colgroup>
             <thead>
                 <tr>
                     <th>QR Code</th>
-                    <th>Batch ID</th>
+                    <th>Batch</th>
                     <th>Size</th>
-                    <th>Quantity</th>
-                    <th>Status</th>
+                    <th>Scans today</th>
+                    <th>Trays today</th>
+                    <th>Eggs today</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,20 +91,17 @@
                         <td>{{ $row['qr_code'] }}</td>
                         <td>{{ $row['batch_id'] }}</td>
                         <td>{{ $row['egg_size'] }}</td>
-                        <td>{{ number_format($row['quantity']) }}</td>
-                        <td>
-                            <span class="qr-overview-status qr-overview-status--{{ strtolower($row['status']) }}">
-                                {{ $row['status'] }}
-                            </span>
-                        </td>
+                        <td>{{ number_format($row['scans']) }}</td>
+                        <td>{{ number_format($row['trays']) }}</td>
+                        <td>{{ number_format($row['eggs']) }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="qr-overview-empty">
+                        <td colspan="6" class="qr-overview-empty">
                             @if($hasFilters)
                                 No QR records match this search.
                             @else
-                                No QR records yet. Generate QR codes from Production.
+                                No size QR codes yet. Generate one QR per size from Production.
                             @endif
                         </td>
                     </tr>

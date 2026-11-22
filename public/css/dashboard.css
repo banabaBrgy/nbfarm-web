@@ -442,6 +442,8 @@
 
 .stat-trend-up { color: #3B8F47 !important; font-weight: 600; }
 .stat-trend-down { color: #dc2626 !important; font-weight: 600; }
+.stat-trend-flat { color: #6b7280; font-weight: 500; }
+.stat-meta { display: flex; flex-direction: column; gap: 2px; }
 
 .stat-card--feed .stat-icon { background: linear-gradient(145deg, #fbbf24 0%, #ea580c 100%); }
 .stat-card--feed .stat-info h2 { color: #ea580c; }

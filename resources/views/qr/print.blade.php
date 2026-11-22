@@ -39,9 +39,9 @@
                 @if($totalLabels > 0)
                     {{ number_format($totalGroups) }} size group{{ $totalGroups === 1 ? '' : 's' }}
                     · {{ number_format($totalLabels) }} QR code{{ $totalLabels === 1 ? '' : 's' }}
-                    (10 per egg size per batch).
+                    (one QR per egg size per batch).
                 @else
-                    Generate QR codes from Production to identify trays by batch and egg size.
+                    Generate one QR per size from Production, then print copies for matching stacks.
                 @endif
             </p>
         </div>

@@ -39,42 +39,35 @@ class QrOverviewTest extends TestCase
             ->assertDontSee('/qr/overview', false);
     }
 
-    public function test_overview_lists_today_status_quantity_and_filters(): void
+    public function test_overview_is_a_today_tally_of_size_codes_only(): void
     {
         $staff = User::factory()->create(['role' => 'staff']);
+        $small = QrRecord::issueSizeCode(1, 'Small', 10);
+        $medium = QrRecord::issueSizeCode(1, 'Medium', 10);
+        $large = QrRecord::issueSizeCode(2, 'Large', 10);
+        $this->record(1, 'QRL-B1-001', 'Large', 2, 30);
+
         $today = $this->production(1, today()->toDateString());
-        $yesterday = $this->production(2, today()->subDay()->toDateString());
-
-        $scanned = $this->record(1, 'QRL-B1-001', 'Large', 2, 30);
-        $edited = $this->record(1, 'QRS-B1-002', 'Small', 10, 30);
-        $available = $this->record(2, 'QRM-B2-003', 'Medium', 4, 30);
-        $usedYesterday = $this->record(2, 'QRXL-B2-004', 'Extra Large', 7, 30);
+        $yesterday = $this->production(1, today()->subDay()->toDateString());
 
         QrTransaction::create([
-            'qr_record_id' => $scanned->id,
-            'production_id' => $today->production_id,
-            'total_eggs' => 60,
-            'status' => 'Scanned',
-            'scanned_at' => now(),
-        ]);
-        QrTransaction::create([
-            'qr_record_id' => $edited->id,
+            'qr_record_id' => $small->id,
             'production_id' => $today->production_id,
             'total_eggs' => 300,
             'status' => 'Scanned',
-            'scanned_at' => now()->subHour(),
+            'scanned_at' => now()->subMinutes(2),
         ]);
         QrTransaction::create([
-            'qr_record_id' => $edited->id,
+            'qr_record_id' => $small->id,
             'production_id' => $today->production_id,
-            'total_eggs' => 90,
-            'status' => 'Edited',
+            'total_eggs' => 300,
+            'status' => 'Scanned',
             'scanned_at' => now(),
         ]);
         QrTransaction::create([
-            'qr_record_id' => $usedYesterday->id,
+            'qr_record_id' => $small->id,
             'production_id' => $yesterday->production_id,
-            'total_eggs' => 30,
+            'total_eggs' => 900,
             'status' => 'Scanned',
             'scanned_at' => now()->subDay(),
         ]);
@@ -83,67 +76,60 @@ class QrOverviewTest extends TestCase
             ->get(route('staff.qr.overview'))
             ->assertOk()
             ->assertSee('Scanned QR Overview', false)
-            ->assertSee('QRL-B1-001', false)
-            ->assertSee('QRS-B1-002', false)
-            ->assertSee('QRM-B2-003', false)
-            ->assertSee('QRXL-B2-004', false)
-            ->assertSee('Scanned', false)
-            ->assertSee('Available', false)
-            ->assertSee('>60<', false)
-            ->assertSee('>90<', false)
-            ->assertSee('>120<', false)
-            ->assertSee('>210<', false)
-            ->assertDontSee('>30<', false);
-
-        $this->actingAs($staff)
-            ->get(route('staff.qr.overview', ['egg_size' => 'Large', 'batch_id' => 1]))
-            ->assertOk()
-            ->assertSee('QRL-B1-001', false)
-            ->assertDontSee('QRS-B1-002', false)
-            ->assertDontSee('QRM-B2-003', false);
-
-        $this->actingAs($staff)
-            ->get(route('staff.qr.overview', ['search' => 'QRM-B2']))
-            ->assertOk()
-            ->assertSee('QRM-B2-003', false)
+            ->assertSee('QRS-B1', false)
+            ->assertSee('QRM-B1', false)
+            ->assertSee('QRL-B2', false)
+            ->assertDontSee('QRL-B1-001', false)
+            ->assertSee('>20<', false)
+            ->assertSee('>600<', false)
+            ->assertDontSee('>900<', false)
+            ->assertDontSee('Available', false)
             ->assertDontSee('QRL-B1-001', false);
 
         $this->actingAs($staff)
-            ->get(route('staff.qr.overview', ['egg_size' => 'Nope', 'batch_id' => 99, 'search' => '%']))
+            ->get(route('staff.qr.overview', ['egg_size' => 'Small', 'batch_id' => 1]))
             ->assertOk()
-            ->assertSee('QRL-B1-001', false)
-            ->assertSee('QRM-B2-003', false);
+            ->assertSee('QRS-B1', false)
+            ->assertDontSee('QRM-B1', false)
+            ->assertDontSee('QRL-B2', false);
+
+        $this->actingAs($staff)
+            ->get(route('staff.qr.overview', ['search' => 'QRM-B1']))
+            ->assertOk()
+            ->assertSee('QRM-B1', false)
+            ->assertDontSee('QRS-B1', false);
+
+        $this->actingAs($staff)
+            ->get(route('staff.qr.overview', ['search' => '%']))
+            ->assertOk()
+            ->assertSee('No QR records match this search.', false)
+            ->assertDontSee('QRS-B1', false);
     }
 
-    public function test_overview_paginates_five_rows_and_keeps_the_filter(): void
+    public function test_overview_fits_all_size_codes_on_one_page(): void
     {
         $staff = User::factory()->create(['role' => 'staff']);
 
-        foreach (range(1, 6) as $sequence) {
-            $this->record(1, sprintf('QRS-B1-%03d', $sequence), 'Small', 1, 30);
+        foreach (QrRecord::BATCH_IDS as $batchId) {
+            foreach (array_keys(QrRecord::SIZE_PREFIXES) as $size) {
+                QrRecord::issueSizeCode($batchId, $size, 10);
+            }
         }
 
-        $this->record(2, 'QRL-B2-001', 'Large', 1, 30);
+        $this->actingAs($staff)
+            ->get(route('staff.qr.overview'))
+            ->assertOk()
+            ->assertSee('QRS-B1', false)
+            ->assertSee('QRXL-B3', false)
+            ->assertDontSee('Page 2 of', false);
 
         $this->actingAs($staff)
             ->get(route('staff.qr.overview', ['egg_size' => 'Small']))
             ->assertOk()
-            ->assertSee('Showing 1–5 of 6', false)
-            ->assertSee('Page 1 of 2', false)
-            ->assertSee('QRS-B1-001', false)
-            ->assertSee('QRS-B1-005', false)
-            ->assertDontSee('QRS-B1-006', false)
-            ->assertDontSee('QRL-B2-001', false)
-            ->assertSee('egg_size=Small', false);
-
-        $this->actingAs($staff)
-            ->get(route('staff.qr.overview', ['egg_size' => 'Small', 'page' => 2]))
-            ->assertOk()
-            ->assertSee('Showing 6–6 of 6', false)
-            ->assertSee('Page 2 of 2', false)
-            ->assertSee('QRS-B1-006', false)
-            ->assertDontSee('QRS-B1-001', false)
-            ->assertSee('egg_size=Small', false);
+            ->assertSee('QRS-B1', false)
+            ->assertSee('QRS-B3', false)
+            ->assertDontSee('QRL-B1', false)
+            ->assertSee('value="Small" selected', false);
     }
 
     public function test_other_roles_cannot_open_the_staff_overview(): void
@@ -158,6 +144,10 @@ class QrOverviewTest extends TestCase
         $this->actingAs($manager)
             ->get(route('staff.qr.overview'))
             ->assertRedirect(route('manager.dashboard'));
+
+        $this->actingAs($manager)
+            ->get(route('manager.qr.overview'))
+            ->assertOk();
 
         auth()->logout();
 

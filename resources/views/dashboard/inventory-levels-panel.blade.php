@@ -10,6 +10,8 @@
     $inventoryMovements = $inventoryMovements ?? [];
     $inventoryAsOfLabel = $inventoryAsOfLabel ?? null;
     $showInventoryTable = ! ($dateFilter['isToday'] ?? true);
+    $inventoryRatings = $inventoryRatings ?? [];
+    $trayLow = $trayLow ?? false;
 
     $eggsPct = min(100, ($eggsTotal / 150) * 100);
     $feedPct = min(100, ($feedStock / max($feedMin, 1)) * 50);
@@ -74,6 +76,7 @@
                     <div class="inventory-levels-bar">
                         <div class="inventory-levels-bar__fill inventory-levels-bar__fill--green" style="width: {{ $eggsPct }}%"></div>
                     </div>
+                    @include('dashboard.inventory-trend', ['rating' => $inventoryRatings['eggs'] ?? null])
                 </div>
             </div>
 
@@ -94,6 +97,7 @@
                     <div class="inventory-levels-bar">
                         <div class="inventory-levels-bar__fill {{ $feedLow ? 'inventory-levels-bar__fill--low' : 'inventory-levels-bar__fill--green' }}" style="width: {{ $feedPct }}%"></div>
                     </div>
+                    @include('dashboard.inventory-trend', ['rating' => $inventoryRatings['feed'] ?? null])
                 </div>
             </div>
 
@@ -104,11 +108,17 @@
                 <div class="inventory-levels-item__body">
                     <div class="inventory-levels-item__meta">
                         <span class="inventory-levels-item__name">Egg Trays</span>
-                        <span class="inventory-levels-item__value">{{ number_format($eggTrays) }} pcs</span>
+                        <span class="inventory-levels-item__value {{ $trayLow ? 'inventory-levels-item__value--warn' : '' }}">
+                            {{ number_format($eggTrays) }} pcs
+                            @if($trayLow)
+                                — below min
+                            @endif
+                        </span>
                     </div>
                     <div class="inventory-levels-bar">
-                        <div class="inventory-levels-bar__fill inventory-levels-bar__fill--green" style="width: {{ $traysPct }}%"></div>
+                        <div class="inventory-levels-bar__fill {{ $trayLow ? 'inventory-levels-bar__fill--low' : 'inventory-levels-bar__fill--green' }}" style="width: {{ $traysPct }}%"></div>
                     </div>
+                    @include('dashboard.inventory-trend', ['rating' => $inventoryRatings['trays'] ?? null])
                 </div>
             </div>
 
@@ -129,6 +139,7 @@
                     <div class="inventory-levels-bar">
                         <div class="inventory-levels-bar__fill {{ $vitaminLow ? 'inventory-levels-bar__fill--low' : 'inventory-levels-bar__fill--teal' }}" style="width: {{ $vitaminsPct }}%"></div>
                     </div>
+                    @include('dashboard.inventory-trend', ['rating' => $inventoryRatings['vitamins'] ?? null])
                 </div>
             </div>
         </div>

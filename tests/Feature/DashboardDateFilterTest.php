@@ -49,8 +49,8 @@ class DashboardDateFilterTest extends TestCase
             ->assertDontSee('data-period="today"', false)
             ->assertSee("Welcome back! Here's today's poultry farm overview.")
             ->assertSee('Total Eggs Today')
-            ->assertSee('id="trendView"', false)
-            ->assertSee('value="forecast" selected', false)
+            ->assertSee('My Activity')
+            ->assertDontSee('id="trendView"', false)
             ->assertSee('Inventory Levels')
             ->assertDontSee('Stock In');
 

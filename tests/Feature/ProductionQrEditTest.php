@@ -173,7 +173,16 @@ class ProductionQrEditTest extends TestCase
         ]);
 
         $this->actingAs($staff)
-            ->postJson(route('staff.scan.store'), ['qr_code' => 'QRL-B2-001'])
+            ->postJson(route('staff.scan.store'), [
+                'qr_code' => 'QRL-B2-001',
+            ])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->actingAs($staff)
+            ->postJson(route('staff.scan.commit'), [
+                'qr_code' => 'QRL-B2-001',
+            ])
             ->assertOk()
             ->assertJsonPath('success', true);
 

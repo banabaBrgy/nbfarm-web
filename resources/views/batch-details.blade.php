@@ -81,22 +81,15 @@
                 @if(\App\Models\User::routeRole() === 'staff')
                 <div class="d-flex gap-2">
 
-                    <form
-                    method="POST"
-                    action="{{ route(\App\Models\User::routeRole() . '.qr.generate') }}">
-
-                    @csrf
-                    <input type="hidden" name="batch_id" value="{{ $production->batch_id }}">
-
-                    <button class="btn btn-success">
+                    <a
+                    href="{{ route(\App\Models\User::routeRole() . '.qr.create', ['batch_id' => $production->batch_id, 'production_date' => \Illuminate\Support\Carbon::parse($production->production_date)->toDateString()]) }}"
+                    class="btn btn-success">
 
                     <i class="fas fa-plus-circle"></i>
 
                     Generate QR
 
-                    </button>
-
-                    </form>
+                    </a>
 
                     <a href="{{ route(\App\Models\User::routeRole() . '.production.scan') }}" class="btn btn-primary">
 

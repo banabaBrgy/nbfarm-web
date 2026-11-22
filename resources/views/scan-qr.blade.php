@@ -12,7 +12,7 @@
             </span>
             <div>
                 <h2>QR Code Scanner</h2>
-                <p>Scan the QR code attached to an egg stack.</p>
+                <p>Scan one size at a time. On Production, tap Review list to edit trays and eggs, then Confirm &amp; Save.</p>
             </div>
         </div>
 
@@ -40,7 +40,7 @@
 
             <p class="scanner-instruction">
                 <i class="fas fa-lightbulb"></i>
-                <span>Choose your camera, tap <strong>Start Camera</strong>, or upload a photo of the farm QR label.</span>
+                <span>Finish this size first. Then open Production, tap Review list, and Confirm &amp; Save.</span>
             </p>
         </section>
 
@@ -70,8 +70,12 @@
                             <td id="size"><span class="scan-value-muted">Not scanned</span></td>
                         </tr>
                         <tr>
-                            <th scope="row">Total eggs</th>
+                            <th scope="row">This scan</th>
                             <td id="eggs"><span class="scan-value-muted">Not scanned</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Pending review</th>
+                            <td id="reviewTotal"><span class="scan-value-muted">None</span></td>
                         </tr>
                         <tr>
                             <th scope="row">Status</th>
@@ -103,6 +107,10 @@
 <script>
 
 let scannerPaused = false;
+let lastCommittedCode = '';
+let lastCommittedAt = 0;
+const SCAN_DEBOUNCE_MS = 2000;
+const scanStoreUrl = "{{ $scanStoreUrl }}";
 
 function escapeScanHtml(value) {
     return String(value ?? '')
@@ -111,6 +119,106 @@ function escapeScanHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        || '{{ csrf_token() }}';
+}
+
+function countLabel(today) {
+    if (!today) {
+        return 'None';
+    }
+
+    return `${Number(today.scans || 0).toLocaleString('en-US')} stacks · ${Number(today.trays || 0).toLocaleString('en-US')} trays · ${Number(today.eggs || 0).toLocaleString('en-US')} eggs`;
+}
+
+function pendingReviewLabel(res) {
+    if (Array.isArray(res.groups) && res.groups.length) {
+        return countLabel({
+            scans: res.groups.reduce((n, group) => n + Number(group.scans || 0), 0),
+            trays: res.groups.reduce((n, group) => n + Number(group.trays || 0), 0),
+            eggs: res.groups.reduce((n, group) => n + Number(group.eggs || 0), 0)
+        });
+    }
+
+    return res.summary ? countLabel(res.summary) : 'None';
+}
+
+function muted(text) {
+    return `<span class="scan-value-muted">${escapeScanHtml(text)}</span>`;
+}
+
+function fillResult(res, statusHtml) {
+    document.getElementById('qrCode').innerHTML = res.qr_code
+        ? escapeScanHtml(res.qr_code)
+        : muted('Not scanned');
+    document.getElementById('batch').innerHTML = res.batch
+        ? escapeScanHtml(res.batch)
+        : muted('Not scanned');
+    document.getElementById('size').innerHTML = res.size
+        ? escapeScanHtml(res.size)
+        : muted('Not scanned');
+    document.getElementById('eggs').innerHTML = res.trays
+        ? `${Number(res.trays).toLocaleString('en-US')} trays · ${Number(res.eggs || 0).toLocaleString('en-US')} eggs`
+        : muted('Not scanned');
+    document.getElementById('reviewTotal').textContent = pendingReviewLabel(res);
+    document.getElementById('status').innerHTML = statusHtml;
+}
+
+function jsonRequest(url, method, body) {
+    const options = {
+        method,
+        headers: {
+            'X-CSRF-TOKEN': csrfToken(),
+            'Accept': 'application/json'
+        }
+    };
+
+    if (body !== undefined) {
+        options.headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+    }
+
+    return fetch(url, options).then((response) => response.json());
+}
+
+function resumeAfterDialog() {
+    scannerPaused = false;
+    updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
+    resumeScannerIfNeeded();
+}
+
+function showScanError(message) {
+    document.getElementById('status').innerHTML = `
+        <span class="scan-status-badge scan-status-badge--error">
+            <i class="fas fa-circle-exclamation"></i>
+            Scan failed
+        </span>
+    `;
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Scan Failed',
+        text: message || 'Scan failed.',
+        confirmButtonText: 'OK',
+        allowOutsideClick: false,
+        allowEscapeKey: false
+    }).then(() => {
+        resumeAfterDialog();
+    });
+}
+
+function toast(title) {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title,
+        timer: 1800,
+        showConfirmButton: false
+    });
 }
 
 function isCameraScanning() {
@@ -144,153 +252,56 @@ function resumeScannerIfNeeded() {
 }
 
 function onScanSuccess(decodedText) {
-
-    // Huwag mag-scan ulit habang may popup
     if (scannerPaused) {
         return;
     }
 
-    scannerPaused = true;
+    if (decodedText === lastCommittedCode && (Date.now() - lastCommittedAt) < SCAN_DEBOUNCE_MS) {
+        return;
+    }
 
+    scannerPaused = true;
     updateScannerStatus('processing');
     pauseScannerIfNeeded();
 
-    fetch("{{ $scanStoreUrl }}", {
+    jsonRequest(scanStoreUrl, 'POST', { qr_code: decodedText })
+        .then((res) => {
+            if (!res.success) {
+                showScanError(res.message);
+                return;
+            }
 
-        method: "POST",
+            lastCommittedCode = String(res.qr_code || decodedText);
+            lastCommittedAt = Date.now();
 
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-
-        body: JSON.stringify({
-            qr_code: decodedText
+            fillResult(res, `
+                <span class="scan-status-badge scan-status-badge--waiting">
+                    <i class="fas fa-list"></i>
+                    On review list
+                </span>
+            `);
+            toast(res.message || 'Added to the Production review list');
+            resumeAfterDialog();
         })
-
-    })
-
-    .then(response => response.json())
-
-    .then(res => {
-
-        if(res.success){
-            document.getElementById("qrCode").textContent = res.qr_code;
-            document.getElementById("batch").textContent = res.batch;
-            document.getElementById("size").textContent = res.size;
-            document.getElementById("eggs").textContent = res.eggs;
-            document.getElementById("status").innerHTML = `
-                <span class="scan-status-badge scan-status-badge--success">
-                    <i class="fas fa-check-circle"></i>
-                    Scan successful
-                </span>
-            `;
-
-            Swal.fire({
-
-                icon: 'success',
-
-                title: 'QR Successfully Scanned',
-
-                html: `
-                    <div style="font-size:16px">
-
-                        <strong>${escapeScanHtml(res.qr_code)}</strong><br><br>
-
-                        Batch :
-                        <strong>${escapeScanHtml(res.batch)}</strong><br>
-
-                        Egg Size :
-                        <strong>${escapeScanHtml(res.size)}</strong><br>
-
-                        Total Eggs :
-                        <strong>${escapeScanHtml(res.eggs)}</strong>
-
-                    </div>
-                `,
-
-                confirmButtonText: 'OK',
-
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                allowEnterKey: false
-
-            }).then(() => {
-
-                scannerPaused = false;
-
-                updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
-                resumeScannerIfNeeded();
-
-            });
-
-        }else{
-
-            document.getElementById("status").innerHTML = `
+        .catch((error) => {
+            console.log(error);
+            document.getElementById('status').innerHTML = `
                 <span class="scan-status-badge scan-status-badge--error">
-                    <i class="fas fa-circle-exclamation"></i>
-                    Scan failed
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Connection error
                 </span>
             `;
+
             Swal.fire({
-
-                icon:'error',
-
-                title:'Scan Failed',
-
-                text:res.message,
-
-                confirmButtonText:'OK',
-
-                allowOutsideClick:false,
-                allowEscapeKey:false
-
-                }).then(()=>{
-
-                scannerPaused = false;
-
-                updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
-                resumeScannerIfNeeded();
-
+                icon: 'error',
+                title: 'Server Error',
+                text: 'Something went wrong.',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false
+            }).then(() => {
+                resumeAfterDialog();
             });
-
-        }
-
-    })
-
-    .catch(error=>{
-
-        console.log(error);
-        document.getElementById("status").innerHTML = `
-            <span class="scan-status-badge scan-status-badge--error">
-                <i class="fas fa-triangle-exclamation"></i>
-                Connection error
-            </span>
-        `;
-
-        Swal.fire({
-
-            icon:'error',
-
-            title:'Server Error',
-
-            text:'Something went wrong.',
-
-            confirmButtonText:'OK',
-
-            allowOutsideClick:false
-
-        }).then(()=>{
-
-            scannerPaused = false;
-
-            updateScannerStatus(document.querySelector('#reader video') ? 'scanning' : 'ready');
-            resumeScannerIfNeeded();
-
         });
-
-    });
-
 }
 
 let html5QrcodeScanner = new Html5QrcodeScanner(

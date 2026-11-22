@@ -91,6 +91,13 @@
             'staff' => 'POULTRY STAFF',
         ];
 
+        $profilePhotos = [
+            'owner' => 'images/owner-profile.jpg',
+            'manager' => 'images/manager-profile.jpg',
+            'staff' => 'images/staff-profile.jpg',
+        ];
+        $profilePhoto = $profilePhotos[$role] ?? 'images/staff-profile.jpg';
+
         $menuItems = [
 
             [
@@ -178,9 +185,13 @@
     <aside class="sidebar" id="app-sidebar">
 
         <div class="profile">
-            <div class="profile-image" aria-hidden="true">
-                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                <span class="profile-status"></span>
+            <div class="profile-image">
+                <img
+                    src="{{ asset($profilePhoto) }}"
+                    alt="{{ auth()->user()->name ?? 'User' }}"
+                    width="44"
+                    height="44">
+                <span class="profile-status" aria-hidden="true"></span>
             </div>
             <div class="profile-meta">
                 <div class="profile-name" title="{{ auth()->user()->name ?? 'User' }}">

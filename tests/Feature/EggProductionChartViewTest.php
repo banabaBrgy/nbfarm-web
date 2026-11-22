@@ -52,21 +52,13 @@ class EggProductionChartViewTest extends TestCase
         $response->assertDontSee('"label":"Actual Production"', false);
     }
 
-    public function test_manager_and_staff_dashboards_use_the_same_dropdown(): void
+    public function test_manager_dashboard_uses_the_same_dropdown(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
-        $staff = User::factory()->create(['role' => 'staff']);
         $sevenDays = '["Nov 9","Nov 10","Nov 11","Nov 12","Nov 13","Nov 14","Nov 15"]';
 
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))
-            ->assertOk()
-            ->assertSee('id="trendView"', false)
-            ->assertSee('value="forecast" selected', false)
-            ->assertSee($sevenDays, false);
-
-        $this->actingAs($staff)
-            ->get(route('staff.dashboard'))
             ->assertOk()
             ->assertSee('id="trendView"', false)
             ->assertSee('value="forecast" selected', false)

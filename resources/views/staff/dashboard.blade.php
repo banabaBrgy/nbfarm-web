@@ -11,6 +11,7 @@
 
     @php
         $eggsChange = $eggsChange ?? 0;
+        $eggsChangeHasBase = $eggsChangeHasBase ?? false;
         $feedStock = $feedStock ?? 0;
         $feedMin = $feedMin ?? 0;
         $feedLow = $feedLow ?? false;
@@ -51,7 +52,10 @@
             <div class="stat-info">
                 <span class="stat-title">{{ $eggsTitle }}</span>
                 <h2>{{ number_format($eggsToday) }}</h2>
-                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">{{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% {{ $eggsChangeLabel }}</small>
+                @include('dashboard.stat-trend', [
+                    'change' => $eggsChange,
+                    'hasBase' => $eggsChangeHasBase,
+                ])
             </div>
         </div>
 
@@ -85,9 +89,7 @@
     </div>
 
     <div class="content-grid">
-        @include('dashboard.egg-production-chart-card', [
-            'trendAction' => route('staff.dashboard'),
-        ])
+        @include('dashboard.my-activity-panel')
 
         @include('dashboard.inventory-levels-panel')
     </div>
@@ -97,8 +99,3 @@
         :previous-forecast-summary="$previousForecastSummary ?? null" />
 
 @endsection
-
-@push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" crossorigin="anonymous"></script>
-    @include('dashboard.production-trend-script')
-@endpush

@@ -589,11 +589,12 @@
     border-collapse: collapse;
 }
 
-.qr-overview-col-code { width: 24%; }
-.qr-overview-col-batch { width: 14%; }
-.qr-overview-col-size { width: 20%; }
-.qr-overview-col-qty { width: 16%; }
-.qr-overview-col-status { width: 26%; }
+.qr-overview-col-code { width: 22%; }
+.qr-overview-col-batch { width: 12%; }
+.qr-overview-col-size { width: 18%; }
+.qr-overview-col-scans { width: 16%; }
+.qr-overview-col-trays { width: 16%; }
+.qr-overview-col-eggs { width: 16%; }
 
 .qr-overview-table th,
 .qr-overview-table td {

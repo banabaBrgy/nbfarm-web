@@ -3,7 +3,7 @@
     $rolePrefix = \App\Models\User::routeRole();
     $indexRoute = $rolePrefix . '.production';
     $scanRoute = $rolePrefix . '.production.scan';
-    $generateRoute = $rolePrefix . '.qr.generate';
+    $generateRoute = $rolePrefix . '.qr.create';
     $overviewRoute = $rolePrefix . '.qr.overview';
     $detailsRoute = $rolePrefix . '.production.details';
     $canManageQr = $rolePrefix === 'staff';
@@ -25,13 +25,10 @@
 
             {{-- STAFF QR ACTIONS --}}
             @if($canManageQr)
-                <form action="{{ route($generateRoute) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn-update">
-                        <i class="fas fa-qrcode"></i>
-                        Generate QR
-                    </button>
-                </form>
+                <a href="{{ route($generateRoute) }}" class="btn-update">
+                    <i class="fas fa-qrcode"></i>
+                    Generate QR
+                </a>
 
                 <a href="{{ route($scanRoute) }}" class="btn-update">
                     <i class="fas fa-camera"></i>
@@ -247,6 +244,10 @@
         </div>
 
     </div>
+
+    @if($canManageQr)
+        @include('production.review-list')
+    @endif
 
     {{-- FORECAST SUMMARY MODAL --}}
     <x-forecast-summary-modal

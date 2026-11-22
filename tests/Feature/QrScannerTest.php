@@ -3,24 +3,26 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class QrScannerTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_scan_page_uses_normalized_staff_routes(): void
     {
-        $user = new User;
-        $user->forceFill([
-            'username' => 'staff1',
-            'role' => 'poultry staff',
-        ]);
-        $user->id = 1;
+        $user = User::factory()->create(['role' => 'staff']);
 
         $this->actingAs($user)
             ->get(route('staff.production.scan'))
             ->assertOk()
             ->assertSee(route('staff.scan.store'), false)
-            ->assertSee(route('staff.production'), false);
+            ->assertSee(route('staff.production'), false)
+            ->assertSee('tap Review list to edit trays and eggs', false)
+            ->assertDontSee('id="productionReviewPanel"', false)
+            ->assertDontSee('id="productionReviewOpenBtn"', false)
+            ->assertDontSee('id="draft-title"', false);
     }
 
     public function test_owner_scan_store_route_is_registered(): void

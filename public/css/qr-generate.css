@@ -1,0 +1,576 @@
+/* Batch QR generate screen and single print label */
+
+.batch-qr-page {
+    padding: 4px 4px 28px;
+}
+
+.batch-label-page {
+    padding: 8px 4px 32px;
+}
+
+.batch-qr-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 14px 0 22px;
+}
+
+.batch-qr-mark {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--ui-green, #34853F);
+    color: #fff;
+    font-size: 22px;
+    box-shadow: 0 8px 16px rgba(52, 133, 63, 0.18);
+    flex-shrink: 0;
+}
+
+.batch-qr-heading h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #1a1a1a;
+}
+
+.batch-qr-heading h1::after {
+    content: "";
+    display: block;
+    width: 48px;
+    height: 4px;
+    margin-top: 8px;
+    border-radius: 999px;
+    background: var(--ui-green, #34853F);
+}
+
+.batch-qr-heading p {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.batch-qr-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 1.05fr) minmax(320px, 0.95fr);
+    gap: 22px;
+    align-items: stretch;
+}
+
+.batch-qr-preview,
+.batch-qr-form {
+    background: #fff;
+    border: 1px solid #e7f0ea;
+    border-radius: 22px;
+    box-shadow: 0 10px 28px rgba(22, 74, 49, 0.06);
+    overflow: hidden;
+}
+
+.batch-qr-preview {
+    display: flex;
+    flex-direction: column;
+}
+
+.batch-qr-preview-head {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 14px 18px;
+    background: var(--ui-green, #34853F);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.batch-qr-preview-head span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.batch-qr-preview-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    min-height: 380px;
+    padding: 28px 24px 26px;
+}
+
+.batch-qr-placeholder {
+    width: min(100%, 250px);
+    aspect-ratio: 1;
+    border: 1px dashed #d5e6da;
+    border-radius: 16px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #9ca3af;
+    font-weight: 700;
+}
+
+.batch-qr-placeholder i {
+    font-size: 36px;
+    color: #c5d4c8;
+}
+
+.batch-qr-image {
+    width: min(100%, 268px);
+    padding: 14px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.1);
+}
+
+.batch-qr-image svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.batch-qr-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.batch-qr-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 148px;
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+}
+
+.batch-qr-btn-ghost {
+    background: #fff;
+    color: var(--ui-green, #34853F);
+    border-color: #b7d7c2;
+}
+
+.batch-qr-btn-ghost:hover {
+    background: #f3faf5;
+    color: var(--ui-green-deep, #2d7d46);
+}
+
+.batch-qr-btn-solid,
+.batch-qr-generate {
+    background: var(--ui-green, #34853F);
+    color: #fff;
+    border-color: var(--ui-green, #34853F);
+}
+
+.batch-qr-btn-solid:hover,
+.batch-qr-generate:hover {
+    background: var(--ui-green-deep, #2d7d46);
+    color: #fff;
+}
+
+.batch-qr-btn:disabled,
+.batch-qr-generate:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.batch-qr-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 18px 16px;
+}
+
+.batch-qr-form-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2px 2px 0;
+    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.batch-qr-form-head i {
+    color: var(--ui-green, #34853F);
+}
+
+.batch-qr-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.batch-qr-field {
+    display: grid;
+    grid-template-columns: 34px 118px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 6px 10px;
+    border: 1px solid #e6eee8;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.batch-qr-field-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #eef8f1;
+    color: var(--ui-green, #34853F);
+    font-size: 14px;
+}
+
+.batch-qr-field label {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.batch-qr-field input,
+.batch-qr-field select {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 8px 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: right;
+}
+
+.batch-qr-field select {
+    appearance: none;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.4.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E") right 4px center / 11px no-repeat;
+    padding-right: 22px;
+}
+
+.batch-qr-field input:focus,
+.batch-qr-field select:focus {
+    outline: none;
+}
+
+.batch-qr-field:focus-within {
+    border-color: var(--ui-green, #34853F);
+    box-shadow: 0 0 0 3px rgba(52, 133, 63, 0.12);
+}
+
+.batch-qr-date {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+    min-height: 36px;
+}
+
+.batch-qr-date input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.batch-qr-date-face {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.batch-qr-date > i {
+    color: #6b7280;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.batch-qr-field input[readonly] {
+    width: 9.5em;
+    justify-self: end;
+    text-align: center;
+    background: #eef2f0;
+    border-radius: 10px;
+    color: #6b7280;
+    cursor: default;
+    padding: 8px 12px;
+}
+
+.batch-qr-error {
+    margin: -4px 4px 0;
+    color: #b42318;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.batch-qr-generate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: auto;
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.batch-label-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.batch-label-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.batch-label-toolbar {
+    width: min(100%, 440px);
+}
+
+.batch-qr-copies {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 18px 12px;
+    padding: 10px 12px;
+    border: 1px solid #e7f0ea;
+    border-radius: 12px;
+    background: #f8fbf9;
+}
+
+.batch-qr-copies label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #216e4b;
+}
+
+.batch-qr-copies input {
+    width: 5.5em;
+    border: 1px solid #d8e2da;
+    border-radius: 10px;
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.batch-qr-copies input:disabled {
+    background: #eef2f0;
+    color: #9ca3af;
+}
+
+.batch-label {
+    width: min(100%, 440px);
+    background: #fff;
+    border: 1px solid #d8e2da;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.batch-label + .batch-label {
+    margin-top: 18px;
+}
+
+.batch-label-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #2f8158;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    padding: 12px 14px;
+}
+
+.batch-label-body {
+    padding: 18px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.batch-label-image {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #eef2ef;
+    border-radius: 12px;
+    background: #fafcfb;
+}
+
+.batch-label-image svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.batch-label-code {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #eef6f1;
+    color: #216e4b;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    word-break: break-all;
+}
+
+.batch-label-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    margin: 16px 0 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.batch-label-meta div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: #f8fbf9;
+}
+
+.batch-label-meta dt {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #9ca3af;
+}
+
+.batch-label-meta dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.batch-label-meta-wide {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 800px) {
+    .batch-qr-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .batch-qr-preview,
+    .batch-qr-form {
+        min-height: 0;
+    }
+
+    .batch-qr-field input[readonly] {
+        width: 8.6em;
+    }
+
+    .batch-qr-field {
+        grid-template-columns: 34px minmax(88px, 110px) minmax(0, 1fr);
+        gap: 6px;
+        padding: 6px 8px;
+    }
+
+    .batch-qr-field label {
+        font-size: 13px;
+    }
+
+    .batch-label,
+    .batch-label-toolbar {
+        width: min(100%, 360px);
+    }
+}
+
+@media print {
+    @page {
+        margin: 12mm;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    .mobile-header,
+    .sidebar,
+    .sidebar-backdrop,
+    .footer,
+    .no-print,
+    .batch-label-toolbar {
+        display: none !important;
+    }
+
+    .wrapper > .main-content,
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .batch-label-page {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .batch-label {
+        box-shadow: none;
+        width: 92mm;
+        max-width: 100%;
+        page-break-after: always;
+        break-after: page;
+    }
+
+    .batch-label:last-of-type {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    .batch-label + .batch-label {
+        margin-top: 0;
+    }
+
+    .batch-label-image {
+        width: 100%;
+        padding: 0;
+    }
+}

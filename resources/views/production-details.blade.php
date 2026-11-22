@@ -94,7 +94,8 @@
                                     data-size="{{ $transaction->qrRecord?->egg_size ?? '' }}"
                                     data-update-url="{{ route(\App\Models\User::routeRole() . '.qr.update', ['id' => $transaction->id]) }}"
                                     data-production-id="{{ $transaction->production_id }}"
-                                    data-eggs="{{ $transaction->total_eggs }}">
+                                    data-eggs="{{ $transaction->total_eggs }}"
+                                    data-max="{{ $transaction->qrRecord ? $transaction->qrRecord->eggCount() : 300 }}">
 
                                     <i class="fas fa-pen" aria-hidden="true"></i>
 
@@ -211,7 +212,6 @@
                         type="number"
                         id="total_eggs"
                         min="0"
-                        max="300"
                         class="form-control">
 
                 </div>
@@ -282,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
             transactionInput.dataset.productionId = this.dataset.productionId || '';
             document.getElementById('qr_code').value = this.dataset.code || '';
             document.getElementById('egg_size').value = this.dataset.size || '';
+            totalEggsInput.max = this.dataset.max || '300';
             totalEggsInput.value = this.dataset.eggs || '';
 
             if (!modal) {

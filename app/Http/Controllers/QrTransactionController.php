@@ -7,6 +7,7 @@ use App\Models\QrTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class QrTransactionController extends Controller
 {
@@ -17,13 +18,22 @@ class QrTransactionController extends Controller
         abort_unless(User::routeRole($user->role) === 'staff', 403);
 
         $validated = $request->validate([
-            'total_eggs' => 'required|integer|min:0|max:300',
+            'total_eggs' => 'required|integer|min:0',
             'production_id' => 'required|integer',
         ]);
 
         $transaction = QrTransaction::query()
+            ->with('qrRecord')
             ->where('production_id', $validated['production_id'])
             ->findOrFail($id);
+
+        $maxEggs = $transaction->qrRecord?->eggCount() ?? (10 * Production::EGGS_PER_TRAY);
+
+        if ((int) $validated['total_eggs'] > $maxEggs) {
+            throw ValidationException::withMessages([
+                'total_eggs' => 'The total eggs must not be greater than '.$maxEggs.'.',
+            ]);
+        }
 
         if (! $transaction->isLastRecordedTray()) {
             return response()->json([

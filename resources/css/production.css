@@ -541,6 +541,273 @@
     font-size:13px;
 }
 
+.production-review-launch{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:18px;
+    padding:16px 18px;
+    background:#FFFFFF;
+    border:1px solid #E6ECE8;
+    border-radius:16px;
+    box-shadow:0 4px 14px rgba(0,0,0,.04);
+}
+
+.production-review-launch p{
+    margin:0;
+    color:#6b7280;
+    font-size:14px;
+    line-height:1.45;
+}
+
+.production-review-open{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:0;
+    border-radius:10px;
+    padding:10px 16px;
+    color:#ffffff;
+    background:#2f8158;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.production-review-open:hover{
+    background:#27734d;
+}
+
+.production-review-open-count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    border-radius:999px;
+    background:rgba(255,255,255,.2);
+    font-size:12px;
+}
+
+#productionReviewModal .modal-dialog,
+#productionReviewModal.fade .modal-dialog,
+#productionReviewModal.show .modal-dialog{
+    position:fixed;
+    top:50%;
+    left:50%;
+    width:min(920px, calc(100vw - 32px));
+    max-width:calc(100vw - 32px);
+    max-height:calc(100vh - 32px);
+    margin:0;
+    min-height:0;
+    transform:translate(-50%, -50%);
+}
+
+#productionReviewModal .modal-content{
+    max-height:calc(100vh - 32px);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+#productionReviewModal .modal-body{
+    overflow:auto;
+    min-height:0;
+    padding:16px 22px;
+}
+
+.production-review-panel{
+    background:#FFFFFF;
+    border:1px solid #E6ECE8;
+    border-radius:16px;
+    box-shadow:0 18px 40px rgba(15, 23, 42, .18);
+}
+
+.production-review-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:0;
+    padding:18px 22px 14px;
+    border-bottom:1px solid #E6ECE8;
+}
+
+.production-review-header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.production-review-toolbar h2,
+#productionReviewModal .modal-title{
+    margin:0 0 4px;
+    color:#ffffff;
+    font-size:20px;
+    font-weight:700;
+}
+
+.production-review-toolbar p{
+    margin:0;
+    color:rgba(255,255,255,.88);
+    font-size:14px;
+}
+
+.production-review-badge{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    padding:6px 10px;
+    color:#8a6500;
+    background:#fff7d6;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+}
+
+.production-review-note{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:14px;
+    padding:12px 14px;
+    border:1px solid #f0d48a;
+    border-radius:12px;
+    color:#7a5b00;
+    background:#fff8e5;
+}
+
+.production-review-note i{
+    margin-top:2px;
+    color:#b8860b;
+}
+
+.production-review-note p{
+    margin:0;
+    font-size:14px;
+    font-weight:600;
+    line-height:1.5;
+}
+
+.production-review-scroll{
+    overflow-x:auto;
+    border:1px solid #E3EEE7;
+}
+
+.production-review-table{
+    margin-bottom:0;
+    width:100%;
+    min-width:640px;
+}
+
+.production-review-table th,
+.production-review-table td{
+    padding:12px 10px;
+    font-size:14px;
+}
+
+.production-review-row-actions{
+    display:flex;
+    gap:8px;
+}
+
+.production-review-edit,
+.production-review-delete{
+    border:1px solid #dbe4de;
+    border-radius:8px;
+    padding:6px 10px;
+    background:#ffffff;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.production-review-edit{
+    color:#2f8158;
+}
+
+.production-review-delete{
+    color:#b42318;
+}
+
+.production-review-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    padding:16px 22px 18px;
+    border-top:1px solid #E6ECE8;
+}
+
+.production-review-totals{
+    margin:0;
+    color:#1f2937;
+    font-size:15px;
+    font-weight:700;
+}
+
+.production-review-buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.production-review-add,
+.production-review-save{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border-radius:10px;
+    padding:10px 16px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.production-review-add{
+    border:1px solid #dbe4de;
+    color:#2f8158;
+    background:#ffffff;
+}
+
+.production-review-save{
+    border:0;
+    color:#ffffff;
+    background:#2f8158;
+}
+
+.production-review-add:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+.production-review-edit-locked{
+    margin:0 0 12px;
+    color:#6b7280;
+    font-size:13px;
+    line-height:1.45;
+}
+
+.production-review-edit-label{
+    display:block;
+    margin:8px 0 0;
+    color:#1f2937;
+    font-size:13px;
+    font-weight:700;
+    text-align:left;
+}
+
+.swal2-html-container .production-review-edit-input{
+    margin:6px 0 0;
+    width:100%;
+}
+
 /* Beat shared layout overflow rules so the toolbar does not scroll away. */
 .wrapper > .main-content .production-page .table-container,
 .wrapper > .main-content .production-page .production-table-panel{
@@ -554,6 +821,16 @@
 }
 
 @media (max-width:768px){
+    .production-review-launch{
+        align-items:stretch;
+    }
+
+    .production-review-open,
+    .production-review-footer{
+        width:100%;
+        justify-content:center;
+    }
+
     .production-page .table-container,
     .production-page .production-table-panel{
         padding:16px;

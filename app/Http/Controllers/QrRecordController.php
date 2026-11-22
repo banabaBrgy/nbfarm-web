@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Production;
 use App\Models\QrRecord;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\Rule;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class QrRecordController extends Controller
 {
@@ -20,10 +23,7 @@ class QrRecordController extends Controller
 
     public function overview(Request $request)
     {
-        abort_unless(
-    in_array(User::routeRole(), ['staff', 'manager'], true),
-    403
-);
+        abort_unless(in_array(User::routeRole(), ['staff', 'manager'], true), 403);
 
         $eggSize = $this->resolvedEggSize($request->input('egg_size'));
         $batchId = $this->resolvedBatchId($request->input('batch_id'));
@@ -34,11 +34,9 @@ class QrRecordController extends Controller
             ->pluck('production_id');
 
         $query = QrRecord::query()
+            ->sizeCodes()
             ->with(['transactions' => function ($relation) use ($todayProductionIds) {
-                $relation
-                    ->whereIn('production_id', $todayProductionIds)
-                    ->orderByDesc('scanned_at')
-                    ->orderByDesc('id');
+                $relation->whereIn('production_id', $todayProductionIds);
             }])
             ->whereIn('batch_id', QrRecord::BATCH_IDS)
             ->whereIn('egg_size', array_keys(QrRecord::SIZE_PREFIXES));
@@ -58,17 +56,16 @@ class QrRecordController extends Controller
             ->orderBy('qr_code')
             ->get()
             ->map(function (QrRecord $record) {
-                $latest = $record->transactions->first();
-                $scanned = $latest !== null;
+                $eggs = (int) $record->transactions->sum('total_eggs');
+                $perTray = max(1, (int) $record->eggs_per_tray);
 
                 return [
                     'qr_code' => (string) $record->qr_code,
                     'batch_id' => (int) $record->batch_id,
                     'egg_size' => (string) $record->egg_size,
-                    'quantity' => $scanned
-                        ? (int) $latest->total_eggs
-                        : (int) $record->tray_count * (int) $record->eggs_per_tray,
-                    'status' => $scanned ? 'Scanned' : 'Available',
+                    'scans' => $record->transactions->count(),
+                    'trays' => intdiv($eggs, $perTray),
+                    'eggs' => $eggs,
                 ];
             })
             ->values();
@@ -80,8 +77,9 @@ class QrRecordController extends Controller
                     'qr_code',
                     'batch_id',
                     'egg_size',
-                    'quantity',
-                    'status',
+                    'scans',
+                    'trays',
+                    'eggs',
                 ] as $field) {
                     if (mb_stripos((string) $row[$field], $search) !== false) {
                         return true;
@@ -93,7 +91,7 @@ class QrRecordController extends Controller
         }
 
         // Paginate the filtered results.
-        $perPage = 5;
+        $perPage = 12;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
 
         $rows = new LengthAwarePaginator(
@@ -149,31 +147,100 @@ class QrRecordController extends Controller
         ));
     }
 
+    public function create(Request $request)
+    {
+        $this->ensureStaff();
+
+        $record = $request->filled('record')
+            ? QrRecord::query()->find($request->integer('record'))
+            : null;
+
+        $copies = max(1, min(50, $request->integer('copies', 1)));
+
+        return view('qr.generate', [
+            'batches' => QrRecord::BATCH_IDS,
+            'sizes' => array_keys(QrRecord::SIZE_PREFIXES),
+            'eggsPerTray' => Production::EGGS_PER_TRAY,
+            'record' => $record,
+            'batchId' => $record?->batch_id ?? $this->resolvedBatchId($request->input('batch_id')) ?? QrRecord::BATCH_IDS[0],
+            'trays' => $record?->tray_count ?? (is_numeric($request->input('trays')) ? (int) $request->input('trays') : 10),
+            'eggSize' => $record?->egg_size ?? $this->resolvedEggSize($request->input('egg_size')) ?? 'Small',
+            'copies' => $copies,
+        ]);
+    }
+
     public function generate(Request $request)
     {
-        abort_unless(User::routeRole() === 'staff', 403);
+        $this->ensureStaff();
 
-        $batchId = $request->filled('batch_id') ? (int) $request->batch_id : null;
-        $batches = $batchId ? [$batchId] : QrRecord::BATCH_IDS;
+        $data = $request->validate([
+            'batch_id' => ['required', 'integer', Rule::in(QrRecord::BATCH_IDS)],
+            'trays' => ['required', 'integer', 'min:1', 'max:999'],
+            'egg_size' => ['required', 'string', Rule::in(array_keys(QrRecord::SIZE_PREFIXES))],
+        ]);
 
-        $today = Production::whereDate('production_date', today())
-            ->whereIn('batch_id', $batches)
-            ->get()
-            ->keyBy('batch_id');
+        $batchId = (int) $data['batch_id'];
+        $code = QrRecord::sizeCode($batchId, $data['egg_size']);
+        $existed = QrRecord::query()->where('qr_code', $code)->exists();
 
-        foreach ($batches as $id) {
-            QrRecord::ensurePrintedCodes(
-                $id,
-                $today->get($id)?->production_id
-            );
-        }
+        $record = QrRecord::issueSizeCode(
+            $batchId,
+            $data['egg_size'],
+            (int) $data['trays']
+        );
 
-        $role = User::routeRole();
-        $count = count($batches) * count(QrRecord::SIZE_PREFIXES) * 10;
+        $message = $existed
+            ? 'Batch '.$batchId.' '.$data['egg_size'].' already uses '.$record->qr_code.'. Print copies for every '.$record->tray_count.'-tray stack.'
+            : 'QR code '.$record->qr_code.' is ready. Print copies and scan this same code on every matching stack.';
 
         return redirect()
-            ->route($role . '.qr.print')
-            ->with('success', $count.' QR codes ready (001–010 per size).');
+            ->route(User::routeRole().'.qr.create', ['record' => $record->id])
+            ->with('success', $message);
+    }
+
+    public function download(QrRecord $record)
+    {
+        $this->ensureStaff();
+
+        $svg = (string) QrCode::format('svg')
+            ->size(640)
+            ->margin(2)
+            ->generate($record->qr_code);
+
+        return response($svg, 200, [
+            'Content-Type' => 'image/svg+xml; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$record->qr_code.'.svg"',
+        ]);
+    }
+
+    public function label(QrRecord $record, Request $request)
+    {
+        $this->ensureStaff();
+
+        $copies = max(1, min(50, $request->integer('copies', 1)));
+
+        return view('qr.label', [
+            'record' => $record,
+            'copies' => $copies,
+        ]);
+    }
+
+    private function ensureStaff(): void
+    {
+        abort_unless(User::routeRole() === 'staff', 403);
+    }
+
+    private function dateInput(mixed $value): ?string
+    {
+        if (! is_string($value) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private function resolvedEggSize(mixed $eggSize): ?string

@@ -48,6 +48,13 @@ class HistoricalInventory
             ->sum('min_level');
     }
 
+    public function firstNamedMin(string $itemName): float
+    {
+        $item = InventoryItem::query()->where('item_name', $itemName)->first();
+
+        return (float) ($item?->min_level ?? 0);
+    }
+
     public function lowStockCount(Carbon $asOf, bool $useCurrent): int
     {
         if ($useCurrent) {

@@ -13,6 +13,14 @@
         $role = auth()->user()->role;
         $eggsToday = $eggsToday ?? 0;
         $eggsChange = $eggsChange ?? 0;
+        $eggsChangeHasBase = $eggsChangeHasBase ?? false;
+        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
+        $dispatchChange = $dispatchChange ?? 0;
+        $dispatchChangeHasBase = $dispatchChangeHasBase ?? false;
+        $dispatchChangeLabel = $dispatchChangeLabel ?? 'vs yesterday';
+        $revenueChange = $revenueChange ?? 0;
+        $revenueChangeHasBase = $revenueChangeHasBase ?? false;
+        $revenueChangeLabel = $revenueChangeLabel ?? 'vs yesterday';
         $feedStock = $feedStock ?? 0;
         $feedMin = $feedMin ?? 0;
         $feedLow = $feedLow ?? false;
@@ -28,7 +36,6 @@
         $predictedEggs = $predictedEggs ?? 0;
         $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
         $eggsTitle = $eggsTitle ?? 'Total Eggs Today';
-        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
         $predictedSubtitle = $predictedSubtitle ?? 'Next-day forecast · tap for sizes';
         $revenueTitle = $revenueTitle ?? 'Revenue Today';
         $revenueSubtitle = $revenueSubtitle ?? "Today's Income";
@@ -66,9 +73,10 @@
 
                 <h2>{{ number_format($eggsToday) }}</h2>
 
-                <small class="{{ $eggsChange >= 0 ? 'stat-trend-up' : 'stat-trend-down' }}">
-                    {{ $eggsChange >= 0 ? '+' : '-' }}{{ abs($eggsChange) }}% {{ $eggsChangeLabel }}
-                </small>
+                @include('dashboard.stat-trend', [
+                    'change' => $eggsChange,
+                    'hasBase' => $eggsChangeHasBase,
+                ])
             </div>
         </div>
 
@@ -103,7 +111,13 @@
 
                     <h2>{{ number_format($dispatchedTrays) }}</h2>
 
-                    <small>{{ $pendingDeliveries }} Pending</small>
+                    <div class="stat-meta">
+                        @include('dashboard.stat-trend', [
+                            'change' => $dispatchChange,
+                            'hasBase' => $dispatchChangeHasBase,
+                        ])
+                        <small>{{ $pendingDeliveries }} Pending</small>
+                    </div>
                 </div>
             </div>
 
@@ -118,7 +132,11 @@
 
                     <h2>₱{{ number_format($revenueToday, 0) }}</h2>
 
-                    <small>{{ $revenueSubtitle }}</small>
+                    @include('dashboard.stat-trend', [
+                        'change' => $revenueChange,
+                        'hasBase' => $revenueChangeHasBase,
+                        'empty' => $revenueSubtitle,
+                    ])
                 </div>
             </div>
 

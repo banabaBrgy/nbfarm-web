@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Production;
-use App\Models\QrRecord;
-use App\Models\QrTransaction;
+use App\Exceptions\QrScanRejected;
 use App\Models\User;
 use App\Services\DailyInventory;
-use Carbon\Carbon;
+use App\Services\QrScanRecorder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class QrScannerController extends Controller
@@ -19,132 +18,134 @@ class QrScannerController extends Controller
         $routeRole = User::routeRole();
 
         return view('scan-qr', [
-            'scanStoreUrl' => route($routeRole . '.scan.store'),
-            'productionUrl' => route($routeRole . '.production'),
+            'scanStoreUrl' => route($routeRole.'.scan.store'),
+            'productionUrl' => route($routeRole.'.production'),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        abort_unless(User::routeRole() === 'staff', 403);
-
-        app(DailyInventory::class)->applyForToday();
+        $this->ensureStaff();
 
         $request->validate([
-            'qr_code' => 'required'
+            'qr_code' => 'required|string|max:80',
         ]);
 
-        $qrCode = trim($request->qr_code);
+        return $this->jsonResult(
+            fn (QrScanRecorder $recorder) => $recorder->stage(
+                trim($request->qr_code),
+                $request->user()
+            )
+        );
+    }
 
-        /*
-        ---------------------------------------
-        Hanapin ang QR Record
-        ---------------------------------------
-        */
+    public function drafts(Request $request): JsonResponse
+    {
+        $this->ensureStaff();
 
-        $qr = QrRecord::where('qr_code', $qrCode)->first();
+        $qrCode = trim((string) $request->query('qr_code', ''));
 
-        if (!$qr) {
-            return response()->json([
-                'success' => false,
-                'message' => 'QR Code not found.'
-            ]);
-        }
+        return response()->json(
+            app(QrScanRecorder::class)->listing($qrCode !== '' ? $qrCode : null)
+        );
+    }
 
-        if ($qr->egg_size === 'Cracked' || str_starts_with($qr->qr_code, 'QRC-')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cracked QR codes are no longer used.',
-            ]);
-        }
+    public function add(Request $request): JsonResponse
+    {
+        $this->ensureStaff();
 
-        /*
-        ---------------------------------------
-        Hanapin ang Production ngayong araw
-        ---------------------------------------
-        */
-
-        $today = Carbon::today();
-
-        $batchId = (int) ($qr->batch_id ?: 1);
-
-        $production = Production::whereDate('production_date', $today)
-            ->where('batch_id', $batchId)
-            ->first();
-
-        /*
-        ---------------------------------------
-        Kapag wala pa gumawa
-        ---------------------------------------
-        */
-
-        if (!$production) {
-
-            $production = Production::create([
-                'production_date' => $today,
-                'batch_id' => $batchId,
-                'small_eggs' => 0,
-                'medium_eggs' => 0,
-                'large_eggs' => 0,
-                'extra_large_eggs' => 0,
-                'cracked_eggs' => 0,
-                'eggs_produced' => 0
-            ]);
-        }
-
-        /*
-        ---------------------------------------
-        Duplicate Protection
-        ---------------------------------------
-        */
-
-        $exist = QrTransaction::where('production_id', $production->production_id)
-            ->where('qr_record_id', $qr->id)
-            ->first();
-
-        if ($exist) {
-            return response()->json([
-                'success' => false,
-                'message' => 'QR already scanned.'
-            ]);
-        }
-
-        /*
-        ---------------------------------------
-        Save Transaction
-        ---------------------------------------
-        */
-
-        QrTransaction::create([
-            'production_id' => $production->production_id,
-            'qr_record_id' => $qr->id,
-            'total_eggs' => $qr->tray_count * $qr->eggs_per_tray,
-            'status' => 'Scanned',
-            'scanned_by' => auth()->id(),
-            'scanned_at' => now()
+        $request->validate([
+            'qr_code' => 'required|string|max:80',
         ]);
-        /*
-        ---------------------------------------
-        Recompute Production
-        (tray stock: eggs ÷ 30, via ProductionObserver)
-        ---------------------------------------
-        */
 
-        $production->recalculateEggTotals();
+        return $this->jsonResult(
+            fn (QrScanRecorder $recorder) => $recorder->addStack(
+                trim($request->qr_code),
+                $request->user()
+            )
+        );
+    }
 
-        /*
-        ---------------------------------------
-        Return Result
-        ---------------------------------------
-        */
+    public function update(Request $request, int $draft): JsonResponse
+    {
+        $this->ensureStaff();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'QR scanned successfully.',
-            'qr_code' => $qr->qr_code,
-            'batch' => $qr->batch_id,
-            'size' => $qr->egg_size,
-            'eggs' => $qr->tray_count * $qr->eggs_per_tray,
+        $request->validate([
+            'trays' => 'required|integer|min:1|max:999',
+            'eggs' => 'nullable|integer|min:1|max:99999',
         ]);
+
+        return $this->jsonResult(
+            fn (QrScanRecorder $recorder) => $recorder->updateDraft(
+                $draft,
+                $request->integer('trays'),
+                $request->user(),
+                $request->filled('eggs') ? $request->integer('eggs') : null
+            )
+        );
+    }
+
+    public function destroy(Request $request, int $draft): JsonResponse
+    {
+        $this->ensureStaff();
+
+        return $this->jsonResult(
+            fn (QrScanRecorder $recorder) => $recorder->deleteDraft(
+                $draft,
+                $request->user()
+            )
+        );
+    }
+
+    public function commit(Request $request): JsonResponse
+    {
+        $this->ensureStaff();
+
+        $request->validate([
+            'qr_code' => 'nullable|string|max:80',
+            'harvest_date' => 'nullable|date',
+        ]);
+
+        $qrCode = trim((string) $request->input('qr_code', ''));
+
+        try {
+            app(DailyInventory::class)->applyForToday();
+            $recorder = app(QrScanRecorder::class);
+
+            if ($qrCode !== '') {
+                return response()->json(
+                    $recorder->commit($qrCode, $request->user())
+                );
+            }
+
+            return response()->json(
+                $recorder->commitAll(
+                    $request->input('harvest_date'),
+                    $request->user()
+                )
+            );
+        } catch (QrScanRejected $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function ensureStaff(): void
+    {
+        abort_unless(User::routeRole() === 'staff', 403);
+    }
+
+    private function jsonResult(callable $callback): JsonResponse
+    {
+        try {
+            return response()->json($callback(app(QrScanRecorder::class)));
+        } catch (QrScanRejected $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 }

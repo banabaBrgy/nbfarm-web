@@ -134,6 +134,23 @@ Route::prefix('manager')
         Route::post('/scan/store', [QrScannerController::class, 'store'])
             ->name('scan.store');
 
+        Route::get('/scan/drafts', [QrScannerController::class, 'drafts'])
+            ->name('scan.drafts');
+
+        Route::post('/scan/drafts', [QrScannerController::class, 'add'])
+            ->name('scan.drafts.add');
+
+        Route::patch('/scan/drafts/{draft}', [QrScannerController::class, 'update'])
+            ->whereNumber('draft')
+            ->name('scan.drafts.update');
+
+        Route::delete('/scan/drafts/{draft}', [QrScannerController::class, 'destroy'])
+            ->whereNumber('draft')
+            ->name('scan.drafts.destroy');
+
+        Route::post('/scan/commit', [QrScannerController::class, 'commit'])
+            ->name('scan.commit');
+
         // QR Records
         Route::post('/qr/generate', [QrRecordController::class, 'generate'])
             ->name('qr.generate');
@@ -193,6 +210,11 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::get('/production/scan-qr', [QrScannerController::class, 'index'])->name('production.scan');
 
     Route::post('/scan/store', [QrScannerController::class, 'store'])->name('scan.store');
+    Route::get('/scan/drafts', [QrScannerController::class, 'drafts'])->name('scan.drafts');
+    Route::post('/scan/drafts', [QrScannerController::class, 'add'])->name('scan.drafts.add');
+    Route::patch('/scan/drafts/{draft}', [QrScannerController::class, 'update'])->whereNumber('draft')->name('scan.drafts.update');
+    Route::delete('/scan/drafts/{draft}', [QrScannerController::class, 'destroy'])->whereNumber('draft')->name('scan.drafts.destroy');
+    Route::post('/scan/commit', [QrScannerController::class, 'commit'])->name('scan.commit');
 
     Route::post('/qr/generate', [QrRecordController::class, 'generate'])->name('qr.generate');
     Route::get('/qr/list', [QrRecordController::class, 'index'])->name('qr.list');
@@ -270,12 +292,40 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
     Route::post('/scan/store', [QrScannerController::class, 'store'])
         ->name('scan.store');
 
-    // QR Records
-    Route::post('/qr/generate', [QrRecordController::class, 'generate'])
-        ->name('qr.generate');
+    Route::get('/scan/drafts', [QrScannerController::class, 'drafts'])
+        ->name('scan.drafts');
 
-    Route::get('/qr/overview', [QrRecordController::class, 'overview'])
-        ->name('qr.overview');
+    Route::post('/scan/drafts', [QrScannerController::class, 'add'])
+        ->name('scan.drafts.add');
+
+    Route::patch('/scan/drafts/{draft}', [QrScannerController::class, 'update'])
+        ->whereNumber('draft')
+        ->name('scan.drafts.update');
+
+    Route::delete('/scan/drafts/{draft}', [QrScannerController::class, 'destroy'])
+        ->whereNumber('draft')
+        ->name('scan.drafts.destroy');
+
+    Route::post('/scan/commit', [QrScannerController::class, 'commit'])
+        ->name('scan.commit');
+
+        // QR Records
+        Route::get('/qr/generate', [QrRecordController::class, 'create'])
+            ->name('qr.create');
+
+        Route::post('/qr/generate', [QrRecordController::class, 'generate'])
+            ->name('qr.generate');
+
+        Route::get('/qr/{record}/download', [QrRecordController::class, 'download'])
+            ->whereNumber('record')
+            ->name('qr.download');
+
+        Route::get('/qr/{record}/label', [QrRecordController::class, 'label'])
+            ->whereNumber('record')
+            ->name('qr.label');
+
+        Route::get('/qr/overview', [QrRecordController::class, 'overview'])
+            ->name('qr.overview');
 
     Route::get('/qr/list', [QrRecordController::class, 'index'])
         ->name('qr.list');

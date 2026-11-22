@@ -33,6 +33,9 @@ class HistoricalInventoryTest extends TestCase
         $this->assertSame(100.0, $inventory->namedStock('Feeds', Carbon::parse('2026-11-08'), true));
         $this->assertSame(40.0, $inventory->namedStock('Feeds', Carbon::parse('2026-11-01'), false));
         $this->assertSame(30.0, $inventory->namedStock('Feeds', Carbon::parse('2026-11-05'), false));
+        $this->assertSame(20.0, $inventory->namedMin('Feeds'));
+        $this->assertSame(20.0, $inventory->firstNamedMin('Feeds'));
+        $this->assertSame(0.0, $inventory->firstNamedMin('Egg Trays'));
 
         $range = $inventory->movements(Carbon::parse('2026-11-01'), Carbon::parse('2026-11-05'));
         $feeds = collect($range)->firstWhere('name', 'Feeds');

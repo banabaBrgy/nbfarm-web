@@ -236,6 +236,40 @@ textarea,
     background: var(--nb-day-green-hover);
 }
 
+.my-activity-head-icon,
+.my-activity-filter,
+.my-activity-item__icon {
+    color: var(--nb-day-green);
+}
+
+.my-activity-filter {
+    background: var(--nb-day-green-soft);
+}
+
+.my-activity-filter:hover {
+    background: #dceee3;
+    color: var(--nb-day-green-hover);
+}
+
+.my-activity-filter.is-active,
+.my-activity-filter.is-active:hover {
+    background: var(--nb-day-green);
+    color: #fff;
+}
+
+.my-activity-filter.is-active:hover {
+    background: var(--nb-day-green-hover);
+}
+
+.my-activity-filter:focus-visible,
+.my-activity-item__link:focus-visible {
+    outline-color: var(--nb-day-green);
+}
+
+.my-activity-item__icon {
+    background: var(--nb-day-green-soft);
+}
+
 .dispatch-page .btn-new,
 .reports-page .rpt-btn-generate,
 .dispatch-modal .modal-header,
