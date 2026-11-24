@@ -47,9 +47,11 @@ class DashboardKpiTest extends TestCase
             ->assertOk()
             ->assertDontSee('Total Egg Production')
             ->assertDontSee('Available Inventory')
-            ->assertDontSee('Total Dispatch')
             ->assertDontSee('Total Revenue')
-            ->assertSee('Total Eggs Today');
+            ->assertSee('Total Eggs Produced')
+            ->assertSee('Eggs Stock')
+            ->assertSee('Total Dispatch')
+            ->assertSee('>Revenue<', false);
     }
 
     private function harvest(string $date, int $largeEggs, int $crackedEggs): void

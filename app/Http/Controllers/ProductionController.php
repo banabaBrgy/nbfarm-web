@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Forecast;
 use App\Models\Production;
 use App\Models\QrTransaction;
-use App\Models\User;
 use App\Services\Forecasting\GenerateEggForecast;
-use App\Services\QrScanRecorder;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -58,9 +56,6 @@ class ProductionController extends Controller
 
         $selectedDate = $date;
         $viewType = $view;
-        $reviewState = User::routeRole() === 'staff'
-            ? app(QrScanRecorder::class)->listingForDate($date)
-            : ['drafts' => []];
 
         $routeName = $request->route()->getName();
         $role = explode('.', $routeName)[0];
@@ -74,8 +69,7 @@ class ProductionController extends Controller
             'forecastHistory',
             'qrTransactions',
             'selectedDate',
-            'viewType',
-            'reviewState'
+            'viewType'
         ));
     }
 }

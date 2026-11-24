@@ -15,15 +15,6 @@
         $role = auth()->user()->role;
 
         $eggsToday = $eggsToday ?? 0;
-        $eggsChange = $eggsChange ?? 0;
-        $eggsChangeHasBase = $eggsChangeHasBase ?? false;
-        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
-        $dispatchChange = $dispatchChange ?? 0;
-        $dispatchChangeHasBase = $dispatchChangeHasBase ?? false;
-        $dispatchChangeLabel = $dispatchChangeLabel ?? 'vs yesterday';
-        $revenueChange = $revenueChange ?? 0;
-        $revenueChangeHasBase = $revenueChangeHasBase ?? false;
-        $revenueChangeLabel = $revenueChangeLabel ?? 'vs yesterday';
 
         $feedStock = $feedStock ?? 0;
         $feedMin = $feedMin ?? 0;
@@ -45,8 +36,10 @@
 
         $predictedEggs = $predictedEggs ?? 0;
         $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
-        $eggsTitle = $eggsTitle ?? 'Total Eggs Today';
-        $predictedSubtitle = $predictedSubtitle ?? 'Next-day forecast · tap for sizes';
+        $eggsTitle = 'Egg stock';
+        $predictedSubtitle = ($dateFilter['isToday'] ?? true)
+            ? 'Next-day forecast · tap for stats.'
+            : ($predictedSubtitle ?? 'Forecast · tap for stats.');
         $revenueTitle = $revenueTitle ?? 'Revenue Today';
         $revenueSubtitle = $revenueSubtitle ?? "Today's Income";
 
@@ -76,7 +69,7 @@
     <div class="stats-grid">
 
 
-        {{-- TODAY EGGS --}}
+        {{-- EGG STOCK --}}
         <div class="stat-card stat-card--eggs">
 
             <div class="stat-icon">
@@ -92,11 +85,6 @@
                 <h2>
                     {{ number_format($eggsToday) }}
                 </h2>
-
-                @include('dashboard.stat-trend', [
-                    'change' => $eggsChange,
-                    'hasBase' => $eggsChangeHasBase,
-                ])
 
             </div>
 
@@ -114,7 +102,7 @@
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-title">Predicted Eggs</span>
+                <span class="stat-title">predicted eggs</span>
                 <h2>{{ number_format($predictedEggs) }}</h2>
                 <small>{{ $predictedSubtitle }}</small>
             </div>
@@ -147,10 +135,6 @@
 
 
                     <div class="stat-meta">
-                        @include('dashboard.stat-trend', [
-                            'change' => $dispatchChange,
-                            'hasBase' => $dispatchChangeHasBase,
-                        ])
                         <small>{{ $pendingDeliveries }} Pending</small>
                     </div>
 
@@ -183,13 +167,7 @@
                         ₱{{ number_format($revenueToday, 0) }}
                     </h2>
 
-
-                    @include('dashboard.stat-trend', [
-                        'change' => $revenueChange,
-                        'hasBase' => $revenueChangeHasBase,
-                        'empty' => $revenueSubtitle,
-                    ])
-
+                    <small>{{ $revenueSubtitle }}</small>
 
                 </div>
 
@@ -265,16 +243,11 @@
 
     </div>
 
-    <div class="content-grid">
+    <div class="content-grid manager-content-grid">
 
-
-        @include('dashboard.egg-production-chart-card', [
-            'trendAction' => route('manager.dashboard'),
+        @include('dashboard.pending-dispatches-panel', [
+            'dispatchIndexRoute' => route('manager.dispatch'),
         ])
-
-
-
-
 
         @include('dashboard.inventory-levels-panel')
 
@@ -286,8 +259,3 @@
         :previous-forecast-summary="$previousForecastSummary ?? null" />
 
 @endsection
-
-@push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" crossorigin="anonymous"></script>
-    @include('dashboard.production-trend-script')
-@endpush

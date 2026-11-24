@@ -51,7 +51,7 @@ class StaffMyActivityTest extends TestCase
             ->assertDontSee('chart.umd.min.js', false);
     }
 
-    public function test_owner_and_manager_dashboards_keep_the_production_chart(): void
+    public function test_owner_keeps_the_production_chart_and_manager_shows_pending_dispatches(): void
     {
         $owner = User::factory()->create(['role' => 'owner']);
         $manager = User::factory()->create(['role' => 'manager']);
@@ -66,8 +66,10 @@ class StaffMyActivityTest extends TestCase
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))
             ->assertOk()
-            ->assertSee('id="trendView"', false)
-            ->assertSee('Seven-Day Forecast')
+            ->assertSee('Pending Dispatches')
+            ->assertSee('Egg stock')
+            ->assertDontSee('id="trendView"', false)
+            ->assertDontSee('Seven-Day Forecast')
             ->assertDontSee('My Activity');
     }
 

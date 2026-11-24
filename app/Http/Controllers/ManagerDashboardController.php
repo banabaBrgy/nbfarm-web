@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dispatch;
 use App\Services\DailyInventory;
 use App\Services\DashboardDateFilter;
 use App\Services\DashboardKpis;
@@ -17,15 +18,23 @@ class ManagerDashboardController extends Controller
     {
         $request->validate(array_merge(
             DashboardDateFilter::rules(),
-            DashboardDateFilter::chartRules(),
             DashboardDateFilter::effectivenessRules(),
         ));
 
         app(DailyInventory::class)->applyForToday();
 
-        $overview = app(DashboardOverview::class)->forRequest($request);
+        $overview = app(DashboardOverview::class)->forRequest($request, includeChart: false);
         $effectiveness = app(SystemEffectiveness::class)->forRequest($request);
         $roleTodos = app(RoleTodoList::class)->forUser(auth()->user());
+        $pendingDispatchCount = (int) ($overview['pendingDeliveries'] ?? 0);
+        $pendingDispatches = Dispatch::query()
+            ->with('items')
+            ->whereIn('status', ['Pending', 'On Transit'])
+            ->orderByRaw("CASE WHEN status = 'Pending' THEN 0 ELSE 1 END")
+            ->orderByDesc('dispatch_date')
+            ->orderByDesc('id')
+            ->limit(6)
+            ->get();
 
         if (config('app.debug')) {
             Log::info('MANAGER FORECAST DIAGNOSTIC', [
@@ -39,7 +48,7 @@ class ManagerDashboardController extends Controller
             'manager.dashboard',
             array_merge(
                 $overview,
-                compact('effectiveness', 'roleTodos'),
+                compact('effectiveness', 'roleTodos', 'pendingDispatches', 'pendingDispatchCount'),
                 app(DashboardKpis::class)->summary()
             )
         );

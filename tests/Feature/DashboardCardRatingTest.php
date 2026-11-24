@@ -42,7 +42,7 @@ class DashboardCardRatingTest extends TestCase
         $this->actingAs($this->owner())
             ->get(route('owner.dashboard'))
             ->assertOk()
-            ->assertSee('-20.0%')
+            ->assertDontSee('-20.0%')
             ->assertDontSee('vs expected')
             ->assertDontSee('vs yesterday')
             ->assertDontSee('vs prior period');
@@ -74,7 +74,7 @@ class DashboardCardRatingTest extends TestCase
                 'dash_date' => '2026-11-01',
             ]))
             ->assertOk()
-            ->assertSee('-20.0%')
+            ->assertDontSee('-20.0%')
             ->assertDontSee('+20.0%')
             ->assertDontSee('vs prior period');
     }
@@ -93,7 +93,7 @@ class DashboardCardRatingTest extends TestCase
                 'dash_to' => '2026-11-02',
             ]))
             ->assertOk()
-            ->assertSee('-62.5%')
+            ->assertDontSee('-62.5%')
             ->assertDontSee('vs expected')
             ->assertDontSee('vs prior period');
     }
@@ -131,8 +131,8 @@ class DashboardCardRatingTest extends TestCase
             '/stat-card--dispatch[\s\S]*?>\s*6\s*</',
             $response->getContent()
         );
-        $response->assertSee('+50.0%')
-            ->assertSee('-20.0%')
+        $response->assertDontSee('+50.0%')
+            ->assertDontSee('-20.0%')
             ->assertDontSee('vs yesterday')
             ->assertDontSee('>13<', false);
     }
@@ -190,7 +190,7 @@ class DashboardCardRatingTest extends TestCase
         $this->actingAs($staff)
             ->get(route('staff.dashboard'))
             ->assertOk()
-            ->assertSee('-20.0%')
+            ->assertDontSee('-20.0%')
             ->assertSee('-25.0%')
             ->assertDontSee('vs expected')
             ->assertDontSee('vs yesterday');

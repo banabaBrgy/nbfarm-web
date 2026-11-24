@@ -6,348 +6,229 @@ body{
     background:#f5f7fb;
 }
 
-.dashboard-title{
-    font-size:2.2rem;
-    font-weight:700;
-    color:#1f2937;
-}
-
-.dashboard-subtitle{
-    color:#6b7280;
-    margin-bottom:30px;
+.manager-content-grid {
+    display: grid;
+    grid-template-columns: 1.7fr 0.9fr;
+    gap: 20px;
+    align-items: stretch;
 }
 
 /* ===========================
-   SUMMARY CARDS
+   PENDING DISPATCHES
 =========================== */
 
-.summary-card{
-    background:#fff;
-    border:none;
-    border-radius:22px;
-    padding:25px;
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-    transition:.25s;
-    height:170px;
+.pending-dispatches-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 22px 22px 12px;
 }
 
-.summary-card:hover{
-    transform:translateY(-4px);
+.pending-dispatches-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-.summary-card .icon-box{
-    width:82px;
-    height:82px;
-    border-radius:22px;
-    background:#3B8F47;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.pending-dispatches-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: -0.01em;
 }
 
-.summary-card .icon-box i{
-    color:#fff;
-    font-size:35px;
+.pending-dispatches-count {
+    color: #6b7280;
+    font-weight: 600;
 }
 
-.summary-card small{
-    color:#8b8b8b;
-    font-weight:600;
-    display:block;
+.pending-dispatches-view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2f8158;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
-.summary-card h2{
-    font-size:48px;
-    font-weight:700;
-    color:#3B8F47;
-    margin:5px 0;
+.pending-dispatches-view-all:hover,
+.pending-dispatches-view-all:focus-visible {
+    color: #1e5f40;
+    text-decoration: underline;
 }
 
-.summary-card p{
-    color:#8b8b8b;
-    margin:0;
+.pending-dispatches-table-wrap {
+    overflow-x: auto;
+    margin: 0 -6px;
+    padding: 0 6px;
 }
 
-/* ===========================
-   BIG CARDS
-=========================== */
-
-.dashboard-card{
-    background:#fff;
-    border:none;
-    border-radius:22px;
-    padding:30px;
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-    margin-top:30px;
+.pending-dispatches-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
 }
 
-.dashboard-card h3{
-    color:#3B8F47;
-    font-weight:700;
-    margin-bottom:20px;
+.pending-dispatches-table th {
+    padding: 0 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    text-align: left;
+    letter-spacing: 0.01em;
+    border-bottom: 1px solid #d1d5db;
+    white-space: nowrap;
 }
 
-/* ===========================
-   INVENTORY SUMMARY
-=========================== */
-
-.inventory-item{
-    margin-bottom:22px;
+.pending-dispatches-table td {
+    padding: 14px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f4f8;
+    font-size: 13px;
+    color: #374151;
 }
 
-.inventory-item h6{
-    font-weight:600;
-    color:#333;
-    margin-bottom:8px;
+.pending-dispatches-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-.progress{
-    height:10px;
-    border-radius:20px;
-    background:#ececec;
+.pending-dispatches-recipient {
+    font-weight: 600;
+    color: #1f2937;
+    max-width: 140px;
 }
 
-.progress-bar{
-    background:#3B8F47;
-    border-radius:20px;
+.pending-dispatches-address {
+    color: #6b7280;
+    max-width: 150px;
 }
 
-/* ===========================
-   ACTIVITY LIST
-=========================== */
-
-.activity-item{
-    display:flex;
-    align-items:center;
-    margin-bottom:18px;
-    border-bottom:1px solid #f0f0f0;
-    padding-bottom:15px;
+.pending-dispatches-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.activity-icon{
-    width:45px;
-    height:45px;
-    background:#e8f5e9;
-    border-radius:12px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin-right:15px;
+.pending-dispatches-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.activity-icon i{
-    color:#3B8F47;
+.pending-dispatches-qty {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
 }
 
-.activity-title{
-    font-weight:600;
-    color:#333;
+.pending-dispatches-card .dsp-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
 }
 
-.activity-time{
-    color:#9ca3af;
-    font-size:13px;
+.pending-dispatches-card .dsp-chip-small {
+    background: #e8f5e9;
+    color: #3B8F47;
 }
 
-/* ===========================
-   CHART
-=========================== */
+.pending-dispatches-card .dsp-chip-medium {
+    background: #e3f2fd;
+    color: #1565c0;
+}
 
-.chart-container{
-    height:360px;
+.pending-dispatches-card .dsp-chip-large {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.pending-dispatches-card .dsp-chip-extra-large {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.pending-dispatches-price {
+    font-weight: 700;
+    color: #1f2937;
+    white-space: nowrap;
+}
+
+.pending-dispatches-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    white-space: nowrap;
+}
+
+.pending-dispatches-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9ca3af;
+    flex-shrink: 0;
+}
+
+.pending-dispatches-status--pending .pending-dispatches-status-dot {
+    background: #f59e0b;
+}
+
+.pending-dispatches-status--pending {
+    color: #b45309;
+}
+
+.pending-dispatches-status--on-transit .pending-dispatches-status-dot {
+    background: #2563eb;
+}
+
+.pending-dispatches-status--on-transit {
+    color: #1d4ed8;
+}
+
+.pending-dispatches-status--delivered .pending-dispatches-status-dot {
+    background: #22c55e;
+}
+
+.pending-dispatches-status--delivered {
+    color: #15803d;
+}
+
+.pending-dispatches-empty {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 13px;
+    padding: 28px 10px !important;
 }
 
 /* ===========================
    RESPONSIVE
 =========================== */
 
-@media(max-width:992px){
-
-    .summary-card{
-        margin-bottom:20px;
-    }
-
-}
-
-@media(max-width:768px){
-
-    .dashboard-title{
-        font-size:1.8rem;
-    }
-
-    .summary-card h2{
-        font-size:36px;
-    }
-
-}
-
-.trend-chart-card {
-    margin-top: 20px;
-    min-height: 0;
-    height: auto;
-}
-
-.trend-chart-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-}
-
-.trend-chart-hint {
-    margin: 0;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.trend-year-filter {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.trend-year-filter label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #4b5563;
-}
-
-.trend-year-filter select {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 13px;
-    background: #fff;
-}
-
-.trend-chart-wrap {
-    height: 280px;
-    min-height: 260px;
-}
-
-.stats-grid.stats-grid--five {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.stats-grid.stats-grid--five .stat-card {
-    min-width: 0;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 9px;
-    padding: 15px;
-}
-
-.stats-grid.stats-grid--five .stat-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-}
-
-.stats-grid.stats-grid--five .stat-icon i {
-    font-size: 19px;
-}
-
-.stats-grid.stats-grid--five .stat-info {
-    width: 100%;
-    min-width: 0;
-}
-
-.stats-grid.stats-grid--five .stat-title,
-.stats-grid.stats-grid--five .stat-info small {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.stats-grid.stats-grid--five .stat-title {
-    font-size: 12px;
-}
-
-.stats-grid.stats-grid--five .stat-info h2 {
-    font-size: 24px;
-    margin: 2px 0 4px;
-    white-space: nowrap;
-}
-
-.stats-grid.stats-grid--five .stat-info small {
-    font-size: 11px;
-}
-
-@media (max-width: 1100px) {
-    .stats-grid.stats-grid--five {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .stats-grid.stats-grid--five .stat-card {
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 14px;
-        padding: 18px 16px;
-    }
-
-    .stats-grid.stats-grid--five .stat-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
-    }
-
-    .stats-grid.stats-grid--five .stat-icon i {
-        font-size: 21px;
-    }
-
-    .stats-grid.stats-grid--five .stat-info {
-        width: auto;
-        flex: 1;
-    }
-
-    .stats-grid.stats-grid--five .stat-title {
-        font-size: 13px;
-        white-space: nowrap;
-    }
-
-    .stats-grid.stats-grid--five .stat-info h2 {
-        font-size: 26px;
-        margin: 2px 0;
-    }
-
-    .stats-grid.stats-grid--five .stat-info small {
-        font-size: 12px;
-        white-space: nowrap;
+@media (max-width: 1024px) {
+    .manager-content-grid {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 768px) {
-    .stats-grid.stats-grid--five .stat-card {
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
+    .pending-dispatches-card {
+        padding: 18px 16px 8px;
     }
 
-    .stats-grid.stats-grid--five .stat-title,
-    .stats-grid.stats-grid--five .stat-info small {
-        white-space: normal;
-    }
-}
-
-@media (max-width: 420px) {
-    .stats-grid.stats-grid--five {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-.content-grid {
-    display: grid;
-    grid-template-columns: 1.65fr 0.85fr;
-    gap: 20px;
-    align-items: stretch;
-}
-
-@media (max-width: 1024px) {
-    .content-grid {
-        grid-template-columns: 1fr;
+    .pending-dispatches-title {
+        font-size: 16px;
     }
 }

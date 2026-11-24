@@ -1,4 +1,3 @@
-
 @extends('layouts.sidebar')
 
 @section('content')
@@ -12,20 +11,10 @@
 
         $role = auth()->user()->role;
         $eggsToday = $eggsToday ?? 0;
-        $eggsChange = $eggsChange ?? 0;
-        $eggsChangeHasBase = $eggsChangeHasBase ?? false;
-        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
-        $dispatchChange = $dispatchChange ?? 0;
-        $dispatchChangeHasBase = $dispatchChangeHasBase ?? false;
-        $dispatchChangeLabel = $dispatchChangeLabel ?? 'vs yesterday';
-        $revenueChange = $revenueChange ?? 0;
-        $revenueChangeHasBase = $revenueChangeHasBase ?? false;
-        $revenueChangeLabel = $revenueChangeLabel ?? 'vs yesterday';
         $feedStock = $feedStock ?? 0;
         $feedMin = $feedMin ?? 0;
         $feedLow = $feedLow ?? false;
         $dispatchedTrays = $dispatchedTrays ?? 0;
-        $pendingDeliveries = $pendingDeliveries ?? 0;
         $revenueToday = $revenueToday ?? 0;
         $eggsTotal = $eggsTotal ?? 0;
         $eggTrays = $eggTrays ?? 0;
@@ -33,12 +22,12 @@
         $vitaminMin = $vitaminMin ?? 0;
         $vitaminLow = $vitaminLow ?? false;
         $lowStockAlert = $lowStockAlert ?? null;
-        $predictedEggs = $predictedEggs ?? 0;
         $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
-        $eggsTitle = $eggsTitle ?? 'Total Eggs Today';
-        $predictedSubtitle = $predictedSubtitle ?? 'Next-day forecast · tap for sizes';
-        $revenueTitle = $revenueTitle ?? 'Revenue Today';
-        $revenueSubtitle = $revenueSubtitle ?? "Today's Income";
+        $inventoryRatings = $inventoryRatings ?? [];
+        $eggsTitle = 'Total Eggs Produced';
+        $dispatchTitle = 'Total Dispatch';
+        $revenueTitle = 'Revenue';
+
     @endphp
 
     <!-- Header -->
@@ -62,7 +51,7 @@
     <!-- Stat cards -->
     <div class="stats-grid stats-grid--four">
 
-        {{-- Eggs --}}
+        {{-- Total eggs produced --}}
         <div class="stat-card stat-card--eggs">
             <div class="stat-icon">
                 <i class="fas fa-egg"></i>
@@ -72,29 +61,17 @@
                 <span class="stat-title">{{ $eggsTitle }}</span>
 
                 <h2>{{ number_format($eggsToday) }}</h2>
-
-                @include('dashboard.stat-trend', [
-                    'change' => $eggsChange,
-                    'hasBase' => $eggsChangeHasBase,
-                ])
             </div>
         </div>
 
-        {{-- Predicted eggs (Python ARIMA 2,1,1) --}}
-        <div
-            class="stat-card stat-card--predicted stat-card--clickable"
-            role="button"
-            tabindex="0"
-            data-bs-toggle="modal"
-            data-bs-target="#forecastSummaryModal"
-            aria-label="View forecast summary by size">
+        {{-- Eggs stock on hand --}}
+        <div class="stat-card stat-card--predicted">
             <div class="stat-icon">
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-title">Predicted Eggs</span>
-                <h2>{{ number_format($predictedEggs) }}</h2>
-                <small>{{ $predictedSubtitle }}</small>
+                <span class="stat-title">Eggs Stock</span>
+                <h2>{{ number_format($eggsTotal) }}</h2>
             </div>
         </div>
 
@@ -107,17 +84,9 @@
                 </div>
 
                 <div class="stat-info">
-                    <span class="stat-title">Egg Trays Dispatched</span>
+                    <span class="stat-title">{{ $dispatchTitle }}</span>
 
                     <h2>{{ number_format($dispatchedTrays) }}</h2>
-
-                    <div class="stat-meta">
-                        @include('dashboard.stat-trend', [
-                            'change' => $dispatchChange,
-                            'hasBase' => $dispatchChangeHasBase,
-                        ])
-                        <small>{{ $pendingDeliveries }} Pending</small>
-                    </div>
                 </div>
             </div>
 
@@ -131,12 +100,6 @@
                     <span class="stat-title">{{ $revenueTitle }}</span>
 
                     <h2>₱{{ number_format($revenueToday, 0) }}</h2>
-
-                    @include('dashboard.stat-trend', [
-                        'change' => $revenueChange,
-                        'hasBase' => $revenueChangeHasBase,
-                        'empty' => $revenueSubtitle,
-                    ])
                 </div>
             </div>
 

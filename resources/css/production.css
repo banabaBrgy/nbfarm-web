@@ -541,57 +541,6 @@
     font-size:13px;
 }
 
-.production-review-launch{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:14px;
-    flex-wrap:wrap;
-    margin-top:18px;
-    padding:16px 18px;
-    background:#FFFFFF;
-    border:1px solid #E6ECE8;
-    border-radius:16px;
-    box-shadow:0 4px 14px rgba(0,0,0,.04);
-}
-
-.production-review-launch p{
-    margin:0;
-    color:#6b7280;
-    font-size:14px;
-    line-height:1.45;
-}
-
-.production-review-open{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    border:0;
-    border-radius:10px;
-    padding:10px 16px;
-    color:#ffffff;
-    background:#2f8158;
-    font-size:14px;
-    font-weight:700;
-    cursor:pointer;
-}
-
-.production-review-open:hover{
-    background:#27734d;
-}
-
-.production-review-open-count{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    min-width:22px;
-    height:22px;
-    padding:0 6px;
-    border-radius:999px;
-    background:rgba(255,255,255,.2);
-    font-size:12px;
-}
-
 #productionReviewModal .modal-dialog,
 #productionReviewModal.fade .modal-dialog,
 #productionReviewModal.show .modal-dialog{
@@ -634,7 +583,7 @@
     flex-wrap:wrap;
     margin:0;
     padding:18px 22px 14px;
-    border-bottom:1px solid #E6ECE8;
+    border-bottom:0;
 }
 
 .production-review-header-actions{
@@ -670,6 +619,14 @@
     text-transform:uppercase;
 }
 
+.production-review-body{
+    padding:16px 22px 0;
+}
+
+#productionReviewModal .production-review-body{
+    padding:16px 22px;
+}
+
 .production-review-note{
     display:flex;
     align-items:flex-start;
@@ -703,16 +660,37 @@
     margin-bottom:0;
     width:100%;
     min-width:640px;
+    height:auto;
+}
+
+.production-review-table thead,
+#productionReviewModal .production-review-table thead,
+#productionReviewModal .production-review-table thead th,
+.production-review-table thead th{
+    background:#2f8158 !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
+    border:0 !important;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-size:12px;
+    font-weight:700;
+    text-align:center;
+    white-space:nowrap;
 }
 
 .production-review-table th,
 .production-review-table td{
     padding:12px 10px;
     font-size:14px;
+    text-align:center !important;
+    vertical-align:middle;
 }
 
 .production-review-row-actions{
     display:flex;
+    justify-content:center;
+    align-items:center;
     gap:8px;
 }
 
@@ -821,11 +799,6 @@
 }
 
 @media (max-width:768px){
-    .production-review-launch{
-        align-items:stretch;
-    }
-
-    .production-review-open,
     .production-review-footer{
         width:100%;
         justify-content:center;

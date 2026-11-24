@@ -20,6 +20,7 @@ class QrScannerController extends Controller
         return view('scan-qr', [
             'scanStoreUrl' => route($routeRole.'.scan.store'),
             'productionUrl' => route($routeRole.'.production'),
+            'reviewState' => app(QrScanRecorder::class)->listingForDate(),
         ]);
     }
 

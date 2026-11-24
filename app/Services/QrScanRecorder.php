@@ -304,7 +304,7 @@ class QrScanRecorder
         $payload['staged'] = true;
         $payload['trays'] = (int) $qr->tray_count;
         $payload['eggs'] = $qr->eggCount();
-        $payload['message'] = 'Added to the review list. Open Production to double-check and Confirm & Save.';
+        $payload['message'] = 'Added to the review list. Double-check below, then Confirm & Save.';
 
         return $payload;
     }

@@ -64,7 +64,10 @@ class DashboardDateFilterTest extends TestCase
             ->get(route('owner.dashboard'))
             ->assertOk()
             ->assertSee('id="dashTo"', false)
-            ->assertSee('Total Eggs Today');
+            ->assertSee('Total Eggs Produced')
+            ->assertSee('Eggs Stock')
+            ->assertSee('Total Dispatch')
+            ->assertSee('Revenue');
     }
 
     public function test_kpi_cards_follow_the_selected_date(): void
@@ -216,8 +219,12 @@ class DashboardDateFilterTest extends TestCase
             '/stat-card--dispatch[\s\S]*?>\s*3\s*</',
             $response->getContent()
         );
+        $this->assertMatchesRegularExpression(
+            '/stat-card--revenue[\s\S]*?<h2>\s*₱80\s*<\/h2>/',
+            $response->getContent()
+        );
         $this->assertDoesNotMatchRegularExpression(
-            '/stat-card--revenue[\s\S]*₱40/',
+            '/stat-card--revenue[\s\S]*?<h2>\s*₱40\s*<\/h2>/',
             $response->getContent()
         );
     }
@@ -233,7 +240,8 @@ class DashboardDateFilterTest extends TestCase
             ]))
             ->assertOk()
             ->assertSee("Welcome back! Here's today's poultry farm overview.")
-            ->assertSee('Total Eggs Today')
+            ->assertSee('Total Eggs Produced')
+            ->assertSee('Eggs Stock')
             ->assertSee('value="2026-11-08"', false)
             ->assertSee('value="forecast"', false);
     }
@@ -246,10 +254,10 @@ class DashboardDateFilterTest extends TestCase
             'series' => [],
         ]);
 
-        $owner = User::factory()->create(['role' => 'owner']);
+        $manager = User::factory()->create(['role' => 'manager']);
 
-        $this->actingAs($owner)
-            ->get(route('owner.dashboard', [
+        $this->actingAs($manager)
+            ->get(route('manager.dashboard', [
                 'dash_period' => 'date',
                 'dash_date' => '2026-11-01',
             ]))

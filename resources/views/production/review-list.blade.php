@@ -3,7 +3,10 @@
     $reviewDrafts = $reviewState['drafts'] ?? [];
     $reviewSummary = $reviewState['summary'] ?? ['scans' => 0, 'trays' => 0, 'eggs' => 0];
     $reviewNote = $reviewState['note'] ?? \App\Services\QrScanRecorder::NOTE;
-    $harvestDate = $reviewState['harvest_date'] ?? $date->toDateString();
+    $harvestDate = $reviewState['harvest_date']
+        ?? (isset($date) && $date instanceof \Carbon\Carbon
+            ? $date->toDateString()
+            : now()->toDateString());
     $addQrCode = trim((string) ($reviewState['qr_code'] ?? ''));
     $rolePrefix = \App\Models\User::routeRole();
     $summaryLabel = number_format($reviewSummary['scans']).' stacks · '
@@ -22,22 +25,6 @@
         route($rolePrefix.'.scan.drafts.destroy', ['draft' => 999999])
     );
 @endphp
-
-@if(count($reviewDrafts) > 0)
-<div class="production-review-launch">
-    <button
-        type="button"
-        class="production-review-open"
-        id="productionReviewOpenBtn"
-        data-bs-toggle="modal"
-        data-bs-target="#productionReviewModal"
-        aria-haspopup="dialog">
-        <i class="fas fa-list" aria-hidden="true"></i>
-        Review list
-        <span class="production-review-open-count">{{ number_format($reviewSummary['scans']) }}</span>
-    </button>
-    <p>One size at a time. Open the list to edit trays and eggs, then Confirm &amp; Save.</p>
-</div>
 
 <div
     class="modal fade"
@@ -59,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body production-review-body">
                 <div class="production-review-note" role="note">
                     <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
                     <p>{{ $reviewNote }}</p>
@@ -190,6 +177,16 @@
         return document.getElementById('productionReviewModal');
     }
 
+    function reviewModal() {
+        const modal = reviewModalEl();
+
+        if (!modal || !window.bootstrap) {
+            return null;
+        }
+
+        return window.bootstrap.Modal.getOrCreateInstance(modal);
+    }
+
     function holdReviewModal() {
         const modal = reviewModalEl();
 
@@ -198,6 +195,10 @@
         }
 
         document.body.classList.add('modal-open');
+    }
+
+    function hideReviewModal() {
+        reviewModal()?.hide();
     }
 
     function swalOnModal(options) {
@@ -223,21 +224,35 @@
         });
     }
 
+    function hasDraftRows() {
+        return Boolean(document.querySelector('#productionReviewPanel tbody tr'));
+    }
+
+    function updateReviewCount(scans) {
+        const count = document.getElementById('scanReviewCount');
+
+        if (!count) {
+            return;
+        }
+
+        count.textContent = formatCount(scans);
+
+        if (Number(scans) > 0) {
+            count.hidden = false;
+        } else {
+            count.hidden = true;
+        }
+    }
+
     function applyListing(res) {
         const drafts = Array.isArray(res.drafts) ? res.drafts : [];
         const summary = res.summary || { scans: 0, trays: 0, eggs: 0 };
-        const tbody = document.querySelector('#productionReviewPanel tbody');
-        const totals = document.querySelector('#productionReviewPanel .production-review-totals');
+        const panel = document.getElementById('productionReviewPanel');
+        const tbody = panel?.querySelector('tbody');
+        const totals = panel?.querySelector('.production-review-totals');
         const addBtn = document.getElementById('productionAddStackBtn');
-        const countBadge = document.querySelector('.production-review-open-count');
-        const launch = document.querySelector('.production-review-launch');
-        const modal = reviewModalEl();
 
         summaryLabel = `${formatCount(summary.scans)} stacks · ${formatCount(summary.trays)} trays · ${formatCount(summary.eggs)} eggs`;
-
-        if (countBadge) {
-            countBadge.textContent = formatCount(summary.scans);
-        }
 
         if (addBtn) {
             const qrCode = res.qr_code || '';
@@ -245,13 +260,15 @@
             addBtn.disabled = qrCode === '';
         }
 
+        updateReviewCount(summary.scans);
+
         if (!drafts.length) {
-            if (modal && window.bootstrap) {
-                window.bootstrap.Modal.getInstance(modal)?.hide();
+            hideReviewModal();
+
+            if (tbody) {
+                tbody.innerHTML = '';
             }
 
-            launch?.remove();
-            modal?.remove();
             return;
         }
 
@@ -299,6 +316,20 @@
 
         holdReviewModal();
     }
+
+    document.getElementById('scanReviewBtn')?.addEventListener('click', function () {
+        if (!hasDraftRows()) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Review list',
+                text: 'No stacks yet. Scan or upload a QR first.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        reviewModal()?.show();
+    });
 
     document.getElementById('productionAddStackBtn')?.addEventListener('click', function () {
         const qrCode = this.getAttribute('data-qr');
@@ -471,7 +502,8 @@
             event.preventDefault();
         }
     });
+
+    window.applyReviewListing = applyListing;
 })();
 </script>
 @endpush
-@endif

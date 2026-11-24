@@ -52,17 +52,17 @@ class EggProductionChartViewTest extends TestCase
         $response->assertDontSee('"label":"Actual Production"', false);
     }
 
-    public function test_manager_dashboard_uses_the_same_dropdown(): void
+    public function test_manager_dashboard_shows_pending_dispatches_instead_of_chart(): void
     {
         $manager = User::factory()->create(['role' => 'manager']);
-        $sevenDays = '["Nov 9","Nov 10","Nov 11","Nov 12","Nov 13","Nov 14","Nov 15"]';
 
         $this->actingAs($manager)
             ->get(route('manager.dashboard'))
             ->assertOk()
-            ->assertSee('id="trendView"', false)
-            ->assertSee('value="forecast" selected', false)
-            ->assertSee($sevenDays, false);
+            ->assertSee('Pending Dispatches')
+            ->assertSee('Inventory Levels')
+            ->assertDontSee('id="trendView"', false)
+            ->assertDontSee('value="forecast" selected', false);
     }
 
     public function test_historical_view_shows_past_production_and_arima_forecast(): void

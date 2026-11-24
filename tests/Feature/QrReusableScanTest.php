@@ -145,7 +145,7 @@ class QrReusableScanTest extends TestCase
         $this->assertSame(0, QrScanDraft::query()->count());
     }
 
-    public function test_review_list_lives_on_production_and_disappears_after_save(): void
+    public function test_review_list_lives_on_scanner_and_disappears_after_save(): void
     {
         $this->bindForecastEngine();
         $staff = User::factory()->create(['role' => 'staff']);
@@ -156,26 +156,25 @@ class QrReusableScanTest extends TestCase
             ->get(route('staff.production'))
             ->assertOk()
             ->assertDontSee('id="productionReviewPanel"', false)
-            ->assertDontSee('id="productionReviewOpenBtn"', false);
+            ->assertDontSee('Confirm &amp; Save', false);
 
         $this->actingAs($staff)
             ->postJson(route('staff.scan.store'), ['qr_code' => $record->qr_code])
             ->assertOk();
 
         $this->actingAs($staff)
-            ->get(route('staff.production.scan'))
-            ->assertOk()
-            ->assertDontSee('id="productionReviewPanel"', false)
-            ->assertDontSee('id="productionReviewOpenBtn"', false)
-            ->assertDontSee('id="draft-title"', false);
-
-        $this->actingAs($staff)
             ->get(route('staff.production'))
             ->assertOk()
-            ->assertSee('id="productionReviewOpenBtn"', false)
-            ->assertSee('id="productionReviewModal"', false)
+            ->assertDontSee('id="productionReviewPanel"', false)
+            ->assertDontSee('Confirm &amp; Save', false);
+
+        $this->actingAs($staff)
+            ->get(route('staff.production.scan'))
+            ->assertOk()
             ->assertSee('id="productionReviewPanel"', false)
-            ->assertSee('data-bs-toggle="modal"', false)
+            ->assertSee('id="productionReviewModal"', false)
+            ->assertSee('id="scanReviewBtn"', false)
+            ->assertDontSee('id="draft-title"', false)
             ->assertSee('Review list', false)
             ->assertSee('QRS-B1', false)
             ->assertSee('Confirm &amp; Save', false)
@@ -196,10 +195,14 @@ class QrReusableScanTest extends TestCase
         $this->assertSame(0, QrScanDraft::query()->count());
 
         $this->actingAs($staff)
+            ->get(route('staff.production.scan'))
+            ->assertOk()
+            ->assertDontSee('QRS-B1', false);
+
+        $this->actingAs($staff)
             ->get(route('staff.production'))
             ->assertOk()
             ->assertDontSee('id="productionReviewPanel"', false)
-            ->assertDontSee('id="productionReviewOpenBtn"', false)
             ->assertSee('>300<', false);
     }
 

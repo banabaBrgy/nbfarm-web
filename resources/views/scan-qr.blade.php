@@ -12,7 +12,7 @@
             </span>
             <div>
                 <h2>QR Code Scanner</h2>
-                <p>Scan one size at a time. On Production, tap Review list to edit trays and eggs, then Confirm &amp; Save.</p>
+                <p>Scan one size at a time. Tap Review List to double-check, then Confirm &amp; Save.</p>
             </div>
         </div>
 
@@ -29,18 +29,38 @@
                     <span class="scanner-card-title-icon" aria-hidden="true">
                         <i class="fas fa-camera"></i>
                     </span>
-                    <h3 id="scanner-title">Camera scanner</h3>
+                    <h3 id="scanner-title">Camera Scanner</h3>
                 </div>
                 <span class="scanner-status" id="scannerStatus">Ready to scan</span>
             </div>
 
             <div class="scanner-frame">
-                <div id="reader"></div>
+                <div class="scanner-viewfinder">
+                    <div id="reader"></div>
+                </div>
+                <button type="button" class="scanner-toggle-btn" id="scannerToggleBtn">
+                    <i class="fas fa-play" aria-hidden="true"></i>
+                    Start Camera
+                </button>
+
+                <div class="scanner-upload">
+                    <span class="scanner-upload-or">or</span>
+                    <button type="button" class="scanner-upload-btn" id="scannerUploadBtn">
+                        <i class="fas fa-image" aria-hidden="true"></i>
+                        Upload QR
+                    </button>
+                    <input
+                        type="file"
+                        id="qrFileInput"
+                        accept="image/*"
+                        hidden>
+                </div>
+                <div id="qrFileReader" hidden></div>
             </div>
 
             <p class="scanner-instruction">
-                <i class="fas fa-lightbulb"></i>
-                <span>Finish this size first. Then open Production, tap Review list, and Confirm &amp; Save.</span>
+                <i class="fas fa-circle-info"></i>
+                <span>Finish this size first. Then tap Review List and Confirm &amp; Save.</span>
             </p>
         </section>
 
@@ -48,49 +68,58 @@
             <div class="scan-result-header">
                 <div class="scanner-card-title">
                     <span class="scan-result-header-icon" aria-hidden="true">
-                        <i class="fas fa-clipboard-check"></i>
+                        <i class="fas fa-clipboard-list"></i>
                     </span>
-                    <h3 id="result-title">Scan result</h3>
+                    <h3 id="result-title">Scan Result</h3>
                 </div>
             </div>
 
             <div class="scan-result-body">
-                <table class="scan-result-table">
-                    <tbody>
-                        <tr>
-                            <th scope="row">QR code</th>
-                            <td id="qrCode"><span class="scan-value-muted">Not scanned</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Batch</th>
-                            <td id="batch"><span class="scan-value-muted">Not scanned</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Egg size</th>
-                            <td id="size"><span class="scan-value-muted">Not scanned</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">This scan</th>
-                            <td id="eggs"><span class="scan-value-muted">Not scanned</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Pending review</th>
-                            <td id="reviewTotal"><span class="scan-value-muted">None</span></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Status</th>
-                            <td id="status">
-                                <span class="scan-status-badge scan-status-badge--waiting">
-                                    <i class="fas fa-clock"></i>
-                                    Waiting
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <ul class="scan-result-list">
+                    <li class="scan-result-row">
+                        <span class="scan-result-icon" aria-hidden="true"><i class="fas fa-qrcode"></i></span>
+                        <span class="scan-result-label">QR Code</span>
+                        <span class="scan-result-value" id="qrCode"><span class="scan-value-muted">Not scanned</span></span>
+                    </li>
+                    <li class="scan-result-row">
+                        <span class="scan-result-icon" aria-hidden="true"><i class="fas fa-layer-group"></i></span>
+                        <span class="scan-result-label">Batch</span>
+                        <span class="scan-result-value" id="batch"><span class="scan-value-muted">Not scanned</span></span>
+                    </li>
+                    <li class="scan-result-row">
+                        <span class="scan-result-icon" aria-hidden="true"><i class="fas fa-tag"></i></span>
+                        <span class="scan-result-label">Size</span>
+                        <span class="scan-result-value" id="size"><span class="scan-value-muted">Not scanned</span></span>
+                    </li>
+                    <li class="scan-result-row">
+                        <span class="scan-result-icon" aria-hidden="true"><i class="fas fa-table-cells"></i></span>
+                        <span class="scan-result-label">Trays</span>
+                        <span class="scan-result-value" id="trays"><span class="scan-value-muted">Not scanned</span></span>
+                    </li>
+                    <li class="scan-result-row">
+                        <span class="scan-result-icon" aria-hidden="true"><i class="fas fa-egg"></i></span>
+                        <span class="scan-result-label">Eggs</span>
+                        <span class="scan-result-value" id="eggs"><span class="scan-value-muted">Not scanned</span></span>
+                    </li>
+                </ul>
+
+                <div class="scan-result-status" id="status" hidden></div>
+
+                <button type="button" class="scan-review-button" id="scanReviewBtn">
+                    <i class="fas fa-list" aria-hidden="true"></i>
+                    Review List
+                    <span
+                        class="scan-review-count"
+                        id="scanReviewCount"
+                        @if((int) ($reviewState['summary']['scans'] ?? 0) < 1) hidden @endif>
+                        {{ number_format((int) ($reviewState['summary']['scans'] ?? 0)) }}
+                    </span>
+                </button>
             </div>
         </section>
     </div>
+
+    @include('production.review-list')
 </div>
 
 @endsection
@@ -126,28 +155,35 @@ function csrfToken() {
         || '{{ csrf_token() }}';
 }
 
-function countLabel(today) {
-    if (!today) {
-        return 'None';
-    }
-
-    return `${Number(today.scans || 0).toLocaleString('en-US')} stacks · ${Number(today.trays || 0).toLocaleString('en-US')} trays · ${Number(today.eggs || 0).toLocaleString('en-US')} eggs`;
-}
-
-function pendingReviewLabel(res) {
-    if (Array.isArray(res.groups) && res.groups.length) {
-        return countLabel({
-            scans: res.groups.reduce((n, group) => n + Number(group.scans || 0), 0),
-            trays: res.groups.reduce((n, group) => n + Number(group.trays || 0), 0),
-            eggs: res.groups.reduce((n, group) => n + Number(group.eggs || 0), 0)
-        });
-    }
-
-    return res.summary ? countLabel(res.summary) : 'None';
-}
-
 function muted(text) {
     return `<span class="scan-value-muted">${escapeScanHtml(text)}</span>`;
+}
+
+function formatBatch(batch) {
+    const text = String(batch ?? '').trim();
+
+    if (!text) {
+        return '';
+    }
+
+    return /^b/i.test(text) ? text.toUpperCase() : `B${text}`;
+}
+
+function setStatus(html) {
+    const statusEl = document.getElementById('status');
+
+    if (!statusEl) {
+        return;
+    }
+
+    if (html) {
+        statusEl.innerHTML = html;
+        statusEl.hidden = false;
+        return;
+    }
+
+    statusEl.innerHTML = '';
+    statusEl.hidden = true;
 }
 
 function fillResult(res, statusHtml) {
@@ -155,16 +191,18 @@ function fillResult(res, statusHtml) {
         ? escapeScanHtml(res.qr_code)
         : muted('Not scanned');
     document.getElementById('batch').innerHTML = res.batch
-        ? escapeScanHtml(res.batch)
+        ? escapeScanHtml(formatBatch(res.batch))
         : muted('Not scanned');
     document.getElementById('size').innerHTML = res.size
         ? escapeScanHtml(res.size)
         : muted('Not scanned');
-    document.getElementById('eggs').innerHTML = res.trays
-        ? `${Number(res.trays).toLocaleString('en-US')} trays · ${Number(res.eggs || 0).toLocaleString('en-US')} eggs`
+    document.getElementById('trays').innerHTML = res.trays != null && res.trays !== ''
+        ? escapeScanHtml(Number(res.trays).toLocaleString('en-US'))
         : muted('Not scanned');
-    document.getElementById('reviewTotal').textContent = pendingReviewLabel(res);
-    document.getElementById('status').innerHTML = statusHtml;
+    document.getElementById('eggs').innerHTML = res.eggs != null && res.eggs !== ''
+        ? escapeScanHtml(Number(res.eggs).toLocaleString('en-US'))
+        : muted('Not scanned');
+    setStatus(statusHtml);
 }
 
 function jsonRequest(url, method, body) {
@@ -191,12 +229,12 @@ function resumeAfterDialog() {
 }
 
 function showScanError(message) {
-    document.getElementById('status').innerHTML = `
+    setStatus(`
         <span class="scan-status-badge scan-status-badge--error">
             <i class="fas fa-circle-exclamation"></i>
             Scan failed
         </span>
-    `;
+    `);
 
     Swal.fire({
         icon: 'error',
@@ -221,34 +259,132 @@ function toast(title) {
     });
 }
 
-function isCameraScanning() {
-    const video = document.querySelector('#reader video');
+const html5Qrcode = new Html5Qrcode('reader');
+const fileScanner = new Html5Qrcode('qrFileReader');
+let cameraRunning = false;
+const scannerToggleBtn = document.getElementById('scannerToggleBtn');
+const scannerUploadBtn = document.getElementById('scannerUploadBtn');
+const qrFileInput = document.getElementById('qrFileInput');
 
-    return Boolean(video && video.srcObject);
+function isCameraScanning() {
+    return cameraRunning;
+}
+
+function setCameraLive(live) {
+    document.querySelector('.scanner-frame')?.classList.toggle('is-live', live);
+
+    if (!scannerToggleBtn) {
+        return;
+    }
+
+    scannerToggleBtn.innerHTML = live
+        ? '<i class="fas fa-stop" aria-hidden="true"></i> Stop Camera'
+        : '<i class="fas fa-play" aria-hidden="true"></i> Start Camera';
 }
 
 function pauseScannerIfNeeded() {
-    if (!isCameraScanning()) {
+    if (!cameraRunning) {
         return;
     }
 
     try {
-        html5QrcodeScanner.pause(true);
+        html5Qrcode.pause(true);
     } catch (error) {
         console.warn('Scanner pause skipped:', error);
     }
 }
 
 function resumeScannerIfNeeded() {
-    if (!isCameraScanning()) {
+    if (!cameraRunning) {
         return;
     }
 
     try {
-        html5QrcodeScanner.resume();
+        html5Qrcode.resume();
     } catch (error) {
         console.warn('Scanner resume skipped:', error);
     }
+}
+
+function isVirtualCamera(label) {
+    return /obs|virtual|snap camera|manycam|droidcam|iriun|nvidia broadcast|xsplit|ndi/i.test(label || '');
+}
+
+function pickPreferredCamera(cameras) {
+    const real = cameras.filter((camera) => !isVirtualCamera(camera.label));
+    const pool = real.length ? real : cameras;
+    const rear = pool.find((camera) => /back|rear|environment/i.test(camera.label || ''));
+
+    return rear || pool[0] || cameras[0];
+}
+
+function startCamera() {
+    if (cameraRunning || !scannerToggleBtn) {
+        return;
+    }
+
+    scannerToggleBtn.disabled = true;
+    updateScannerStatus('processing');
+
+    const config = { fps: 10, aspectRatio: 1.777 };
+
+    Html5Qrcode.getCameras()
+        .then((cameras) => {
+            if (!cameras.length) {
+                throw new Error('No camera found');
+            }
+
+            return html5Qrcode.start(pickPreferredCamera(cameras).id, config, onScanSuccess);
+        })
+        .catch(() => html5Qrcode.start({ facingMode: 'user' }, config, onScanSuccess))
+        .then(() => {
+            cameraRunning = true;
+            scannerToggleBtn.disabled = false;
+            setCameraLive(true);
+            updateScannerStatus('scanning');
+        }).catch((error) => {
+            console.warn(error);
+            scannerToggleBtn.disabled = false;
+            cameraRunning = false;
+            setCameraLive(false);
+            updateScannerStatus('ready');
+            Swal.fire({
+                icon: 'error',
+                title: 'Camera Error',
+                text: 'Could not start the camera. Check browser permissions and try again.',
+                confirmButtonText: 'OK'
+            });
+        });
+}
+
+function stopCamera() {
+    if (!cameraRunning) {
+        setCameraLive(false);
+        updateScannerStatus('ready');
+        return Promise.resolve();
+    }
+
+    if (scannerToggleBtn) {
+        scannerToggleBtn.disabled = true;
+    }
+
+    return html5Qrcode.stop().then(() => {
+        cameraRunning = false;
+        scannerPaused = false;
+        if (scannerToggleBtn) {
+            scannerToggleBtn.disabled = false;
+        }
+        setCameraLive(false);
+        updateScannerStatus('ready');
+    }).catch((error) => {
+        console.warn(error);
+        cameraRunning = false;
+        if (scannerToggleBtn) {
+            scannerToggleBtn.disabled = false;
+        }
+        setCameraLive(false);
+        updateScannerStatus('ready');
+    });
 }
 
 function onScanSuccess(decodedText) {
@@ -274,23 +410,21 @@ function onScanSuccess(decodedText) {
             lastCommittedCode = String(res.qr_code || decodedText);
             lastCommittedAt = Date.now();
 
-            fillResult(res, `
-                <span class="scan-status-badge scan-status-badge--waiting">
-                    <i class="fas fa-list"></i>
-                    On review list
-                </span>
-            `);
-            toast(res.message || 'Added to the Production review list');
+            fillResult(res);
+            if (typeof window.applyReviewListing === 'function') {
+                window.applyReviewListing(res);
+            }
+            toast(res.message || 'Added to the review list');
             resumeAfterDialog();
         })
         .catch((error) => {
             console.log(error);
-            document.getElementById('status').innerHTML = `
+            setStatus(`
                 <span class="scan-status-badge scan-status-badge--error">
                     <i class="fas fa-triangle-exclamation"></i>
                     Connection error
                 </span>
-            `;
+            `);
 
             Swal.fire({
                 icon: 'error',
@@ -303,30 +437,6 @@ function onScanSuccess(decodedText) {
             });
         });
 }
-
-let html5QrcodeScanner = new Html5QrcodeScanner(
-
-    "reader",
-
-    {
-        fps: 10,
-        qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            const size = Math.max(180, Math.floor(minEdge * 0.7));
-
-            return { width: size, height: size };
-        },
-        aspectRatio: 1.0,
-        videoConstraints: {
-            facingMode: { ideal: "environment" }
-        }
-    },
-
-    false
-
-);
-
-html5QrcodeScanner.render(onScanSuccess);
 
 function updateScannerStatus(state) {
     const badge = document.getElementById('scannerStatus');
@@ -346,78 +456,56 @@ function updateScannerStatus(state) {
     }
 }
 
-let scannerUiPolished = false;
-
-function polishScannerUi() {
-    if (scannerUiPolished) {
-        return;
-    }
-
-    const cameraLabel = document.querySelector('#reader__dashboard_section_csr > span');
-    const startBtn = document.getElementById('html5-qrcode-button-camera-start');
-    const swapLink = document.getElementById('reader__dashboard_section_swaplink');
-
-    if (!startBtn && !swapLink) {
-        return;
-    }
-
-    if (cameraLabel && cameraLabel.textContent !== 'Camera source') {
-        cameraLabel.textContent = 'Camera source';
-    }
-
-    if (startBtn && startBtn.textContent !== 'Start Camera') {
-        startBtn.textContent = 'Start Camera';
-    }
-
-    const stopBtn = document.getElementById('html5-qrcode-button-camera-stop');
-    if (stopBtn && stopBtn.textContent !== 'Stop Camera') {
-        stopBtn.textContent = 'Stop Camera';
-    }
-
-    if (swapLink && !swapLink.dataset.polished) {
-        swapLink.dataset.polished = '1';
-        swapLink.innerHTML = '<i class="fas fa-image"></i> Upload QR Image';
-        swapLink.removeAttribute('style');
-    }
-
-    const statusSpan = document.getElementById('reader__status_span');
-    if (statusSpan && statusSpan.textContent.toLowerCase().includes('error')) {
-        statusSpan.classList.add('scanner-error');
-    }
-
-    scannerUiPolished = true;
-}
-
-function watchForActiveCamera() {
-    const video = document.querySelector('#reader video');
-
-    if (video && video.srcObject && !video.dataset.statusWatched) {
-        video.dataset.statusWatched = '1';
-        updateScannerStatus('scanning');
-
-        video.addEventListener('pause', () => {
-            if (!scannerPaused) {
-                updateScannerStatus('ready');
-            }
-        });
-
-        video.addEventListener('play', () => {
-            if (!scannerPaused) {
-                updateScannerStatus('scanning');
-            }
-        });
+function setUploadBusy(busy) {
+    if (scannerUploadBtn) {
+        scannerUploadBtn.disabled = busy;
     }
 }
 
-let polishAttempts = 0;
-const polishTimer = setInterval(() => {
-    polishScannerUi();
-    watchForActiveCamera();
-
-    if (scannerUiPolished || ++polishAttempts >= 15) {
-        clearInterval(polishTimer);
+function scanUploadedFile(file) {
+    if (!file) {
+        return;
     }
-}, 200);
+
+    setUploadBusy(true);
+    updateScannerStatus('processing');
+
+    fileScanner.scanFile(file, false)
+        .then((decodedText) => {
+            setUploadBusy(false);
+            onScanSuccess(decodedText);
+        })
+        .catch((error) => {
+            console.warn(error);
+            setUploadBusy(false);
+            updateScannerStatus(cameraRunning ? 'scanning' : 'ready');
+            showScanError('No QR code found in that image. Try another photo of the farm QR label.');
+        });
+}
+
+if (scannerToggleBtn) {
+    scannerToggleBtn.addEventListener('click', () => {
+        if (cameraRunning) {
+            stopCamera();
+            return;
+        }
+
+        startCamera();
+    });
+}
+
+scannerUploadBtn?.addEventListener('click', () => {
+    qrFileInput?.click();
+});
+
+qrFileInput?.addEventListener('change', function () {
+    const file = this.files && this.files[0];
+    this.value = '';
+    scanUploadedFile(file);
+});
+
+setCameraLive(false);
+updateScannerStatus('ready');
 
 </script>
 @endpush

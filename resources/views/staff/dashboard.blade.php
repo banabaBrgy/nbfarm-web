@@ -10,8 +10,6 @@
     @endpush
 
     @php
-        $eggsChange = $eggsChange ?? 0;
-        $eggsChangeHasBase = $eggsChangeHasBase ?? false;
         $feedStock = $feedStock ?? 0;
         $feedMin = $feedMin ?? 0;
         $feedLow = $feedLow ?? false;
@@ -22,7 +20,6 @@
         $vitaminLow = $vitaminLow ?? false;
         $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
         $eggsTitle = $eggsTitle ?? 'Total Eggs Today';
-        $eggsChangeLabel = $eggsChangeLabel ?? 'vs yesterday';
         $predictedSubtitle = $predictedSubtitle ?? 'Next-day forecast · tap for sizes';
         $activeBatchesSubtitle = $activeBatchesSubtitle ?? 'Currently producing';
     @endphp
@@ -52,10 +49,6 @@
             <div class="stat-info">
                 <span class="stat-title">{{ $eggsTitle }}</span>
                 <h2>{{ number_format($eggsToday) }}</h2>
-                @include('dashboard.stat-trend', [
-                    'change' => $eggsChange,
-                    'hasBase' => $eggsChangeHasBase,
-                ])
             </div>
         </div>
 

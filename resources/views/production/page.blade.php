@@ -245,10 +245,6 @@
 
     </div>
 
-    @if($canManageQr)
-        @include('production.review-list')
-    @endif
-
     {{-- FORECAST SUMMARY MODAL --}}
     <x-forecast-summary-modal
         :forecast-summary="$forecastSummary ?? null"

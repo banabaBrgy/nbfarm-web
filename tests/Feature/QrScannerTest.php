@@ -19,8 +19,15 @@ class QrScannerTest extends TestCase
             ->assertOk()
             ->assertSee(route('staff.scan.store'), false)
             ->assertSee(route('staff.production'), false)
-            ->assertSee('tap Review list to edit trays and eggs', false)
-            ->assertDontSee('id="productionReviewPanel"', false)
+            ->assertSee('Tap Review List to double-check, then Confirm &amp; Save', false)
+            ->assertSee('Camera Scanner', false)
+            ->assertSee('Scan Result', false)
+            ->assertSee('Review List', false)
+            ->assertSee('Upload QR', false)
+            ->assertSee('id="qrFileInput"', false)
+            ->assertSee('id="scannerUploadBtn"', false)
+            ->assertSee('id="productionReviewPanel"', false)
+            ->assertSee('id="productionReviewModal"', false)
             ->assertDontSee('id="productionReviewOpenBtn"', false)
             ->assertDontSee('id="draft-title"', false);
     }
