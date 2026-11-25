@@ -19,7 +19,7 @@
     <div class="page-header">
         <div>
             <h2>Scanned QR Overview</h2>
-            <p>Today’s saved tally for each size QR — scans, trays, and eggs after Confirm &amp; Save. Pending review lists are not counted yet.</p>
+            <p>Today’s saved tally for each size QR — trays and eggs after Confirm &amp; Save. Pending review lists are not counted yet.</p>
         </div>
         <a href="{{ route($role . '.production') }}" class="scan-back-button">
             <i class="fas fa-arrow-left"></i>
@@ -71,7 +71,6 @@
                 <col class="qr-overview-col-code">
                 <col class="qr-overview-col-batch">
                 <col class="qr-overview-col-size">
-                <col class="qr-overview-col-scans">
                 <col class="qr-overview-col-trays">
                 <col class="qr-overview-col-eggs">
             </colgroup>
@@ -80,7 +79,6 @@
                     <th>QR Code</th>
                     <th>Batch</th>
                     <th>Size</th>
-                    <th>Scans today</th>
                     <th>Trays today</th>
                     <th>Eggs today</th>
                 </tr>
@@ -91,13 +89,12 @@
                         <td>{{ $row['qr_code'] }}</td>
                         <td>{{ $row['batch_id'] }}</td>
                         <td>{{ $row['egg_size'] }}</td>
-                        <td>{{ number_format($row['scans']) }}</td>
                         <td>{{ number_format($row['trays']) }}</td>
                         <td>{{ number_format($row['eggs']) }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="qr-overview-empty">
+                        <td colspan="5" class="qr-overview-empty">
                             @if($hasFilters)
                                 No QR records match this search.
                             @else

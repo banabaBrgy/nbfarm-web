@@ -63,7 +63,6 @@ class QrRecordController extends Controller
                     'qr_code' => (string) $record->qr_code,
                     'batch_id' => (int) $record->batch_id,
                     'egg_size' => (string) $record->egg_size,
-                    'scans' => $record->transactions->count(),
                     'trays' => intdiv($eggs, $perTray),
                     'eggs' => $eggs,
                 ];
@@ -77,7 +76,6 @@ class QrRecordController extends Controller
                     'qr_code',
                     'batch_id',
                     'egg_size',
-                    'scans',
                     'trays',
                     'eggs',
                 ] as $field) {
