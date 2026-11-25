@@ -283,7 +283,19 @@
 }
 
 .scanner-frame:not(.is-live) #reader {
-    visibility: hidden;
+    opacity: 0;
+}
+
+.qr-file-reader {
+    position: fixed;
+    width: 280px;
+    height: 280px;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
 }
 
 #reader::before,
@@ -357,10 +369,9 @@
 #reader video {
     display: block;
     width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
     max-height: none;
-    border-radius: 12px;
-    object-fit: cover;
+    object-fit: contain;
     border: 0;
     background: #000;
 }

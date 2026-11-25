@@ -33,22 +33,29 @@ class DashboardCardRatingTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_production_rates_the_selected_day_against_its_forecast(): void
+    public function test_owner_production_rates_against_previous_day_not_forecast(): void
     {
         $this->forecast('2026-11-08', 1000);
         $this->harvest('2026-11-07', 400);
         $this->harvest('2026-11-08', 800);
 
-        $this->actingAs($this->owner())
+        $html = $this->actingAs($this->owner())
             ->get(route('owner.dashboard'))
             ->assertOk()
+            ->assertSee('+100.0%')
             ->assertDontSee('-20.0%')
             ->assertDontSee('vs expected')
             ->assertDontSee('vs yesterday')
-            ->assertDontSee('vs prior period');
+            ->assertDontSee('vs prior period')
+            ->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/stat-card--eggs[\s\S]*?\+100\.0%/',
+            $html
+        );
     }
 
-    public function test_production_has_no_rating_without_a_forecast_for_the_filter(): void
+    public function test_owner_production_uses_previous_period_without_forecast(): void
     {
         $this->harvest('2026-11-07', 500);
         $this->harvest('2026-11-08', 600);
@@ -56,49 +63,63 @@ class DashboardCardRatingTest extends TestCase
         $this->actingAs($this->owner())
             ->get(route('owner.dashboard'))
             ->assertOk()
-            ->assertDontSee('+20.0%')
+            ->assertSee('+20.0%')
             ->assertDontSee('vs yesterday')
             ->assertDontSee('vs prior period');
     }
 
-    public function test_date_filter_rates_that_date_not_today(): void
+    public function test_date_filter_rates_that_date_against_previous_day(): void
     {
         $this->forecast('2026-11-01', 1000);
         $this->forecast('2026-11-08', 1000);
+        $this->harvest('2026-10-31', 1000);
         $this->harvest('2026-11-01', 800);
         $this->harvest('2026-11-08', 1200);
 
-        $this->actingAs($this->owner())
+        $html = $this->actingAs($this->owner())
             ->get(route('owner.dashboard', [
                 'dash_period' => 'date',
                 'dash_date' => '2026-11-01',
             ]))
             ->assertOk()
-            ->assertDontSee('-20.0%')
             ->assertDontSee('+20.0%')
-            ->assertDontSee('vs prior period');
+            ->assertDontSee('vs prior period')
+            ->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/stat-card--eggs[\s\S]*?-20\.0%/',
+            $html
+        );
     }
 
-    public function test_range_rates_the_filtered_dates_against_their_forecasts(): void
+    public function test_range_rates_against_equal_length_previous_period(): void
     {
+        $this->harvest('2026-10-30', 200);
+        $this->harvest('2026-10-31', 200);
         $this->harvest('2026-11-01', 100);
         $this->harvest('2026-11-02', 50);
         $this->forecast('2026-11-01', 200);
         $this->forecast('2026-11-02', 200);
 
-        $this->actingAs($this->owner())
+        $html = $this->actingAs($this->owner())
             ->get(route('owner.dashboard', [
                 'dash_period' => 'range',
                 'dash_from' => '2026-11-01',
                 'dash_to' => '2026-11-02',
             ]))
             ->assertOk()
-            ->assertDontSee('-62.5%')
             ->assertDontSee('vs expected')
-            ->assertDontSee('vs prior period');
+            ->assertDontSee('vs prior period')
+            ->getContent();
+
+        // Current 150 vs previous Oct 30–31 (400) = -62.5%.
+        $this->assertMatchesRegularExpression(
+            '/stat-card--eggs[\s\S]*?-62\.5%/',
+            $html
+        );
     }
 
-    public function test_incomplete_range_forecast_does_not_use_the_prior_period(): void
+    public function test_owner_range_uses_previous_period_even_without_full_forecast(): void
     {
         $this->harvest('2026-10-30', 40);
         $this->harvest('2026-10-31', 40);
@@ -106,35 +127,46 @@ class DashboardCardRatingTest extends TestCase
         $this->harvest('2026-11-02', 50);
         $this->forecast('2026-11-01', 200);
 
-        $this->actingAs($this->owner())
+        $html = $this->actingAs($this->owner())
             ->get(route('owner.dashboard', [
                 'dash_period' => 'range',
                 'dash_from' => '2026-11-01',
                 'dash_to' => '2026-11-02',
             ]))
             ->assertOk()
-            ->assertDontSee('+87.5%')
-            ->assertDontSee('vs prior period');
+            ->assertDontSee('vs prior period')
+            ->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/stat-card--eggs[\s\S]*?\+87\.5%/',
+            $html
+        );
     }
 
-    public function test_today_dispatch_and_sales_rate_against_yesterday_not_lifetime(): void
+    public function test_today_dispatch_and_sales_rate_delivered_against_yesterday(): void
     {
         $this->dispatchDay('2026-11-01', 3, 80, 'Delivered');
         $this->dispatchDay('2026-11-07', 4, 100, 'Delivered');
         $this->dispatchDay('2026-11-08', 6, 80, 'Pending');
+        $this->dispatchDay('2026-11-08', 2, 50, 'Delivered');
 
-        $response = $this->actingAs($this->owner())
+        $html = $this->actingAs($this->owner())
             ->get(route('owner.dashboard'))
-            ->assertOk();
-
-        $this->assertMatchesRegularExpression(
-            '/stat-card--dispatch[\s\S]*?>\s*6\s*</',
-            $response->getContent()
-        );
-        $response->assertDontSee('+50.0%')
-            ->assertDontSee('-20.0%')
+            ->assertOk()
             ->assertDontSee('vs yesterday')
-            ->assertDontSee('>13<', false);
+            ->assertDontSee('>13<', false)
+            ->getContent();
+
+        // Card = all trays today (8). Rating = delivered 2 vs yesterday delivered 4 = -50.0%.
+        $this->assertMatchesRegularExpression(
+            '/stat-card--dispatch[\s\S]*?<h2>\s*8\s*<\/h2>[\s\S]*?-50\.0%/',
+            $html
+        );
+        // Revenue card includes all transactions today (80+50=130). Rating uses Delivered only: 50 vs 100 = -50.0%.
+        $this->assertMatchesRegularExpression(
+            '/stat-card--revenue[\s\S]*?<h2>\s*₱130\s*<\/h2>[\s\S]*?-50\.0%/',
+            $html
+        );
     }
 
     public function test_inventory_levels_rate_stock_against_yesterday_and_min(): void
@@ -226,7 +258,7 @@ class DashboardCardRatingTest extends TestCase
     private function dispatchDay(string $date, int $trays, float $price, string $status): void
     {
         $dispatch = Dispatch::create([
-            'recipient' => 'Store '.$date,
+            'recipient' => 'Store '.$date.' '.$status.' '.$trays,
             'address' => 'Lipa City',
             'dispatch_date' => $date,
             'price' => $price,
@@ -238,7 +270,8 @@ class DashboardCardRatingTest extends TestCase
             'quantity' => $trays,
         ]);
         Transaction::create([
-            'customer' => 'Store '.$date,
+            'dispatch_id' => $dispatch->id,
+            'customer' => 'Store '.$date.' '.$status.' '.$trays,
             'transaction_date' => $date,
             'quantity' => $trays,
             'price' => $price,

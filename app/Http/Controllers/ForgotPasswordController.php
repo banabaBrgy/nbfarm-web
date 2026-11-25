@@ -50,8 +50,19 @@ class ForgotPasswordController extends Controller
             return redirect('/forgot-password')->with('error', 'Session expired.');
         }
 
+        $user = User::find(session('reset_user_id'));
+        $securityQuestion = $user && $user->hasSecurityAnswer() && ! $this->isInactive($user)
+            ? trim((string) $user->security_question)
+            : '';
+
+        // Same layout for missing/inactive accounts so the form does not reveal account status.
+        if ($securityQuestion === '') {
+            $securityQuestion = 'What is the name of your first pet?';
+        }
+
         return view('auth.verify-question', [
             'username' => $username,
+            'securityQuestion' => $securityQuestion,
         ]);
     }
 

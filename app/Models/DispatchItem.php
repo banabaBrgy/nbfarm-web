@@ -12,10 +12,21 @@ class DispatchItem extends Model
         'dispatch_id',
         'size',
         'quantity',
+        'loaded_quantity',
     ];
 
     public function dispatch()
     {
         return $this->belongsTo(Dispatch::class);
+    }
+
+    public function remainingQuantity(): int
+    {
+        return max(0, (int) $this->quantity - (int) $this->loaded_quantity);
+    }
+
+    public function isFullyLoaded(): bool
+    {
+        return $this->remainingQuantity() === 0;
     }
 }

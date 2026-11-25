@@ -445,6 +445,27 @@
 .stat-trend-flat { color: #6b7280; font-weight: 500; }
 .stat-meta { display: flex; flex-direction: column; gap: 2px; }
 
+/* Owner target rating: only +/- % vs operational target */
+.target-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.target-rating i {
+  font-size: 10px;
+  line-height: 1;
+}
+.target-rating--up,
+.stat-info small.target-rating--up { color: #15803d !important; }
+.target-rating--down,
+.stat-info small.target-rating--down { color: #dc2626 !important; }
+.target-rating--flat,
+.stat-info small.target-rating--flat { color: #6b7280 !important; font-weight: 600; }
+/* Stock above desired level is not framed as better */
 .stat-card--feed .stat-icon { background: linear-gradient(145deg, #fbbf24 0%, #ea580c 100%); }
 .stat-card--feed .stat-info h2 { color: #ea580c; }
 .stat-card--dispatch .stat-icon { background: linear-gradient(145deg, #60a5fa 0%, #2563eb 100%); }

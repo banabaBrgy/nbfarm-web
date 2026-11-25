@@ -222,6 +222,19 @@ body{
     font-weight:500;
 }
 
+/* Beat .stat-info small gray so +/- ratings stay colored */
+.stat-info small.target-rating--up{
+    color:#15803d !important;
+}
+
+.stat-info small.target-rating--down{
+    color:#dc2626 !important;
+}
+
+.stat-info small.target-rating--flat{
+    color:#6b7280 !important;
+}
+
 .stat-meta{
     display:flex;
     flex-direction:column;

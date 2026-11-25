@@ -27,6 +27,12 @@
         $eggsTitle = 'Total Eggs Produced';
         $dispatchTitle = 'Total Dispatch';
         $revenueTitle = 'Revenue';
+        $kpis = $kpis ?? [];
+        $productionKpi = $kpis['production'] ?? null;
+        $stockKpi = $kpis['stock'] ?? null;
+        $dispatchKpi = $kpis['dispatch'] ?? null;
+        $revenueKpi = $kpis['revenue'] ?? null;
+        // Card totals stay as DashboardOverview DB values; KPI only drives the +/- rating.
 
     @endphp
 
@@ -61,6 +67,8 @@
                 <span class="stat-title">{{ $eggsTitle }}</span>
 
                 <h2>{{ number_format($eggsToday) }}</h2>
+
+                @include('dashboard.target-rating', ['rating' => $productionKpi])
             </div>
         </div>
 
@@ -72,6 +80,8 @@
             <div class="stat-info">
                 <span class="stat-title">Eggs Stock</span>
                 <h2>{{ number_format($eggsTotal) }}</h2>
+
+                @include('dashboard.target-rating', ['rating' => $stockKpi])
             </div>
         </div>
 
@@ -87,6 +97,8 @@
                     <span class="stat-title">{{ $dispatchTitle }}</span>
 
                     <h2>{{ number_format($dispatchedTrays) }}</h2>
+
+                    @include('dashboard.target-rating', ['rating' => $dispatchKpi])
                 </div>
             </div>
 
@@ -100,6 +112,8 @@
                     <span class="stat-title">{{ $revenueTitle }}</span>
 
                     <h2>₱{{ number_format($revenueToday, 0) }}</h2>
+
+                    @include('dashboard.target-rating', ['rating' => $revenueKpi])
                 </div>
             </div>
 

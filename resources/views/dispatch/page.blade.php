@@ -6,7 +6,7 @@
     $sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
     $hasFilters = request()->filled('search') || request()->filled('status') || request()->filled('size');
     $availableDispatchTrays = array_sum(
-        \App\Models\Production::availableDispatchTraysBySize()
+        \App\Models\Production::promiseableDispatchTraysBySize()
     );
     $createFailed = $errors->any() && old('_form') === 'create';
     $editFailedId = $errors->any() && old('_form') === 'edit' ? (int) old('dispatch_id') : null;
@@ -34,19 +34,27 @@
             <p>Track outgoing egg deliveries by recipient, size, and status.</p>
         </div>
 
-        @if($canManage)
-            <button
-                type="button"
-                class="btn-new"
-                data-bs-toggle="modal"
-                data-bs-target="#newDispatchModal"
-                @disabled($availableDispatchTrays < 1)
-                title="{{ $availableDispatchTrays > 0 ? 'Create a new dispatch' : 'No egg trays are available for dispatch' }}"
-            >
-                <i class="fas fa-plus"></i>
-                {{ $availableDispatchTrays > 0 ? 'New Dispatch' : 'No Egg Stock' }}
-            </button>
-        @endif
+        <div class="page-header-actions" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+            @if(! $canManage && $canEdit)
+                <a href="{{ route($rolePrefix.'.dispatch.scan') }}" class="btn-new" style="text-decoration:none;">
+                    <i class="fas fa-qrcode"></i>
+                    Scan for Dispatch
+                </a>
+            @endif
+            @if($canManage)
+                <button
+                    type="button"
+                    class="btn-new"
+                    data-bs-toggle="modal"
+                    data-bs-target="#newDispatchModal"
+                    @disabled($availableDispatchTrays < 1)
+                    title="{{ $availableDispatchTrays > 0 ? 'Create a new dispatch' : 'No egg trays are available for dispatch' }}"
+                >
+                    <i class="fas fa-plus"></i>
+                    {{ $availableDispatchTrays > 0 ? 'New Dispatch' : 'No Egg Stock' }}
+                </button>
+            @endif
+        </div>
     </div>
 
     <div class="dispatch-stats">
@@ -205,7 +213,7 @@
                                         @endphp
                                         <div class="dsp-item">
                                             <span class="dsp-chip dsp-chip-{{ $chip }}">{{ $item->size }}</span>
-                                            <span class="dsp-qty">{{ $item->quantity }} trays</span>
+                                            <span class="dsp-qty">{{ (int) ($item->loaded_quantity ?? 0) }}/{{ $item->quantity }} trays</span>
                                         </div>
                                     @endforeach
                                 </div>
@@ -513,11 +521,11 @@
                                         @php $chip = strtolower(str_replace(' ', '-', $item->size)); @endphp
                                         <div class="dsp-items-box-row">
                                             <span class="dsp-chip dsp-chip-{{ $chip }}">{{ $item->size }}</span>
-                                            <span class="dsp-items-box-qty">{{ number_format($item->quantity) }} trays</span>
+                                            <span class="dsp-items-box-qty">{{ number_format((int) ($item->loaded_quantity ?? 0)) }}/{{ number_format($item->quantity) }} trays loaded</span>
                                         </div>
                                     @endforeach
                                 </div>
-                                <p class="dsp-field-hint">Size and trays cannot be changed here.</p>
+                                <p class="dsp-field-hint">Size and trays cannot be changed here. Use Scan for Dispatch to load Pending trays.</p>
                             </div>
 
                             <div class="dsp-field dsp-field-last">
@@ -581,7 +589,7 @@
                                     @php $chip = strtolower(str_replace(' ', '-', $item->size)); @endphp
                                     <div class="dsp-items-box-row">
                                         <span class="dsp-chip dsp-chip-{{ $chip }}">{{ $item->size }}</span>
-                                        <span class="dsp-items-box-qty">{{ number_format($item->quantity) }} trays</span>
+                                        <span class="dsp-items-box-qty">{{ number_format((int) ($item->loaded_quantity ?? 0)) }}/{{ number_format($item->quantity) }} trays loaded</span>
                                     </div>
                                 @endforeach
                             </div>

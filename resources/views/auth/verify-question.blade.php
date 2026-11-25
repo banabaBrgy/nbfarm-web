@@ -10,17 +10,19 @@
 @section('sub', 'Enter the answer to the security question on this account.')
 
 @section('content')
+    <div class="field recovery-account">
+        <div class="field-label">Username</div>
+        <p class="recovery-account-name">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            {{ $username }}
+        </p>
+    </div>
+
     <div class="field">
-        <label class="field-label" for="username">Username</label>
-        <div class="input-icon-wrap">
-            <span class="input-icon" aria-hidden="true"><i class="fas fa-user"></i></span>
-            <input
-                type="text"
-                id="username"
-                value="{{ $username }}"
-                readonly
-                tabindex="-1"
-            >
+        <div class="field-label">Security question</div>
+        <div class="question-card" role="note">
+            <span class="question-card-mark" aria-hidden="true">?</span>
+            <p class="question-card-text">{{ $securityQuestion }}</p>
         </div>
     </div>
 

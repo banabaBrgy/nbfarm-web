@@ -55,7 +55,7 @@
                         accept="image/*"
                         hidden>
                 </div>
-                <div id="qrFileReader" hidden></div>
+                <div id="qrFileReader" class="qr-file-reader" aria-hidden="true"></div>
             </div>
 
             <p class="scanner-instruction">
@@ -131,7 +131,9 @@
 
 @push('scripts')
 
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" integrity="sha384-c9d8RFSL+u3exBOJ4Yp3HUJXS4znl9f+z66d1y54ig+ea249SpqR+w1wyvXz/lk+" crossorigin="anonymous"></script>
+<script src="{{ versioned_asset('js/html5-qrcode.min.js') }}"></script>
+<script src="{{ versioned_asset('js/qr-camera.js') }}"></script>
+<script src="{{ versioned_asset('js/farm-toast.js') }}"></script>
 
 <script>
 
@@ -228,6 +230,12 @@ function resumeAfterDialog() {
     resumeScannerIfNeeded();
 }
 
+function toast(title, type = 'success') {
+    if (window.nbToast) {
+        window.nbToast(title, type);
+    }
+}
+
 function showScanError(message) {
     setStatus(`
         <span class="scan-status-badge scan-status-badge--error">
@@ -235,32 +243,13 @@ function showScanError(message) {
             Scan failed
         </span>
     `);
-
-    Swal.fire({
-        icon: 'error',
-        title: 'Scan Failed',
-        text: message || 'Scan failed.',
-        confirmButtonText: 'OK',
-        allowOutsideClick: false,
-        allowEscapeKey: false
-    }).then(() => {
-        resumeAfterDialog();
-    });
+    toast(message || 'Scan failed.', 'error');
+    resumeAfterDialog();
 }
 
-function toast(title) {
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title,
-        timer: 1800,
-        showConfirmButton: false
-    });
-}
-
-const html5Qrcode = new Html5Qrcode('reader');
-const fileScanner = new Html5Qrcode('qrFileReader');
+let html5Qrcode = window.NbFarmQr && NbFarmQr.libraryReady()
+    ? new Html5Qrcode('reader')
+    : null;
 let cameraRunning = false;
 const scannerToggleBtn = document.getElementById('scannerToggleBtn');
 const scannerUploadBtn = document.getElementById('scannerUploadBtn');
@@ -306,38 +295,23 @@ function resumeScannerIfNeeded() {
     }
 }
 
-function isVirtualCamera(label) {
-    return /obs|virtual|snap camera|manycam|droidcam|iriun|nvidia broadcast|xsplit|ndi/i.test(label || '');
-}
-
-function pickPreferredCamera(cameras) {
-    const real = cameras.filter((camera) => !isVirtualCamera(camera.label));
-    const pool = real.length ? real : cameras;
-    const rear = pool.find((camera) => /back|rear|environment/i.test(camera.label || ''));
-
-    return rear || pool[0] || cameras[0];
-}
-
 function startCamera() {
     if (cameraRunning || !scannerToggleBtn) {
         return;
     }
 
+    if (!window.NbFarmQr || !NbFarmQr.libraryReady()) {
+        toast('Scanner failed to load. Refresh the page.', 'error');
+        return;
+    }
+
     scannerToggleBtn.disabled = true;
     updateScannerStatus('processing');
+    setCameraLive(true);
 
-    const config = { fps: 10, aspectRatio: 1.777 };
-
-    Html5Qrcode.getCameras()
-        .then((cameras) => {
-            if (!cameras.length) {
-                throw new Error('No camera found');
-            }
-
-            return html5Qrcode.start(pickPreferredCamera(cameras).id, config, onScanSuccess);
-        })
-        .catch(() => html5Qrcode.start({ facingMode: 'user' }, config, onScanSuccess))
-        .then(() => {
+    NbFarmQr.start('reader', onScanSuccess, html5Qrcode)
+        .then((scanner) => {
+            html5Qrcode = scanner;
             cameraRunning = true;
             scannerToggleBtn.disabled = false;
             setCameraLive(true);
@@ -348,12 +322,7 @@ function startCamera() {
             cameraRunning = false;
             setCameraLive(false);
             updateScannerStatus('ready');
-            Swal.fire({
-                icon: 'error',
-                title: 'Camera Error',
-                text: 'Could not start the camera. Check browser permissions and try again.',
-                confirmButtonText: 'OK'
-            });
+            toast('Could not start the camera. Check permissions or use Upload QR.', 'error');
         });
 }
 
@@ -368,7 +337,8 @@ function stopCamera() {
         scannerToggleBtn.disabled = true;
     }
 
-    return html5Qrcode.stop().then(() => {
+    return NbFarmQr.resetScanner(html5Qrcode).then(() => {
+        html5Qrcode = new Html5Qrcode('reader');
         cameraRunning = false;
         scannerPaused = false;
         if (scannerToggleBtn) {
@@ -403,6 +373,8 @@ function onScanSuccess(decodedText) {
     jsonRequest(scanStoreUrl, 'POST', { qr_code: decodedText })
         .then((res) => {
             if (!res.success) {
+                lastCommittedCode = String(decodedText);
+                lastCommittedAt = Date.now();
                 showScanError(res.message);
                 return;
             }
@@ -414,27 +386,21 @@ function onScanSuccess(decodedText) {
             if (typeof window.applyReviewListing === 'function') {
                 window.applyReviewListing(res);
             }
-            toast(res.message || 'Added to the review list');
+            toast(res.message || 'Added to the review list', 'success');
             resumeAfterDialog();
         })
         .catch((error) => {
             console.log(error);
+            lastCommittedCode = String(decodedText);
+            lastCommittedAt = Date.now();
             setStatus(`
                 <span class="scan-status-badge scan-status-badge--error">
                     <i class="fas fa-triangle-exclamation"></i>
                     Connection error
                 </span>
             `);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Server Error',
-                text: 'Something went wrong.',
-                confirmButtonText: 'OK',
-                allowOutsideClick: false
-            }).then(() => {
-                resumeAfterDialog();
-            });
+            toast('Something went wrong. Try the scan again.', 'error');
+            resumeAfterDialog();
         });
 }
 
@@ -470,7 +436,7 @@ function scanUploadedFile(file) {
     setUploadBusy(true);
     updateScannerStatus('processing');
 
-    fileScanner.scanFile(file, false)
+    NbFarmQr.scanFile('qrFileReader', file)
         .then((decodedText) => {
             setUploadBusy(false);
             onScanSuccess(decodedText);
@@ -506,6 +472,13 @@ qrFileInput?.addEventListener('change', function () {
 
 setCameraLive(false);
 updateScannerStatus('ready');
+
+if (!html5Qrcode) {
+    const badge = document.getElementById('scannerStatus');
+    if (badge) {
+        badge.textContent = 'Scanner failed to load';
+    }
+}
 
 </script>
 @endpush

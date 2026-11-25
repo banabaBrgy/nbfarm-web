@@ -27,7 +27,7 @@ class DashboardOverview
         $filter = DashboardDateFilter::fromRequest($request);
         $useCurrentInventory = $filter->isToday();
         $asOf = $filter->asOf();
-        [$previousStart, $previousEnd] = $this->previousWindow($filter);
+        [$previousStart, $previousEnd] = $filter->previousWindow();
 
         $eggsToday = (int) Production::query()
             ->whereDate('production_date', '>=', $filter->startDate())
@@ -152,21 +152,6 @@ class DashboardOverview
         }
 
         return $payload;
-    }
-
-    /**
-     * @return array{0: string, 1: string}
-     */
-    private function previousWindow(DashboardDateFilter $filter): array
-    {
-        $length = (int) $filter->start->diffInDays($filter->end);
-        $previousEnd = $filter->start->copy()->subDay();
-        $previousStart = $previousEnd->copy()->subDays($length);
-
-        return [
-            $previousStart->toDateString(),
-            $previousEnd->toDateString(),
-        ];
     }
 
     /**

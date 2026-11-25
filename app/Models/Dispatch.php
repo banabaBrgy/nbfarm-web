@@ -48,4 +48,35 @@ class Dispatch extends Model
             ]
         );
     }
+
+    public function isFullyLoaded(): bool
+    {
+        $this->loadMissing('items');
+
+        if ($this->items->isEmpty()) {
+            return false;
+        }
+
+        foreach ($this->items as $item) {
+            if (! $item->isFullyLoaded()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function totalOrderedTrays(): int
+    {
+        $this->loadMissing('items');
+
+        return (int) $this->items->sum('quantity');
+    }
+
+    public function totalLoadedTrays(): int
+    {
+        $this->loadMissing('items');
+
+        return (int) $this->items->sum('loaded_quantity');
+    }
 }

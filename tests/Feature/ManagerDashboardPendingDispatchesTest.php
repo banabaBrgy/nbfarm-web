@@ -69,7 +69,7 @@ class ManagerDashboardPendingDispatchesTest extends TestCase
             ->get(route('manager.dashboard'))
             ->assertOk()
             ->assertSee('Manager Dashboard')
-            ->assertSee('Egg stock')
+            ->assertSee('Total Eggs Today')
             ->assertSee('predicted eggs')
             ->assertSee('Pending Dispatches')
             ->assertSee('(1)')

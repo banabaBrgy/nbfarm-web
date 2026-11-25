@@ -375,8 +375,13 @@ class QrScanRecorder
      */
     private function locate(string $qrCode): array
     {
+        $code = trim($qrCode);
+        if (str_contains($code, '/')) {
+            $code = trim((string) basename(parse_url($code, PHP_URL_PATH) ?: $code));
+        }
+
         $qr = QrRecord::query()
-            ->where('qr_code', $qrCode)
+            ->where('qr_code', $code)
             ->orderBy('id')
             ->first();
 

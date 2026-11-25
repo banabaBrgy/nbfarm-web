@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\DailyInventory;
 use App\Services\DashboardDateFilter;
 use App\Services\DashboardOverview;
+use App\Services\OwnerDashboardKpis;
 use App\Services\RoleTodoList;
 use App\Services\SystemEffectiveness;
 use Illuminate\Http\Request;
@@ -27,7 +28,8 @@ class OwnerDashboardController extends Controller
 
         return view('owner.dashboard', array_merge(
             $overview,
-            compact('effectiveness', 'roleTodos')
+            compact('effectiveness', 'roleTodos'),
+            app(OwnerDashboardKpis::class)->forRequest($request)
         ));
     }
 }

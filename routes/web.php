@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionDetailsController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DispatchController;
+use App\Http\Controllers\OwnerDispatchScanController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\SalesHistoryController;
 use App\Http\Controllers\BatchController;
@@ -229,6 +230,9 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
 
     Route::get('/dispatch', [DispatchController::class, 'index'])->name('dispatch');
     Route::put('/dispatch/{dispatch}', [DispatchController::class, 'update'])->name('dispatch.update');
+    Route::get('/dispatch/scan', [OwnerDispatchScanController::class, 'index'])->name('dispatch.scan');
+    Route::post('/dispatch/scan/resolve', [OwnerDispatchScanController::class, 'resolve'])->name('dispatch.scan.resolve');
+    Route::post('/dispatch/scan/apply', [OwnerDispatchScanController::class, 'apply'])->name('dispatch.scan.apply');
 
     Route::view('/forecast', 'forecast')->name('forecast');
     Route::get('/users', [UserController::class, 'index'])->name('users');

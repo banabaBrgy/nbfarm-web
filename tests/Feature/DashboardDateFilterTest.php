@@ -179,6 +179,7 @@ class DashboardDateFilterTest extends TestCase
             'quantity' => 3,
         ]);
         Transaction::create([
+            'dispatch_id' => $past->id,
             'customer' => 'North Store',
             'transaction_date' => '2026-11-01',
             'quantity' => 3,
@@ -199,6 +200,7 @@ class DashboardDateFilterTest extends TestCase
             'quantity' => 9,
         ]);
         Transaction::create([
+            'dispatch_id' => $today->id,
             'customer' => 'South Store',
             'transaction_date' => '2026-11-08',
             'quantity' => 9,

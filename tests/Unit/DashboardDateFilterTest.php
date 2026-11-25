@@ -88,4 +88,25 @@ class DashboardDateFilterTest extends TestCase
         $this->assertTrue($today->isToday());
         $this->assertSame('today', $today->period);
     }
+
+    public function test_previous_window_for_today_is_yesterday(): void
+    {
+        $filter = DashboardDateFilter::fromRequest(Request::create('/dashboard', 'GET'));
+
+        $this->assertSame(['2026-11-07', '2026-11-07'], $filter->previousWindow());
+        $this->assertSame('2026-11-07', $filter->previousAsOf()->toDateString());
+    }
+
+    public function test_previous_window_matches_equal_length_range(): void
+    {
+        // Fully in the past so the filter is not clamped to "today".
+        $filter = DashboardDateFilter::fromRequest(Request::create('/dashboard', 'GET', [
+            'dash_period' => 'range',
+            'dash_from' => '2026-10-01',
+            'dash_to' => '2026-10-17',
+        ]));
+
+        $this->assertSame(['2026-09-14', '2026-09-30'], $filter->previousWindow());
+        $this->assertSame('2026-09-30', $filter->previousAsOf()->toDateString());
+    }
 }

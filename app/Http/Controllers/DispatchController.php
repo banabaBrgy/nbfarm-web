@@ -81,6 +81,38 @@ class DispatchController extends Controller
                 );
             }
 
+            $loadedBySize = [];
+            foreach ($dispatch->items as $item) {
+                $loadedBySize[$item->size] = ($loadedBySize[$item->size] ?? 0) + (int) $item->loaded_quantity;
+            }
+
+            $additionalLoad = array_fill_keys(array_keys(Production::EGG_SIZE_COLUMNS), 0);
+            $nextItems = [];
+            foreach ($validated['size'] as $index => $size) {
+                $quantity = (int) $validated['quantity'][$index];
+                $already = (int) ($loadedBySize[$size] ?? 0);
+                $loaded = min($quantity, $already);
+                if ($validated['status'] !== 'Pending') {
+                    $additionalLoad[$size] += max(0, $quantity - $already);
+                    $loaded = $quantity;
+                }
+                $nextItems[] = [
+                    'size' => $size,
+                    'quantity' => $quantity,
+                    'loaded_quantity' => $loaded,
+                ];
+            }
+
+            if (
+                $validated['status'] !== 'Pending'
+                && $this->isWithinStockWindow($validated['dispatch_date'])
+            ) {
+                $this->assertEnoughTrays(
+                    $additionalLoad,
+                    Production::availableDispatchTraysBySize()
+                );
+            }
+
             $dispatch->update([
                 'recipient' => $validated['recipient'],
                 'address' => $validated['address'],
@@ -91,11 +123,8 @@ class DispatchController extends Controller
 
             $dispatch->items()->delete();
 
-            foreach ($validated['size'] as $index => $size) {
-                $dispatch->items()->create([
-                    'size' => $size,
-                    'quantity' => $validated['quantity'][$index],
-                ]);
+            foreach ($nextItems as $item) {
+                $dispatch->items()->create($item);
             }
 
             $dispatch->syncSale();
@@ -142,7 +171,7 @@ class DispatchController extends Controller
             Production::lockStockWindow();
             $this->assertEnoughTrays(
                 $this->requestedTraysBySize($validated),
-                Production::availableDispatchTraysBySize()
+                Production::promiseableDispatchTraysBySize()
             );
 
             $dispatch = Dispatch::create([
@@ -154,13 +183,20 @@ class DispatchController extends Controller
                 'status' => $validated['status'],
             ]);
 
-            foreach ($validated['size'] as $index => $size) {
+            $requested = $this->requestedTraysBySize($validated);
+            if ($validated['status'] !== 'Pending') {
+                // Creating already On Transit/Delivered loads trays immediately from physical stock.
+                $this->assertEnoughTrays($requested, Production::availableDispatchTraysBySize());
+            }
 
+            foreach ($validated['size'] as $index => $size) {
+                $quantity = (int) $validated['quantity'][$index];
                 $dispatch->items()->create([
                     'size' => $size,
-                    'quantity' => $validated['quantity'][$index],
+                    'quantity' => $quantity,
+                    // Pending waits for owner QR scan; other statuses load trays now.
+                    'loaded_quantity' => $validated['status'] === 'Pending' ? 0 : $quantity,
                 ]);
-
             }
 
             $dispatch->syncSale();
@@ -178,11 +214,33 @@ class DispatchController extends Controller
             'status' => 'required|in:Pending,On Transit,Delivered',
         ]);
 
-        $dispatch->update([
-            'status' => $request->status,
-        ]);
+        DB::transaction(function () use ($dispatch, $request) {
+            Production::lockStockWindow();
+            $dispatch->loadMissing('items');
 
-        $dispatch->syncSale();
+            if ($request->status !== 'Pending') {
+                $additional = array_fill_keys(array_keys(Production::EGG_SIZE_COLUMNS), 0);
+                foreach ($dispatch->items as $item) {
+                    $additional[$item->size] += max(
+                        0,
+                        (int) $item->quantity - (int) $item->loaded_quantity
+                    );
+                }
+                $this->assertEnoughTrays($additional, Production::availableDispatchTraysBySize());
+
+                foreach ($dispatch->items as $item) {
+                    if ((int) $item->loaded_quantity < (int) $item->quantity) {
+                        $item->update(['loaded_quantity' => (int) $item->quantity]);
+                    }
+                }
+            }
+
+            $dispatch->update([
+                'status' => $request->status,
+            ]);
+
+            $dispatch->syncSale();
+        });
 
         return back()->with('success', 'Dispatch status updated successfully.');
     }
@@ -254,6 +312,13 @@ class DispatchController extends Controller
             ]);
         }
 
+        $uniqueSizes = array_unique($validated['size']);
+        if (count($uniqueSizes) !== count($validated['size'])) {
+            throw ValidationException::withMessages([
+                'size' => 'Each egg size can only appear once per dispatch. Combine trays into one line.',
+            ]);
+        }
+
         return $validated;
     }
 
@@ -270,7 +335,7 @@ class DispatchController extends Controller
 
     private function availableTraysForUpdate(Dispatch $dispatch): array
     {
-        $available = Production::availableDispatchTraysBySize();
+        $available = Production::promiseableDispatchTraysBySize();
 
         if (! $this->isWithinStockWindow($this->dispatchDateString($dispatch))) {
             return $available;

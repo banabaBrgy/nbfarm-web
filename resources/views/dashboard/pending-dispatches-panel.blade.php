@@ -40,7 +40,7 @@
                                 @foreach($dispatch->items as $item)
                                     @php $chip = strtolower(str_replace(' ', '-', $item->size)); @endphp
                                     <span class="pending-dispatches-item">
-                                        <span class="pending-dispatches-qty">{{ number_format($item->quantity) }} trays</span>
+                                        <span class="pending-dispatches-qty">{{ number_format((int) ($item->loaded_quantity ?? 0)) }}/{{ number_format($item->quantity) }} trays</span>
                                         <span class="dsp-chip dsp-chip-{{ $chip }}">{{ $item->size }}</span>
                                     </span>
                                 @endforeach

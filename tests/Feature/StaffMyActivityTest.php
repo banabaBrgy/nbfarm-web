@@ -67,7 +67,7 @@ class StaffMyActivityTest extends TestCase
             ->get(route('manager.dashboard'))
             ->assertOk()
             ->assertSee('Pending Dispatches')
-            ->assertSee('Egg stock')
+            ->assertSee('Total Eggs Today')
             ->assertDontSee('id="trendView"', false)
             ->assertDontSee('Seven-Day Forecast')
             ->assertDontSee('My Activity');

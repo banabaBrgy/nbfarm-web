@@ -66,7 +66,26 @@ class SecurityHardeningTest extends TestCase
         $this->get(route('forgot.verify.form'))
             ->assertOk()
             ->assertDontSee('Username not found')
+            ->assertSee('Security question')
             ->assertSee('g-recaptcha', false);
+    }
+
+    public function test_verify_form_shows_the_account_security_question(): void
+    {
+        User::factory()->create([
+            'username' => 'owner1',
+            'security_question' => 'Pet name?',
+            'security_answer' => User::hashSecurityAnswer('Bluebird'),
+        ]);
+
+        $this->post(route('forgot.check'), ['username' => 'owner1'])
+            ->assertRedirect(route('forgot.verify.form'));
+
+        $this->get(route('forgot.verify.form'))
+            ->assertOk()
+            ->assertSee('Security question')
+            ->assertSee('Pet name?')
+            ->assertSee('Security answer');
     }
 
     public function test_account_without_a_security_answer_cannot_be_reset(): void

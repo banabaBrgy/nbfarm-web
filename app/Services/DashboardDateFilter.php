@@ -208,6 +208,29 @@ class DashboardDateFilter
         return $this->end->toDateString();
     }
 
+    /**
+     * Equal-length window immediately before this filter.
+     * Example: Nov 1–17 → Oct 15–31; a single day → the day before.
+     *
+     * @return array{0: string, 1: string}
+     */
+    public function previousWindow(): array
+    {
+        $length = (int) $this->start->diffInDays($this->end);
+        $previousEnd = $this->start->copy()->subDay();
+        $previousStart = $previousEnd->copy()->subDays($length);
+
+        return [
+            $previousStart->toDateString(),
+            $previousEnd->toDateString(),
+        ];
+    }
+
+    public function previousAsOf(): Carbon
+    {
+        return $this->start->copy()->subDay();
+    }
+
     public function subtitle(): string
     {
         if ($this->isToday()) {

@@ -36,7 +36,7 @@
 
         $predictedEggs = $predictedEggs ?? 0;
         $overviewSubtitle = $overviewSubtitle ?? "Welcome back! Here's today's poultry farm overview.";
-        $eggsTitle = 'Egg stock';
+        $eggsTitle = $eggsTitle ?? (($dateFilter['isToday'] ?? true) ? 'Total Eggs Today' : 'Total Eggs');
         $predictedSubtitle = ($dateFilter['isToday'] ?? true)
             ? 'Next-day forecast · tap for stats.'
             : ($predictedSubtitle ?? 'Forecast · tap for stats.');
@@ -69,7 +69,7 @@
     <div class="stats-grid">
 
 
-        {{-- EGG STOCK --}}
+        {{-- EGG PRODUCTION --}}
         <div class="stat-card stat-card--eggs">
 
             <div class="stat-icon">

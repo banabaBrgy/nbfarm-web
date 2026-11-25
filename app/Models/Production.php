@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class Production extends Model
 {
@@ -103,7 +104,7 @@ class Production extends Model
 
     /**
      * Eggs on hand for the last 7 harvest days (not the 3-year archive).
-     * Existing dispatch trays in the same window are reserved.
+     * Loaded/scanned dispatch trays in the same window are deducted.
      */
     public static function leftoverStock(DateTimeInterface|string|null $asOf = null): int
     {
@@ -111,12 +112,75 @@ class Production extends Model
     }
 
     /**
-     * Return remaining egg stock by size after reserved dispatch trays.
+     * Physical remaining egg stock by size after owner-scanned (loaded) trays.
+     * Pending ordered trays that are not yet scanned do not reduce this.
      *
      * @return array<string, int>
      */
     public static function availableEggStockBySize(DateTimeInterface|string|null $asOf = null): array
     {
+        return static::eggStockAfterTrayDeduction(
+            static::loadedDispatchTraysBySize($asOf),
+            $asOf,
+        );
+    }
+
+    /**
+     * Whole trays still physically available (after loaded/scanned deduct).
+     *
+     * @return array<string, int>
+     */
+    public static function availableDispatchTraysBySize(
+        DateTimeInterface|string|null $asOf = null
+    ): array {
+        return array_map(
+            static fn (int $eggs): int => intdiv($eggs, self::EGGS_PER_TRAY),
+            static::availableEggStockBySize($asOf)
+        );
+    }
+
+    /**
+     * Trays that can still be promised on new Pending orders.
+     * Counts full ordered quantities so Pending orders cannot oversell stock.
+     *
+     * @return array<string, int>
+     */
+    public static function promiseableDispatchTraysBySize(
+        DateTimeInterface|string|null $asOf = null
+    ): array {
+        return array_map(
+            static fn (int $eggs): int => intdiv($eggs, self::EGGS_PER_TRAY),
+            static::eggStockAfterTrayDeduction(
+                static::orderedDispatchTraysBySize($asOf),
+                $asOf,
+            )
+        );
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public static function loadedDispatchTraysBySize(DateTimeInterface|string|null $asOf = null): array
+    {
+        return static::dispatchTraysBySize('loaded_quantity', $asOf);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public static function orderedDispatchTraysBySize(DateTimeInterface|string|null $asOf = null): array
+    {
+        return static::dispatchTraysBySize('quantity', $asOf);
+    }
+
+    /**
+     * @param  array<string, int|float|string>  $traysBySize
+     * @return array<string, int>
+     */
+    private static function eggStockAfterTrayDeduction(
+        array $traysBySize,
+        DateTimeInterface|string|null $asOf = null,
+    ): array {
         [$start, $end] = static::stockWindow($asOf);
         $columns = implode(', ', array_map(
             static fn (string $column): string => "COALESCE(SUM({$column}), 0) as {$column}",
@@ -128,21 +192,12 @@ class Production extends Model
             ->selectRaw($columns)
             ->first();
 
-        $reserved = DB::table('dispatches')
-            ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
-            ->whereDate('dispatches.dispatch_date', '>=', $start)
-            ->whereDate('dispatches.dispatch_date', '<=', $end)
-            ->select('dispatch_items.size')
-            ->selectRaw('COALESCE(SUM(dispatch_items.quantity), 0) as trays')
-            ->groupBy('dispatch_items.size')
-            ->pluck('trays', 'size');
-
         $available = [];
         foreach (self::EGG_SIZE_COLUMNS as $size => $column) {
             $available[$size] = max(
                 0,
                 (int) ($harvested->{$column} ?? 0)
-                - ((int) ($reserved[$size] ?? 0) * self::EGGS_PER_TRAY)
+                - ((int) ($traysBySize[$size] ?? 0) * self::EGGS_PER_TRAY)
             );
         }
 
@@ -150,17 +205,29 @@ class Production extends Model
     }
 
     /**
-     * Return whole-tray stock available by egg size.
-     *
      * @return array<string, int>
      */
-    public static function availableDispatchTraysBySize(
-        DateTimeInterface|string|null $asOf = null
+    private static function dispatchTraysBySize(
+        string $column,
+        DateTimeInterface|string|null $asOf = null,
     ): array {
-        return array_map(
-            static fn (int $eggs): int => intdiv($eggs, self::EGGS_PER_TRAY),
-            static::availableEggStockBySize($asOf)
-        );
+        [$start, $end] = static::stockWindow($asOf);
+        $qtyColumn = $column === 'loaded_quantity' ? 'loaded_quantity' : 'quantity';
+
+        if ($qtyColumn === 'loaded_quantity' && ! Schema::hasColumn('dispatch_items', 'loaded_quantity')) {
+            $qtyColumn = 'quantity';
+        }
+
+        return DB::table('dispatches')
+            ->join('dispatch_items', 'dispatches.id', '=', 'dispatch_items.dispatch_id')
+            ->whereDate('dispatches.dispatch_date', '>=', $start)
+            ->whereDate('dispatches.dispatch_date', '<=', $end)
+            ->select('dispatch_items.size')
+            ->selectRaw('COALESCE(SUM(dispatch_items.'.$qtyColumn.'), 0) as trays')
+            ->groupBy('dispatch_items.size')
+            ->pluck('trays', 'size')
+            ->map(fn ($trays): int => (int) $trays)
+            ->all();
     }
 
     /**
